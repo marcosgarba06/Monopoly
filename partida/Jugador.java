@@ -3,6 +3,8 @@ package partida;
 import java.util.ArrayList;
 
 import monopoly.*;
+
+import javax.print.attribute.standard.MediaSize;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -39,7 +41,10 @@ public class Jugador {
      */
     public Jugador(String nombre, String tipoAvatar, Casilla inicio, ArrayList<Avatar> avCreados) {
         this.nombre = nombre;
-        this.avatar = avatar;
+
+        Avatar nuevoAvatar = new Avatar(tipoAvatar,null, inicio, avCreados);
+        this.avatar = nuevoAvatar;
+        avCreados.add(nuevoAvatar); //se añade al arraylist como metodo para comprobar que el avatar no se repite
 
         this.fortuna = Valor.FORTUNA_INICIAL;
         this.gastos = 0;
@@ -48,12 +53,9 @@ public class Jugador {
         this.tiradasCarcel = 0;
         this.propiedades = new ArrayList<>();
 
-
-
-
-
-
     }
+
+
 
     //Otros métodos:
     //Método para añadir una propiedad al jugador. Como parámetro, la casilla a añadir.

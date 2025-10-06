@@ -2,7 +2,7 @@ package monopoly;
 
 import java.util.ArrayList;
 import partida.*;
-
+//En menu estan definidas lo que serian en C las variables globales, menu tiene la informacion de la partida
 public class Menu {
 
     //Atributos
@@ -10,16 +10,21 @@ public class Menu {
     private ArrayList<Avatar> avatares; //Avatares en la partida.
     private int turno = 0; //Índice correspondiente a la posición en el arrayList del jugador (y el avatar) que tienen el turno
     private int lanzamientos; //Variable para contar el número de lanzamientos de un jugador en un turno.
-    private Tablero tablero; //Tablero en el que se juega.
+    //private Tablero tablero; //Tablero en el que se juega.
     private Dado dado1; //Dos dados para lanzar y avanzar casillas.
     private Dado dado2;
     private Jugador banca; //El jugador banca.
     private boolean tirado; //Booleano para comprobar si el jugador que tiene el turno ha tirado o no.
     private boolean solvente; //Booleano para comprobar si el jugador que tiene el turno es solvente, es decir, si ha pagado sus deudas.
 
+    //Se puede empezar el juego en Menu tambien
+    public Menu(){
+        iniciarPartida();
+    }
 
     // Método para inciar una partida: crea los jugadores y avatares.
     private void iniciarPartida() {
+
     }
     
     /*Método que interpreta el comando introducido y toma la accion correspondiente.
