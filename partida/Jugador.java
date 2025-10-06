@@ -3,6 +3,8 @@ package partida;
 import java.util.ArrayList;
 
 import monopoly.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 
 public class Jugador {
@@ -13,12 +15,21 @@ public class Jugador {
     private float fortuna; //Dinero que posee.
     private float gastos; //Gastos realizados a lo largo del juego.
     private boolean enCarcel; //Será true si el jugador está en la carcel
-    private int tiradasCarcel; //Cuando está en la carcel, contará las tiradas sin éxito que ha hecho allí para intentar salir (se usa para limitar el numero de intentos).
+    private int tiradasCarcel; //Cuando está en la carcel, contará las tiradas sin éxito que ha hecho allí para intentar salir (se usa para limitar el número de intentos).
     private int vueltas; //Cuenta las vueltas dadas al tablero.
     private ArrayList<Casilla> propiedades; //Propiedades que posee el jugador.
 
     //Constructor vacío. Se usará para crear la banca.
-    public Jugador() {
+    public Jugador()  {
+        this.nombre = "BANCA";
+        this.avatar = null; // no juega la banca
+        this.fortuna = Valor.FORTUNA_BANCA; // tiene dinero infinito
+        this.gastos = 0;
+        this.enCarcel = false;
+        this.tiradasCarcel = 0;
+        this.vueltas = 0;
+        this.propiedades = new ArrayList<>();
+
     }
 
     /*Constructor principal. Requiere parámetros:
@@ -27,11 +38,26 @@ public class Jugador {
     * que dos avatares tengan mismo ID). Desde este constructor también se crea el avatar.
      */
     public Jugador(String nombre, String tipoAvatar, Casilla inicio, ArrayList<Avatar> avCreados) {
+        this.nombre = nombre;
+        this.avatar = avatar;
+
+        this.fortuna = Valor.FORTUNA_INICIAL;
+        this.gastos = 0;
+        this.enCarcel = false;
+        this.vueltas = 0;
+        this.tiradasCarcel = 0;
+        this.propiedades = new ArrayList<>();
+
+
+
+
+
+
     }
 
     //Otros métodos:
     //Método para añadir una propiedad al jugador. Como parámetro, la casilla a añadir.
-    public void anhadirPropiedad(Casilla casilla) {
+    public void anadirPropiedad(Casilla casilla) {
     }
 
     //Método para eliminar una propiedad del arraylist de propiedades de jugador.
@@ -41,6 +67,7 @@ public class Jugador {
     //Método para añadir fortuna a un jugador
     //Como parámetro se pide el valor a añadir. Si hay que restar fortuna, se pasaría un valor negativo.
     public void sumarFortuna(float valor) {
+
     }
 
     //Método para sumar gastos a un jugador.
