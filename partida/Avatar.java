@@ -126,8 +126,23 @@ public class Avatar {
             }
         }
     }
-    public String toString() {
-        String pos = (lugar != null) ? lugar.getNombre() : "sin posición";
-        return tipo + " (ID: " + id + ", en " + pos + ")";
+    private int posicion;// se guarda en que asilla esta el avatar en el tablero, del 0 añl 39
+    private boolean enCarcel;//indica si true encarcelado o false libre
+
+    public void setPosicion(int i) {//actualiza la posicion del avatar en el tablero
+        this.posicion = i;
     }
+
+    public void setEnCarcel(boolean b) {
+        this.enCarcel = b;
+    }
+
+    public int getPosicion() {
+        return posicion;
+    }
+
+    public boolean isEnCarcel() {
+        return enCarcel;
+    }
+
 }

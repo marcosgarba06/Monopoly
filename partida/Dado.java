@@ -18,7 +18,7 @@ public class Dado {
         return valor1 == valor2;
     }
 
-    // Lanzamiento forzado de los dados
+    // Método para el lanzamiento forzado de los dados
     public int[] forzarDados(int dado1, int dado2) {
         valor1 = dado1;
         valor2 = dado2;
