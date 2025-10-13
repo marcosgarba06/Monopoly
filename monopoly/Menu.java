@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.*;
 
 import partida.*;
 //En menu estan definidas lo que serian en C las variables globales, menu tiene la informacion de la partida
@@ -124,6 +126,41 @@ public class Menu {
 
     // Método que realiza las acciones asociadas al comando 'listar jugadores'.
     private void listarJugadores() {
+        if (jugadores == null || jugadores.isEmpty()) {
+            System.out.println("No hay jugadores en la partida.");
+            return;
+        }
+
+        System.out.println("$> listar jugadores");
+
+        for (int i = 0; i < jugadores.size(); i++) {
+            Jugador j = jugadores.get(i);
+
+            System.out.println("{");
+            System.out.println("nombre: " + j.getNombre() + ",");
+            System.out.println("avatar: " + (j.getAvatar() != null ? j.getAvatar().toString() : "-") + ",");
+            System.out.println("fortuna: " + (long) j.getFortuna() + ",");
+
+            // Propiedades
+            if (j.getPropiedades().isEmpty()) {
+                System.out.println("propiedades: -,");
+            } else {
+                String props = j.getPropiedades().stream().map(Casilla::getNombre).collect(Collectors.joining(", "));
+                System.out.println("propiedades: [" + props + "],");
+            }
+
+            // Hipotecas y edificios: de momento no tienes listas en Jugador,
+            // así que mostramos "-" como placeholder
+            System.out.println("hipotecas: -,");
+            System.out.println("edificios: -");
+
+            System.out.print("}");
+            if (i < jugadores.size() - 1) {
+                System.out.println(","); // coma entre jugadores
+            } else {
+                System.out.println();
+            }
+        }
     }
 
     // Método que realiza las acciones asociadas al comando 'listar avatares'.
