@@ -4,6 +4,12 @@ import partida.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+
+
+
+
+
+
 /*
 public class Tablero {
     //Atributos.
