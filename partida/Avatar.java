@@ -145,4 +145,9 @@ public class Avatar {
         return enCarcel;
     }
 
+    public String toString() {
+        String pos = (lugar != null) ? lugar.getNombre() : "sin posición";
+        return tipo + " (ID: " + id + ", en " + pos + ")";
+    }
+
 }
