@@ -119,5 +119,35 @@ public class Jugador {
         this.tiradasCarcel = 0;
         // mover la  casilla a la carcel
     }
+    public void pagar(float cantidad, Jugador receptor) {
+        if (fortuna >= cantidad) {
+            this.fortuna -= cantidad;
+            this.gastos += cantidad;
+            receptor.sumarFortuna(cantidad);
+        } else {
+            // lógica si no tiene suficiente dinero (puede hipotecar, vender, etc.)
+            System.out.println(nombre + " no tiene suficiente dinero para pagar " + cantidad);
+        }
+    }
+    public void cobrar(float cantidad, Jugador pagador) {
+        this.fortuna += cantidad;
+        pagador.sumarGastos(cantidad);
+    }
+
+    public void robarCarta(String tipo) {
+        System.out.println(nombre + " roba una carta de tipo " + tipo);
+        // Aquí podrías invocar un método de Mazo para aplicar el efecto
+    }
+
+    public void irACarcel() {
+        this.enCarcel = true;
+        this.tiradasCarcel = 0;
+        avatar.setPosicion(10); // suponiendo que la cárcel está en la casilla 10
+        avatar.setEnCarcel(true);
+        System.out.println(nombre + " ha sido enviado a la cárcel.");
+    }
+
+
+
 
 }
