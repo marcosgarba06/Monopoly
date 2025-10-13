@@ -6,5 +6,6 @@ public class MonopolyETSE {
         Menu menu = new Menu();
 
         //Se puede definir aqui el  bucle interactivo o definir el Menu y crear el juego ahi dentro
+
     }
 }

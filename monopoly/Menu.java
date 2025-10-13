@@ -1,6 +1,10 @@
 package monopoly;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
+
 import partida.*;
 //En menu estan definidas lo que serian en C las variables globales, menu tiene la informacion de la partida
 public class Menu {
@@ -24,7 +28,56 @@ public class Menu {
 
     // Método para inciar una partida: crea los jugadores y avatares.
     private void iniciarPartida() {
+        this.jugadores = new ArrayList<>();
+        this.avatares = new ArrayList<>();
+        this.dado1 = new Dado();
+        this.dado2 = new Dado();
+        this.banca = new Jugador();
+        int numJugadores;
 
+        Set<String> nombresUsados = new HashSet<>();
+        Set<String> avataresUsados = new HashSet<>();
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Cuantos jugadores van a participar (1-4): \n");
+        numJugadores = sc.nextInt();
+        sc.nextLine();
+
+        for (int i = 0; i < numJugadores; i++) {
+            // --- pedir nombre hasta que sea válido ---
+            String nombre;
+            while (true) {
+                System.out.println("Introduce el nombre del jugador " + (i+1) + ":");
+                nombre = sc.nextLine();
+                if (nombresUsados.add(nombre.toLowerCase())) {
+                    break; // nombre válido
+                } else {
+                    System.out.println("Ese nombre ya está en uso. Intenta con otro.");
+                }
+            }
+
+            // --- pedir avatar hasta que sea válido ---
+            String avatar;
+            while (true) {
+                System.out.println("Elige tipo de avatar (Coche, Sombrero, Esfinge, Pelota):");
+                avatar = sc.nextLine();
+                if (avataresUsados.add(avatar.toLowerCase())) {
+                    break; // avatar válido
+                } else {
+                    System.out.println("Ese avatar ya está en uso. Elige otro.");
+                }
+            }
+
+            // Aquí deberías pasar la casilla de salida real de tu tablero
+            Casilla salida = null; // TODO: sustituir por tablero.getSalida()
+
+            Jugador j = new Jugador(nombre, avatar, salida, avatares);
+            jugadores.add(j);
+
+            System.out.println("Jugador " + nombre + " creado con avatar " + avatar);
+        }
+        System.out.println("Jugadores creados correctamente.\n");
     }
     
     /*Método que interpreta el comando introducido y toma la accion correspondiente.
