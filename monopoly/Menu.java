@@ -42,7 +42,7 @@ public class Menu {
 
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("Cuantos jugadores van a participar (1-4): \n");
+        System.out.println("Cuantos jugadores van a participar (1-4): ");
         numJugadores = sc.nextInt();
         sc.nextLine();
 
@@ -125,7 +125,7 @@ public class Menu {
     }
 
     // Método que realiza las acciones asociadas al comando 'listar jugadores'.
-    private void listarJugadores() {
+    public void listarJugadores() {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
             return;
