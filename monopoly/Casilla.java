@@ -128,6 +128,7 @@ public class Casilla {
                 if (renta > 0f) {
                     actual.pagar(renta, this.duenho);    // actual paga al dueño
                 }
+                return true;
             case "Suerte":
                 actual.robarCarta("Suerte");
                 return true;
@@ -145,7 +146,6 @@ public class Casilla {
             default:
                 return true;
         }
-        return true;
     }
 
     private float evaluarAlquiler(int tirada) {
@@ -160,7 +160,6 @@ public class Casilla {
                 return 0f;
         }
     }
-
 
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
         // Aquí pondrás la lógica de compra
