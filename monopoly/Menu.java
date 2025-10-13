@@ -5,30 +5,28 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.*;
 
 import partida.*;
-//En menu estan definidas lo que serian en C las variables globales, menu tiene la informacion de la partida
+
 public class Menu {
 
-    //Atributos
-    private ArrayList<Jugador> jugadores; //Jugadores de la partida.
-    private ArrayList<Avatar> avatares; //Avatares en la partida.
-    private int turno = 0; //Índice correspondiente a la posición en el arrayList del jugador (y el avatar) que tienen el turno
-    private int lanzamientos; //Variable para contar el número de lanzamientos de un jugador en un turno.
-    //private Tablero tablero; //Tablero en el que se juega.
-    private Dado dado1; //Dos dados para lanzar y avanzar casillas.
+    // Atributos
+    private Tablero tablero;
+    private ArrayList<Jugador> jugadores;
+    private ArrayList<Avatar> avatares;
+    private int turno = 0;
+    private int lanzamientos;
+    private Dado dado1;
     private Dado dado2;
-    private Jugador banca; //El jugador banca.
-    private boolean tirado; //Booleano para comprobar si el jugador que tiene el turno ha tirado o no.
-    private boolean solvente; //Booleano para comprobar si el jugador que tiene el turno es solvente, es decir, si ha pagado sus deudas.
+    private Jugador banca;
+    private boolean tirado;
+    private boolean solvente;
 
-    //Se puede empezar el juego en Menu tambien
-    public Menu(){
+    public Menu(Tablero tablero) {
+        this.tablero = tablero;
         iniciarPartida();
     }
 
-    // Método para inciar una partida: crea los jugadores y avatares.
     private void iniciarPartida() {
         this.jugadores = new ArrayList<>();
         this.avatares = new ArrayList<>();
@@ -47,84 +45,125 @@ public class Menu {
         sc.nextLine();
 
         for (int i = 0; i < numJugadores; i++) {
-            // --- pedir nombre hasta que sea válido ---
             String nombre;
             while (true) {
-                System.out.println("Introduce el nombre del jugador " + (i+1) + ":");
+                System.out.println("Introduce el nombre del jugador " + (i + 1) + ":");
                 nombre = sc.nextLine();
                 if (nombresUsados.add(nombre.toLowerCase())) {
-                    break; // nombre válido
+                    break;
                 } else {
                     System.out.println("Ese nombre ya está en uso. Intenta con otro.");
                 }
             }
 
-            // --- pedir avatar hasta que sea válido ---
             String avatar;
             while (true) {
                 System.out.println("Elige tipo de avatar (Coche, Sombrero, Esfinge, Pelota):");
                 avatar = sc.nextLine();
                 if (avataresUsados.add(avatar.toLowerCase())) {
-                    break; // avatar válido
+                    break;
                 } else {
                     System.out.println("Ese avatar ya está en uso. Elige otro.");
                 }
             }
 
-            // Aquí deberías pasar la casilla de salida real de tu tablero
             Casilla salida = null; // TODO: sustituir por tablero.getSalida()
-
             Jugador j = new Jugador(nombre, avatar, salida, avatares);
             jugadores.add(j);
 
             System.out.println("Jugador " + nombre + " creado con avatar " + avatar);
         }
+
         System.out.println("Jugadores creados correctamente.\n");
     }
-    
-    /*Método que interpreta el comando introducido y toma la accion correspondiente.
-    * Parámetro: cadena de caracteres (el comando).
-    */
-    private void analizarComando(String comando) {
+
+    private void indicarTurno() {
+        if (jugadores == null || jugadores.isEmpty()) {
+            System.out.println("No hay jugadores en la partida.");
+            return;
+        }
+
+        Jugador actual = jugadores.get(turno);
+        System.out.println("$> jugador");
+        System.out.println("{");
+        System.out.println("nombre: " + actual.getNombre() + ",");
+        System.out.println("avatar: " + actual.getAvatar().getId());
+        System.out.println("}");
     }
 
-    /*Método que realiza las acciones asociadas al comando 'describir jugador'.
-    * Parámetro: comando introducido
-     */
+    public void analizarComando(String comando) {
+        comando = comando.trim().toLowerCase();
+        String[] partes = comando.split(" ");
+
+        if (comando.equals("listar jugadores") || comando.equals("jugadores")) {
+            listarJugadores();
+        } else if (comando.equals("ver tablero")) {
+            System.out.println(tablero);
+        } else if (comando.equals("salir")) {
+            System.out.println("Saliendo del juego...");
+            System.exit(0);
+        } else if (comando.equals("jugador")) {
+            indicarTurno();
+        } else if (partes.length >= 3 && partes[0].equals("describir") && partes[1].equals("jugador")) {
+            descJugador(partes);
+        } else if (comando.equals("acabar turno")) {
+            acabarTurno();
+        } else {
+            System.out.println("Comando no reconocido. Prueba con 'listar jugadores', 'jugador', 'acabar turno', 'ver tablero', 'describir jugador <nombre>' o 'salir'.");
+        }
+    }
+
     private void descJugador(String[] partes) {
+        if (partes.length < 3) {
+            System.out.println("Uso: describir jugador <nombre>");
+            return;
+        }
+
+        String nombreBuscado = partes[2].toLowerCase();
+
+        for (Jugador j : jugadores) {
+            if (j.getNombre().toLowerCase().equals(nombreBuscado)) {
+                System.out.println("$> describir jugador " + j.getNombre());
+                System.out.println("{");
+                System.out.println("nombre: " + j.getNombre() + ",");
+                System.out.println("avatar: " + j.getAvatar().getId() + ",");
+                System.out.println("fortuna: " + (long) j.getFortuna() + ",");
+
+                if (j.getPropiedades().isEmpty()) {
+                    System.out.println("propiedades: -,");
+                } else {
+                    String props = j.getPropiedades().stream().map(Casilla::getNombre).collect(Collectors.joining(", "));
+                    System.out.println("propiedades: [" + props + "],");
+                }
+
+                System.out.println("hipotecas: -,");
+                System.out.println("edificios: -");
+                System.out.println("}");
+                return;
+            }
+        }
+
+        System.out.println("No se encontró ningún jugador con el nombre '" + nombreBuscado + "'.");
     }
 
-    /*Método que realiza las acciones asociadas al comando 'describir avatar'.
-    * Parámetro: id del avatar a describir.
-    */
     private void descAvatar(String ID) {
     }
 
-    /* Método que realiza las acciones asociadas al comando 'describir nombre_casilla'.
-    * Parámetros: nombre de la casilla a describir.
-    */
     private void descCasilla(String nombre) {
     }
 
-    //Método que ejecuta todas las acciones relacionadas con el comando 'lanzar dados'.
     private void lanzarDados() {
     }
 
-    /*Método que ejecuta todas las acciones realizadas con el comando 'comprar nombre_casilla'.
-    * Parámetro: cadena de caracteres con el nombre de la casilla.
-     */
     private void comprar(String nombre) {
     }
 
-    //Método que ejecuta todas las acciones relacionadas con el comando 'salir carcel'. 
     private void salirCarcel() {
     }
 
-    // Método que realiza las acciones asociadas al comando 'listar enventa'.
     private void listarVenta() {
     }
 
-    // Método que realiza las acciones asociadas al comando 'listar jugadores'.
     public void listarJugadores() {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
@@ -141,7 +180,6 @@ public class Menu {
             System.out.println("avatar: " + (j.getAvatar() != null ? j.getAvatar().toString() : "-") + ",");
             System.out.println("fortuna: " + (long) j.getFortuna() + ",");
 
-            // Propiedades
             if (j.getPropiedades().isEmpty()) {
                 System.out.println("propiedades: -,");
             } else {
@@ -149,26 +187,35 @@ public class Menu {
                 System.out.println("propiedades: [" + props + "],");
             }
 
-            // Hipotecas y edificios: de momento no tienes listas en Jugador,
-            // así que mostramos "-" como placeholder
             System.out.println("hipotecas: -,");
             System.out.println("edificios: -");
 
             System.out.print("}");
             if (i < jugadores.size() - 1) {
-                System.out.println(","); // coma entre jugadores
+                System.out.println(",");
             } else {
                 System.out.println();
             }
         }
     }
 
-    // Método que realiza las acciones asociadas al comando 'listar avatares'.
     private void listarAvatares() {
     }
 
-    // Método que realiza las acciones asociadas al comando 'acabar turno'.
     private void acabarTurno() {
-    }
+        if (jugadores == null || jugadores.isEmpty()) {
+            System.out.println("No hay jugadores en la partida.");
+            return;
+        }
 
+        turno = (turno + 1) % jugadores.size(); // Avanza al siguiente jugador, vuelve a 0 si llega al final
+
+        Jugador actual = jugadores.get(turno);
+        System.out.println("Turno acabado. Ahora le toca a:");
+        System.out.println("$> jugador");
+        System.out.println("{");
+        System.out.println("nombre: " + actual.getNombre() + ",");
+        System.out.println("avatar: " + actual.getAvatar().getId());
+        System.out.println("}");
+    }
 }

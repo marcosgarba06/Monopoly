@@ -162,7 +162,26 @@ public class Casilla {
     }
 
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
-        // Aquí pondrás la lógica de compra
+        // Solo se puede comprar si la casilla es de tipo comprable y no tiene dueño
+        if ((tipo.equals("Solar") || tipo.equals("Servicio") || tipo.equals("Transporte")) && duenho == null) {
+            // Verificamos si el jugador tiene suficiente dinero
+            if (solicitante.getFortuna() >= valor) {
+                // El jugador paga a la banca
+                solicitante.pagar(valor, banca);
+
+                // Se asigna el nuevo dueño
+                setDuenho(solicitante);
+
+                // Se añade la propiedad al jugador
+                solicitante.anadirPropiedad(this);
+
+                System.out.println(solicitante.getNombre() + " ha comprado la casilla " + nombre + " por " + valor);
+            } else {
+                System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + nombre);
+            }
+        } else {
+            System.out.println("La casilla " + nombre + " no está disponible para compra.");
+        }
     }
 
     public String infoCasilla() {
