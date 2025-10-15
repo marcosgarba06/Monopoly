@@ -147,7 +147,4 @@ public class Jugador {
         System.out.println(nombre + " ha sido enviado a la cárcel.");
     }
 
-
-
-
 }
