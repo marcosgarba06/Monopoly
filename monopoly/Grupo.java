@@ -14,8 +14,14 @@ class Grupo {
     //Constructor vacío.
     public Grupo(String colorGrupo) {
         this.miembros = new ArrayList<>();
-        this.colorGrupo = "";
+        this.colorGrupo = colorGrupo;
         this.numCasillas = 0;
+    }
+
+
+
+    public String getColorGrupo() {
+        return colorGrupo;
     }
 
     /*Constructor para cuando el grupo está formado por DOS CASILLAS:
@@ -73,9 +79,6 @@ class Grupo {
         return miembros;
     }
 
-    public String getColorGrupo() {
-        return colorGrupo;
-    }
 
     public String getNombre() {
         return colorGrupo;

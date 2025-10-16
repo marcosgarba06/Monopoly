@@ -11,7 +11,7 @@ import partida.*;
 public class Menu {
 
     // Atributos
-    private Tablero tablero;
+    private final Tablero tablero;
     private ArrayList<Jugador> jugadores;
     private ArrayList<Avatar> avatares;
     private int turno = 0;
@@ -140,6 +140,7 @@ public class Menu {
         if (comando.equals("listar jugadores") || comando.equals("jugadores")) {
             listarJugadores();
         } else if (comando.equals("ver tablero")) {
+
             System.out.println(tablero);
         } else if (comando.equals("salir")) {
             System.out.println("Saliendo del juego...");

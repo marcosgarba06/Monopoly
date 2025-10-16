@@ -202,19 +202,20 @@ public class Tablero {
     // Colores ANSI simples por grupo
     private String colorTexto(String texto, String colorGrupo) {
         if (colorGrupo == null) return texto;
-        String k = colorGrupo.toLowerCase(); // normalizamos
+        String k = colorGrupo.toLowerCase();
         switch (k) {
-            case "negro":   return "\u001B[30m" + texto + "\u001B[0m";
-            case "cian":    return "\u001B[36m" + texto + "\u001B[0m";
-            case "magenta": return "\u001B[35m" + texto + "\u001B[0m";
-            case "amarillo":return "\u001B[33m" + texto + "\u001B[0m";
-            case "rojo":    return "\u001B[31m" + texto + "\u001B[0m";
-            case "marron":  return "\u001B[33m" + texto + "\u001B[0m"; // aproximación
-            case "verde":   return "\u001B[32m" + texto + "\u001B[0m";
-            case "azul":    return "\u001B[34m" + texto + "\u001B[0m";
+            case "negro":   return "\033[0;30m" + texto + "\033[0m";
+            case "cian":    return "\033[0;36m" + texto + "\033[0m";
+            case "magenta": return "\033[0;35m" + texto + "\033[0m";
+            case "amarillo":return "\033[0;33m" + texto + "\033[0m";
+            case "rojo":    return "\033[0;31m" + texto + "\033[0m";
+            case "marron":  return "\033[0;33m" + texto + "\033[0m"; // marrón ≈ amarillo
+            case "verde":   return "\033[0;32m" + texto + "\033[0m";
+            case "azul":    return "\033[0;34m" + texto + "\033[0m";
             default:        return texto;
         }
     }
+
 
     @Override
     public String toString() {
