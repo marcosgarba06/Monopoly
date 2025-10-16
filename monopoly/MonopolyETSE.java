@@ -1,9 +1,11 @@
 package monopoly;
 
+
+//ERRORES: me deja escoger el avatar por pantalla que quiera, sin ser uno de esos 4
+
+
 import java.util.Scanner;
 import partida.Jugador;
-import partida.Dado;
-import partida.Avatar;
 
 public class MonopolyETSE {
 
@@ -21,7 +23,7 @@ public class MonopolyETSE {
 
         boolean continuar = true;
         while (continuar) {
-            System.out.println("Comandos disponibles: 'listar jugadores', 'jugador', 'acabar turno', 'ver tablero', 'describir <casilla>', 'describir jugador <nombre>', 'listar avatares', 'listar venta', 'tirar dado', 'comprar <casilla>', 'salir carcel' o 'salir'");
+            System.out.println("Comandos disponibles: 'listar jugadores', 'jugador', 'acabar turno', 'ver tablero', 'describir <casilla>', 'describir jugador <nombre>', 'listar venta', 'tirar dado', 'salir carcel' o 'salir'");
             System.out.print("> ");
             String comando = sc.nextLine().trim();
 

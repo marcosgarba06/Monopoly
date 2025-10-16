@@ -1,68 +1,25 @@
-//package partida;
-//
-//
-//import monopoly.*;
-//
-//import java.util.ArrayList;
-//
-//
-//public class Avatar {
-//
-//    //Atributos
-//    private String id; //Identificador: una letra generada aleatoriamente.
-//    private String tipo; //Sombrero, Esfinge, Pelota, Coche
-//    private Jugador jugador; //Un jugador al que pertenece ese avatar.
-//    private Casilla lugar; //Los avatares se sitúan en casillas del tablero.
-//
-//    //Constructor vacío
-//    public Avatar() {
-//    }
-//
-//    /*Constructor principal. Requiere éstos parámetros:
-//    * Tipo del avatar, jugador al que pertenece, lugar en el que estará ubicado, y un arraylist con los
-//    * avatares creados (usado para crear un ID distinto del de los demás avatares).
-//     */
-//    public Avatar(String tipo, Jugador jugador, Casilla lugar, ArrayList<Avatar> avCreados) {
-//        this.tipo = tipo;
-//        this.jugador = jugador;
-//        this. lugar = null;
-//    }
-//
-//    //A continuación, tenemos otros métodos útiles para el desarrollo del juego.
-//    /*Método que permite mover a un avatar a una casilla concreta. Parámetros:
-//    * - Un array con las casillas del tablero. Se trata de un arrayList de arrayList de casillas (uno por lado).
-//    * - Un entero que indica el numero de casillas a moverse (será el valor sacado en la tirada de los dados).
-//    * EN ESTA VERSIÓN SUPONEMOS QUE valorTirada siemrpe es positivo.
-//     */
-//    public void moverAvatar(ArrayList<ArrayList<Casilla>> casillas, int valorTirada) {
-//    }
-//
-//    /*Método que permite generar un ID para un avatar. Sólo lo usamos en esta clase (por ello es privado).
-//    * El ID generado será una letra mayúscula. Parámetros:
-//    * - Un arraylist de los avatares ya creados, con el objetivo de evitar que se generen dos ID iguales.
-//     */
-//    private void generarId(ArrayList<Avatar> avCreados) {
-//
-//    }
-//}
 
 package partida;
 
 
 import monopoly.*;
 
-        import java.util.*;
+import java.util.*;
 
 
 public class Avatar {
 
-    //Atributos
+    //Atributos de la clase Avatar
     private String id; //Identificador: una letra generada aleatoriamente.
     private String tipo; //Sombrero, Esfinge, Pelota, Coche
     private Jugador jugador; //Un jugador al que pertenece ese avatar.
     private Casilla lugar; //Los avatares se sitúan en casillas del tablero.
+    private int posicion;// se guarda en que asilla esta el avatar en el tablero, del 0 añl 39
+    private boolean enCarcel;//indica si true encarcelado o false libre
+    private int turnosEnCarcel = 0;
+    private Casilla casilla;
 
-    //Constructor vacío
+    //Constructor vacío, esto permite crear un avatar sin inicializarlo
     public Avatar() {
 
     }
@@ -72,6 +29,7 @@ public class Avatar {
      * avatares creados (usado para crear un ID distinto del de los demás avatares).
      */
     public Avatar(String tipo, Jugador jugador, Casilla lugar, ArrayList<Avatar> avCreados){
+
         this.tipo = tipo;
         this.jugador = jugador;
         this.lugar = lugar;
@@ -88,53 +46,17 @@ public class Avatar {
      * EN ESTA VERSIÓN SUPONEMOS QUE valorTirada siemrpe es positivo.
      */
 
-    public String getId() {
-        return id;
-    }
-
-    public void mover(int pasos, Tablero tablero) {
-        int nuevaPos = (this.posicion + pasos) % 40; // tablero de 40 casillas
+    public void moverAvatar(int pasos, Tablero tablero) {
+        int nuevaPos = (this.posicion + pasos) % 40;
         this.posicion = nuevaPos;
 
-        Casilla nuevaCasilla = tablero.getCasilla(nuevaPos); // método que devuelve la casilla por índice
-        if (this.lugar != null) {
-            this.lugar.eliminarAvatar(this); // quita el avatar de la casilla anterior
-        }
+        Casilla nuevaCasilla = tablero.getCasilla(nuevaPos);
+        setCasilla(nuevaCasilla); // ← unifica y mantiene listas de avatares
 
-        this.lugar = nuevaCasilla;
-        nuevaCasilla.anhadirAvatar(this); // añade el avatar a la nueva casilla
-
-        System.out.println("El avatar " + id + " se ha movido a la casilla " + nuevaCasilla.getNombre());
-
-        nuevaCasilla.evaluar(jugador); // activa la casilla (si tiene lógica de compra, pago, etc.)
+        System.out.println("El avatar " + id + " ha avanzado hasta la casilla " + nuevaCasilla.getNombre());
+        nuevaCasilla.evaluarCasilla(jugador);
     }
 
-
-    public void moverAvatar(ArrayList<ArrayList<Casilla>> casillas, int valorTirada) {
-        // Aplanar la matriz de casillas en una lista lineal
-        ArrayList<Casilla> todas = new ArrayList<>();
-        for (ArrayList<Casilla> lado : casillas) {
-            todas.addAll(lado);
-        }
-
-        int nuevaPos = (this.posicion + valorTirada) % todas.size(); // calcula nueva posición
-        Casilla nuevaCasilla = todas.get(nuevaPos);
-
-        // Eliminar de la casilla actual
-        if (this.lugar != null) {
-            this.lugar.eliminarAvatar(this);
-        }
-
-        // Añadir a la nueva casilla
-        nuevaCasilla.anhadirAvatar(this);
-        this.lugar = nuevaCasilla;
-        this.posicion = nuevaPos;
-
-        System.out.println("El avatar " + id + " se ha movido a la casilla " + nuevaCasilla.getNombre());
-
-        // Evaluar la casilla
-        nuevaCasilla.evaluar(jugador);
-    }
 
 
     /*Método que permite generar un ID para un avatar. Sólo lo usamos en esta clase (por ello es privado).
@@ -168,32 +90,70 @@ public class Avatar {
             }
         }
     }
-    private int posicion;// se guarda en que asilla esta el avatar en el tablero, del 0 añl 39
-    private boolean enCarcel;//indica si true encarcelado o false libre
-
-    public void setPosicion(int i) {//actualiza la posicion del avatar en el tablero
-        this.posicion = i;
-    }
-
-    public void setEnCarcel(boolean b) {
-        this.enCarcel = b;
-    }
-
-    public int getPosicion() {
-        return posicion;
-    }
-
-    public boolean isEnCarcel() {
-        return enCarcel;
-    }
-
     public String toString() {
         String pos = (lugar != null) ? lugar.getNombre() : "sin posición";
         return tipo + " (ID: " + id + ", en " + pos + ")";
     }
 
+    /// SETERS Y GETTERS, acceden y modifican atributos provados
+
+    public void setPosicion(int i) {//actualiza la posicion del avatar en el tablero
+
+        this.posicion = i;
+    }
+
+    public void setEnCarcel(boolean b) {
+
+        this.enCarcel = b;
+    }
+
+    public int getPosicion() {
+
+        return posicion;
+    }
+
+    public String getId() {
+
+        return id;
+    }
 
     public Jugador getJugador() {
+
         return jugador;
     }
+
+    public boolean isEnCarcel() {
+
+        return enCarcel;
+
+    }
+
+    public void setCasilla(Casilla c) {
+        if (this.lugar != null) this.lugar.eliminarAvatar(this);
+        this.lugar = c;
+        this.casilla = c;
+        if (c != null) c.anhadirAvatar(this);
+    }
+
+
+    public boolean estaEnCarcel() {
+        return enCarcel;
+    }
+
+    public int getTurnosEnCarcel() {
+        return turnosEnCarcel;
+    }
+
+    public void setTurnosEnCarcel(int t) {
+        turnosEnCarcel = t;
+    }
+
+    public void incrementarTurnosEnCarcel() {
+        turnosEnCarcel++;
+    }
+
+    public Casilla getCasilla() {
+        return this.casilla;
+    }
+
 }

@@ -18,8 +18,6 @@ class Grupo {
         this.numCasillas = 0;
     }
 
-
-
     public String getColorGrupo() {
         return colorGrupo;
     }

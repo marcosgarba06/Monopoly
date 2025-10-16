@@ -7,232 +7,142 @@ public class Casilla {
 
     // Atributos
     private String nombre;
-    private String tipo;//Tipo de casilla (Solar, Especial, Transporte, Servicio, Comunidad).
+    private String tipo;       // Solar, Especial, Transporte, Servicio, Caja, Suerte, Impuesto
     private float valor;
     private int posicion;
-    private Jugador duenho;
+    private Jugador duenho;    // Propietario (usa solo este, evita "propietario")
     private Grupo grupo;
     private float impuesto;
-    private Jugador propietario;
-    private float hipoteca;
+    private Tablero tablero;   // para acciones como ir a cárcel
     private ArrayList<Avatar> avatares;
 
-    // Constructor vacío
+    // ====== Constructores ======
+
     public Casilla() {
         this.avatares = new ArrayList<>();
     }
 
-    // Constructor para solares, servicios o transporte
-    public Casilla(String nombre, String tipo, int posicion, float valor, Jugador duenho) {
+    // Solares / Servicio / Transporte
+    public Casilla(String nombre, String tipo, int posicion, float valor, Jugador banca) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.posicion = posicion;
         this.valor = valor;
-        this.duenho = duenho;
+        this.duenho = null;        // al crearse, no tiene dueño (banca no cuenta como dueño)
         this.avatares = new ArrayList<>();
     }
 
-    // Constructor para impuestos
-    public Casilla(String nombre, int posicion, float impuesto, Jugador duenho) {
+    // Impuesto
+    public Casilla(String nombre, int posicion, float impuesto, Jugador banca) {
         this.nombre = nombre;
         this.tipo = "Impuesto";
         this.posicion = posicion;
         this.impuesto = impuesto;
-        this.duenho = duenho;
+        this.duenho = null;
         this.avatares = new ArrayList<>();
     }
 
-    // Constructor para especiales, suerte, comunidad...
-    public Casilla(String nombre, String tipo, int posicion, Jugador duenho) {
+    // Especial / Suerte / Caja
+    public Casilla(String nombre, String tipo, int posicion, Jugador banca) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.posicion = posicion;
-        this.duenho = duenho;
+        this.duenho = null;
         this.avatares = new ArrayList<>();
     }
 
-    // --- GETTERS ---
-    public String getNombre() {
-        return nombre;
-    }
+    // ====== Getters ======
 
-    public String getTipo() {
-        return tipo;
-    }
+    public String getNombre() { return nombre; }
+    public String getTipo() { return tipo; }
+    public float getValor() { return valor; }
+    public int getPosicion() { return posicion; }
+    public Jugador getDuenho() { return duenho; }
+    public Grupo getGrupo() { return grupo; }
+    public float getImpuesto() { return impuesto; }
+    public ArrayList<Avatar> getAvatares() { return avatares; }
 
-    public float getValor() {
-        return valor;
-    }
+    // ====== Setters ======
 
-    public int getPosicion() {
-        return posicion;
-    }
+    public void setDuenho(Jugador d) { this.duenho = d; }
+    public void setGrupo(Grupo g) { this.grupo = g; }
+    public void setTablero(Tablero t) { this.tablero = t; }
 
-    public Jugador getDuenho() {
-        return duenho;
-    }
+    // ====== Auxiliares ======
 
-    public Grupo getGrupo() {
-        return grupo;
-    }
+    public void anhadirAvatar(Avatar av) { if (av != null && !avatares.contains(av)) avatares.add(av); }
+    public void eliminarAvatar(Avatar av) { avatares.remove(av); }
+    public void sumarValor(float suma) { this.valor += suma; }
 
+    // ====== Lógica de alquiler sencilla ======
 
-    public float getImpuesto() {
-        return impuesto;
-    }
+    public float evaluarAlquiler(int tirada) {
+        String t = (this.tipo == null) ? "" : this.tipo.toLowerCase();
 
-    public float getHipoteca() {
-        return hipoteca;
-    }
+        switch (t) {
+            case "solar":
+                // alquiler base simple: 10% del valor
+                return Math.max(1f, this.valor * 0.10f);
 
-    public ArrayList<Avatar> getAvatares() {
-        return avatares;
-    }
+            case "transporte":
+                // tarifa fija simple (ajusta si tienes varias estaciones)
+                return 250000f;
 
-    // --- SETTERS básicos ---
-    public void setDuenho(Jugador duenho) {
-        this.duenho = duenho;
-    }
-    public void setGrupo(Grupo grupo){
-        this.grupo = grupo;
-    }
+            case "servicio":
+                // depende de la tirada (si no hay tirada, usa 1)
+                int k = (tirada > 0) ? tirada : 1;
+                return 20000f * k;
 
-    // --- Métodos auxiliares ---
-    public void anhadirAvatar(Avatar av) {
-        avatares.add(av);
-    }
-
-    public void eliminarAvatar(Avatar av) {
-        avatares.remove(av);
-    }
-
-    public void sumarValor(float suma) {
-        this.valor += suma;
-    }
-
-    // Métodos aún por implementar
-    public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
-        // Aquí pondrás la lógica de qué pasa al caer en la casilla
-        switch (tipo) {
-            case "Impuesto": // si es de tipo impuesto
-                //El jugador paga a la banca
-                return true;
-
-            case "Servicio":
-            case "Transporte":
-            case "Solar":
-                if(this.duenho == null){
-                    //si no tiene ducño la casilla a la que se cae
-                    return true;
-                }if(this.duenho == actual){
-                    //no paga si la casilla es suya
-                    return true;
-                }
-                // 3) Calcular y cobrar alquiler
-                float renta = evaluarAlquiler(tirada);   // tu método ya implementado
-                if (renta > 0f) {
-                    actual.pagar(renta, this.duenho);    // actual paga al dueño
-                }
-                return true;
-            case "Suerte":
-                actual.robarCarta("Suerte");
-                return true;
-            case "Comunidad":
-                actual.robarCarta("Comunidad");
-
-            case "Especial":
-                if ("Ir a Cárcel".equals(this.nombre)) {
-                    actual.irACarcel();
-                } else if ("Salida".equals(this.nombre)) {
-                    actual.cobrar(200, banca);
-                }
-                return true;
-
-            default:
-                return true;
-        }
-    }
-
-    private float evaluarAlquiler(int tirada) {
-        switch (tipo) {
-            case "Solar":
-                return valor * 0.1f;
-            case "Transporte":
-                return 25f;
-            case "Servicio":
-                return tirada * 4f;
             default:
                 return 0f;
         }
     }
 
-    public void comprarCasilla(Jugador solicitante, Jugador banca) {
-        // Solo se puede comprar si la casilla es de tipo comprable y no tiene dueño
-        if ((tipo.equals("Solar") || tipo.equals("Servicio") || tipo.equals("Transporte")) && duenho == null) {
-            // Verificamos si el jugador tiene suficiente dinero
-            if (solicitante.getFortuna() >= valor) {
-                // El jugador paga a la banca
-                solicitante.pagar(valor, banca);
+    // ====== Evaluación de casilla al caer ======
 
-                // Se asigna el nuevo dueño
-                setDuenho(solicitante);
-
-                // Se añade la propiedad al jugador
-                solicitante.anadirPropiedad(this);
-
-                System.out.println(solicitante.getNombre() + " ha comprado la casilla " + nombre + " por " + valor);
-            } else {
-                System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + nombre);
-            }
-        } else {
-            System.out.println("La casilla " + nombre + " no está disponible para compra.");
-        }
-    }
-
-    public String infoCasilla() {
-        return "Casilla: " + nombre + " (" + tipo + "), valor=" + valor;
-    }
-
-    public String casEnVenta() {
-        return nombre + " en venta por " + valor;
-    }
-
-    @Override
-    public String toString() {
-        return nombre;
-    }
-
-    public void evaluar(Jugador jugador) {
+    public void evaluarCasilla(Jugador jugador) {
         System.out.println("Evaluando la casilla: " + this.nombre);
+        String t = (this.tipo == null) ? "" : this.tipo.toLowerCase();
 
-        switch (this.tipo.toLowerCase()) {
+        switch (t) {
             case "solar":
             case "transporte":
             case "servicio":
-                if (this.propietario == null || this.propietario.getNombre().equalsIgnoreCase("Banca")) {
-                    System.out.println("La casilla está en venta por " + this.valor + ".");
-                } else if (!this.propietario.equals(jugador)) {
-                    System.out.println("La casilla pertenece a " + this.propietario.getNombre() + ". Debes pagar alquiler.");
-                    // Aquí podrías calcular y restar el alquiler
+                if (this.getDuenho() == null) {
+                    System.out.println("La casilla está en venta por " + (long)this.valor + ".");
+                } else if (!this.getDuenho().equals(jugador)) {
+                    System.out.println("La casilla pertenece a " + this.getDuenho().getNombre() + ". Debes pagar alquiler.");
+                    // float alquiler = evaluarAlquiler(/* tirada real */ 1);
+                    // jugador.pagar(alquiler, this.getDuenho());
                 } else {
                     System.out.println("Has caído en tu propia propiedad.");
                 }
                 break;
 
             case "impuesto":
-                System.out.println("Debes pagar un impuesto de " + this.valor);
-                //jugador.pagar(renta, this.duenho);
+                System.out.println("Debes pagar un impuesto de " + (long)this.impuesto + ".");
+                // jugador.pagar(this.impuesto, banca); // si tienes referencia a banca
                 break;
 
             case "suerte":
             case "caja":
-                System.out.println("Has caído en una casilla de " + this.tipo + ". Roba una carta (no implementado aún).");
+                System.out.println("Has caído en " + this.tipo + ". Roba una carta (pendiente).");
                 break;
 
             case "especial":
-                if (this.nombre.equalsIgnoreCase("IrCarcel")) {
+                if ("ircarcel".equalsIgnoreCase(this.nombre)) {
                     System.out.println("¡Vas a la cárcel!");
-                    jugador.irACarcel();
+                    if (this.tablero != null) {
+                        jugador.irACarcel(this.tablero);
+                    } else {
+                        System.out.println("Error: tablero no asignado en la casilla.");
+                    }
+                } else if ("carcel".equalsIgnoreCase(this.nombre)) {
+                    if (jugador.isEnCarcel()) {
+                        System.out.println("Estás en la cárcel. Tiradas fallidas: " + jugador.getTiradasCarcel());
+                    } else {
+                        System.out.println("Estás de visita en la cárcel.");
+                    }
                 } else {
                     System.out.println("Casilla especial: " + this.nombre);
                 }
@@ -243,47 +153,78 @@ public class Casilla {
         }
     }
 
+    // ====== Compra ======
+
+    public void comprarCasilla(Jugador solicitante, Jugador banca) {
+        String t = (this.tipo == null) ? "" : this.tipo.toLowerCase();
+        boolean comprable = t.equals("solar") || t.equals("servicio") || t.equals("transporte");
+
+        if (!comprable || this.duenho != null) {
+            System.out.println("La casilla " + nombre + " no está disponible para compra.");
+            return;
+        }
+
+        if (solicitante.getFortuna() >= valor) {
+            solicitante.pagar(valor, banca);
+            setDuenho(solicitante);
+            solicitante.anadirPropiedad(this);
+            System.out.println(solicitante.getNombre() + " ha comprado " + nombre + " por " + (long)valor);
+        } else {
+            System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + nombre);
+        }
+    }
+
+    // ====== Info / descripción ======
+
+    public String infoCasilla() {
+        return "Casilla: " + nombre + " (" + tipo + "), valor=" + (long)valor;
+    }
+
+    public String casEnVenta() {
+        return nombre + " en venta por " + (long)valor;
+    }
+
+    @Override
+    public String toString() {
+        return nombre;
+    }
+
     public String describir() {
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
-        sb.append("  tipo: ").append(tipo.toLowerCase()).append(",\n");
+        sb.append("  tipo: ").append((tipo == null) ? "-" : tipo.toLowerCase()).append(",\n");
 
-        switch (tipo.toLowerCase()) {
+        String t = (this.tipo == null) ? "" : this.tipo.toLowerCase();
+
+        switch (t) {
             case "solar":
             case "servicio":
             case "transporte":
-                if (grupo != null)
-                    sb.append("  grupo: ").append(grupo.getNombre()).append(",\n");
+                if (grupo != null) sb.append("  grupo: ").append(grupo.getNombre()).append(",\n");
                 sb.append("  propietario: ").append(duenho != null ? duenho.getNombre() : "Sin propietario").append(",\n");
-                sb.append("  valor: ").append((int) valor).append(",\n");
-                sb.append("  alquiler: ").append((int) evaluarAlquiler(1)).append("\n"); // puedes ajustar tirada
+                sb.append("  valor: ").append((long) valor).append(",\n");
+                sb.append("  alquiler: ").append((long) evaluarAlquiler(1)).append("\n");
                 break;
 
             case "impuesto":
-                sb.append("  apagar: ").append((int) impuesto).append("\n");
-                break;
-            case "suerte":
-
-                break;
-
-            case "comunidad":
-
+                sb.append("  a_pagar: ").append((long) impuesto).append("\n");
                 break;
 
             case "especial":
-                if (nombre.equalsIgnoreCase("Parking")) {
-                    sb.append("  bote: ").append((int) valor).append(",\n");
+                if ("parking".equalsIgnoreCase(nombre)) {
+                    sb.append("  bote: ").append((long) valor).append(",\n");
                     sb.append("  jugadores: [");
                     for (int i = 0; i < avatares.size(); i++) {
                         sb.append(avatares.get(i).getJugador().getNombre());
                         if (i < avatares.size() - 1) sb.append(", ");
                     }
                     sb.append("]\n");
-                } else if (nombre.equalsIgnoreCase("Carcel")) {
-                    sb.append("  salir: 500000,\n"); // puedes parametrizarlo
+                } else if ("carcel".equalsIgnoreCase(nombre)) {
+                    sb.append("  salir: 500000,\n");
                     sb.append("  jugadores: ");
                     for (Avatar av : avatares) {
-                        sb.append("[").append(av.getJugador().getNombre()).append(",").append(av.getJugador().getTiradasCarcel()).append("] ");
+                        sb.append("[").append(av.getJugador().getNombre())
+                                .append(",").append(av.getJugador().getTiradasCarcel()).append("] ");
                     }
                     sb.append("\n");
                 } else {
@@ -298,8 +239,5 @@ public class Casilla {
         sb.append("}");
         return sb.toString();
     }
-
-
-
 }
 

@@ -19,125 +19,116 @@ public class Tablero {
 
     // Constructor
     public Tablero(Jugador banca) {
-        this.banca = banca; //recibimos a partir de la funcion la banca, entonces la inicializamos. Guardamos dentro de tablero la referencia
-
+        this.banca = banca;
         this.posiciones = new ArrayList<>();
-        for (int i = 0; i < 4; i++){
-            this.posiciones.add(new ArrayList<>());
-        }
-        //creamos la lista principal
-        //ahora vamos a crear los cuatro lados y a meterlos en el array
-
+        for (int i = 0; i < 4; i++) this.posiciones.add(new ArrayList<>());
         this.grupos = new HashMap<>();
         generarCasillas();
-
-        this.posiciones.add(new ArrayList<>());
-        //acabamos de incluir en la lista un nuevo elemento que es lista. Para acceder a el debemos de introducir el indice 0, que corresponde al valor de la variable SUR
-        this.posiciones.add(new ArrayList<>());
-        //hacemos lo mismo con el siguiente lado, es decir el oeste 1.
-        this.posiciones.add(new ArrayList<>());
-        //ahora ya estamos en el lado norte, que se representa con la variable NORTE  que tiene el valor dos, es decir que esta en la posicion dos de nuestro array de arrays
-        this.posiciones.add(new ArrayList<>());
-        //el último lado, el lado ESTE.
-
     }
 
     // ======== Generación del tablero ========
 
-
+    private void vincularTableroACasillas() {
+        for (ArrayList<Casilla> lado : posiciones) {
+            for (Casilla c : lado) {
+                c.setTablero(this);
+            }
+        }
+    }
 
     private void generarCasillas() {
         this.insertarLadoSur();
         this.insertarLadoOeste();
         this.insertarLadoNorte();
         this.insertarLadoEste();
-        crearGrupos(); // asigna grupos a casillas existentes
+        crearGrupos();
+        vincularTableroACasillas();
     }
 
-    // SUR (izq->dcha visual, indices 0..10)
+    // NORTE (derecha->izquierda visual, indices 20..30)
     private void insertarLadoNorte() {
         ArrayList<Casilla> norte = posiciones.get(NORTE);
 
         norte.add(new Casilla("IrCarcel", "Especial", 30, banca));
-        norte.add(new Casilla("Solar17", "Solar", 29, 2800000, banca));
-        norte.add(new Casilla("Serv2", "Servicio", 28, 1500000, banca));
-        norte.add(new Casilla("Solar16", "Solar", 27, 2600000, banca));
-        norte.add(new Casilla("Solar15", "Solar", 26, 2600000, banca));
-        norte.add(new Casilla("Trans3", "Transporte", 25, 2000000, banca));
-        norte.add(new Casilla("Solar14", "Solar", 24, 2400000, banca));
-        norte.add(new Casilla("Solar13", "Solar", 23, 2200000, banca));
+        norte.add(new Casilla("Sol17", "Solar", 29, 2800000, banca));
+        norte.add(new Casilla("Serv2", "Servicio", 28, 500000, banca));
+        norte.add(new Casilla("Sol16", "Solar", 27, 2600000, banca));
+        norte.add(new Casilla("Sol15", "Solar", 26, 2600000, banca));
+        norte.add(new Casilla("Tran3", "Transporte", 25, 500000, banca));
+        norte.add(new Casilla("Sol14", "Solar", 24, 2400000, banca));
+        norte.add(new Casilla("Sol13", "Solar", 23, 2200000, banca));
         norte.add(new Casilla("Suerte", "Suerte", 22, banca));
-        norte.add(new Casilla("Solar12", "Solar", 21, 2200000, banca));
+        norte.add(new Casilla("Sol12", "Solar", 21, 2200000, banca));
         norte.add(new Casilla("Parking", "Especial", 20, banca));
     }
 
-    // OESTE (abajo->arriba visual)
+    // SUR (izquierda->derecha visual, indices 0..10)
     private void insertarLadoSur() {
         ArrayList<Casilla> sur = posiciones.get(SUR);
 
         sur.add(new Casilla("Carcel", "Especial", 10, banca));
-        sur.add(new Casilla("Solar5", "Solar", 9, 1200000, banca));
-        sur.add(new Casilla("Solar4", "Solar", 8, 1000000, banca));
+        sur.add(new Casilla("Sol5", "Solar", 9, 1200000, banca));
+        sur.add(new Casilla("Sol4", "Solar", 8, 1000000, banca));
         sur.add(new Casilla("Suerte", "Suerte", 7, banca));
-        sur.add(new Casilla("Solar3", "Solar", 6, 1000000, banca));
-        sur.add(new Casilla("Trans1", "Transporte", 5, 500000, banca));
+        sur.add(new Casilla("Sol3", "Solar", 6, 1000000, banca));
+        sur.add(new Casilla("Tran1", "Transporte", 5, 500000, banca));
         sur.add(new Casilla("Imp1", "Impuesto", 4, 200000, banca));
-        sur.add(new Casilla("Solar2", "Solar", 3, 600000, banca));
+        sur.add(new Casilla("Sol2", "Solar", 3, 600000, banca));
         sur.add(new Casilla("Caja", "Caja", 2, banca));
-        sur.add(new Casilla("Solar1", "Solar", 1, 600000, banca));
+        sur.add(new Casilla("Sol1", "Solar", 1, 600000, banca));
         sur.add(new Casilla("Salida", "Especial", 0, banca));
     }
 
+    // OESTE (abajo->arriba visual, indices 11..19)
     private void insertarLadoOeste() {
         ArrayList<Casilla> oeste = posiciones.get(OESTE);
 
-        oeste.add(new Casilla("Solar6", "Solar", 11, 1400000, banca));
-        oeste.add(new Casilla("Serv1", "Servicio", 12, 1500000, banca));
-        oeste.add(new Casilla("Solar7", "Solar", 13, 1400000, banca));
-        oeste.add(new Casilla("Solar8", "Solar", 14, 1600000, banca));
-        oeste.add(new Casilla("Trans2", "Transporte", 15, 2000000, banca));
-        oeste.add(new Casilla("Solar9", "Solar", 16, 1800000, banca));
+        oeste.add(new Casilla("Sol6", "Solar", 11, 1400000, banca));
+        oeste.add(new Casilla("Serv1", "Servicio", 12, 500000, banca));
+        oeste.add(new Casilla("Sol7", "Solar", 13, 1400000, banca));
+        oeste.add(new Casilla("Sol8", "Solar", 14, 1600000, banca));
+        oeste.add(new Casilla("Tran2", "Transporte", 15, 500000, banca));
+        oeste.add(new Casilla("Sol9", "Solar", 16, 1800000, banca));
         oeste.add(new Casilla("Caja", "Caja", 17, banca));
-        oeste.add(new Casilla("Solar10", "Solar", 18, 1800000, banca));
-        oeste.add(new Casilla("Solar11", "Solar", 19, 2000000, banca));
+        oeste.add(new Casilla("Sol10", "Solar", 18, 1800000, banca));
+        oeste.add(new Casilla("Sol11", "Solar", 19, 2000000, banca));
     }
 
-    // ESTE (arriba->abajo visual)
+    // ESTE (arriba->abajo visual, indices 31..39)
     private void insertarLadoEste() {
         ArrayList<Casilla> este = posiciones.get(ESTE);
 
-        este.add(new Casilla("Solar18", "Solar", 31, 3000000, banca));
-        este.add(new Casilla("Solar19", "Solar", 32, 3000000, banca));
+        este.add(new Casilla("Sol18", "Solar", 31, 3000000, banca));
+        este.add(new Casilla("Sol19", "Solar", 32, 3000000, banca));
         este.add(new Casilla("Caja", "Caja", 33, banca));
-        este.add(new Casilla("Solar20", "Solar", 34, 3200000, banca));
-        este.add(new Casilla("Trans4", "Transporte", 35, 2000000, banca));
+        este.add(new Casilla("Sol20", "Solar", 34, 3200000, banca));
+        este.add(new Casilla("Tran4", "Transporte", 35, 500000, banca));
         este.add(new Casilla("Suerte", "Suerte", 36, banca));
-        este.add(new Casilla("Solar21", "Solar", 37, 3500000, banca));
+        este.add(new Casilla("Sol21", "Solar", 37, 3500000, banca));
         este.add(new Casilla("Imp2", "Impuesto", 38, 200000, banca));
-        este.add(new Casilla("Solar22", "Solar", 39, 4000000, banca));
+        este.add(new Casilla("Sol22", "Solar", 39, 4000000, banca));
     }
 
-    // ======== Grupos (mismos objetos Casilla del tablero) ========
-    // Normaliza a minúsculas sin espacios extra
-    private String norm(String s){
+    // ======== Grupos ========
+    private String norm(String s) {
         if (s == null) return "";
         return s.trim().toLowerCase();
     }
 
-    // Crea grupos usando las MISMAS casillas del tablero y asigna el grupo a cada casilla
     private void crearGrupos() {
         grupos.clear();
 
-        // mapa: nombreGrupo -> lista de nombres de casillas
         String[][] def = {
-                {"negro",   "Solar1", "Solar2"},
-                {"cian",    "Solar3", "Solar4", "Solar5"},
-                {"magenta", "Solar6", "Solar7", "Solar8"},
-                {"amarillo","Solar9", "Solar10","Solar11"},
-                {"rojo",    "Solar12","Solar13","Solar14"},
-                {"marron",  "Solar15","Solar16","Solar17"},
-                {"verde",   "Solar18","Solar19","Solar20"},
-                {"azul",    "Solar21","Solar22"}
+                {"marron",   "Sol1", "Sol2"},
+                {"cian",     "Sol3", "Sol4", "Sol5"},
+                {"magenta",  "Sol6", "Sol7", "Sol8"},
+                {"amarillo", "Sol9", "Sol10", "Sol11"},
+                {"rojo",     "Sol12", "Sol13", "Sol14"},
+                {"naranja",  "Sol15", "Sol16", "Sol17"},
+                {"verde",    "Sol18", "Sol19", "Sol20"},
+                {"azul",     "Sol21", "Sol22"},
+                {"transporte", "Tran1", "Tran2", "Tran3", "Tran4"},
+                {"servicio", "Serv1", "Serv2"}
         };
 
         for (String[] fila : def) {
@@ -154,7 +145,7 @@ public class Tablero {
             grupos.put(nombreGrupo, g);
         }
 
-        // asignar el grupo a cada casilla miembro
+        // Asignar el grupo a cada casilla
         for (Grupo g : grupos.values()) {
             for (Casilla c : g.getMiembros()) {
                 if (c != null) c.setGrupo(g);
@@ -170,52 +161,45 @@ public class Tablero {
                 }
             }
         }
-        return null; // si no se encuentra
+        return null;
     }
 
     // ======== Utilidades de impresión ========
-    private String getColorGrupo(Grupo grupo) {
-        if (grupo == null) return ""; // sin color si no hay grupo
-        return grupo.getColorGrupo(); // suponiendo que Grupo tiene este método
-    }
-
     private String formatCasilla(Casilla c) {
         String nombre = c.getNombre();
         String color = (c.getGrupo() != null) ? c.getGrupo().getColorGrupo() : "";
 
-        // Recoge los IDs de los avatares
-        StringBuilder letras = new StringBuilder();
+        // Recoger IDs de avatares
+        StringBuilder avatares = new StringBuilder();
         for (Avatar av : c.getAvatares()) {
-            letras.append("&").append(av.getId());
+            avatares.append("&").append(av.getId());
         }
 
-        // Limita el nombre a 6 caracteres y los avatares a 4 (ajusta si quieres)
-        String nombreRecortado = String.format("%-6.6s", nombre); // 6 caracteres, alineado a la izquierda
-        String avataresRecortados = String.format("%-4.4s", letras.toString()); // 4 caracteres
+        // Limitar nombre a 7 caracteres y avatares a 5
+        String nombreCorto = String.format("%-7.7s", nombre);
+        String avataresCorto = String.format("%-5.5s", avatares.toString());
 
-        // Total: 6 + 4 = 10 caracteres por casilla
-        String texto = "|" + nombreRecortado + avataresRecortados + "|";
-
+        String texto = nombreCorto + avataresCorto;
         return colorTexto(texto, color);
     }
 
-    // Colores ANSI simples por grupo
     private String colorTexto(String texto, String colorGrupo) {
         if (colorGrupo == null) return texto;
         String k = colorGrupo.toLowerCase();
         switch (k) {
-            case "negro":   return "\033[0;30m" + texto + "\033[0m";
-            case "cian":    return "\033[0;36m" + texto + "\033[0m";
-            case "magenta": return "\033[0;35m" + texto + "\033[0m";
-            case "amarillo":return "\033[0;33m" + texto + "\033[0m";
-            case "rojo":    return "\033[0;31m" + texto + "\033[0m";
-            case "marron":  return "\033[0;33m" + texto + "\033[0m"; // marrón ≈ amarillo
-            case "verde":   return "\033[0;32m" + texto + "\033[0m";
-            case "azul":    return "\033[0;34m" + texto + "\033[0m";
-            default:        return texto;
+            case "marron":     return "\033[38;5;94m" + texto + "\033[0m";  // marrón
+            case "cian":       return "\033[0;36m" + texto + "\033[0m";     // cian
+            case "magenta":    return "\033[0;35m" + texto + "\033[0m";     // magenta
+            case "amarillo":   return "\033[0;33m" + texto + "\033[0m";     // amarillo
+            case "rojo":       return "\033[0;31m" + texto + "\033[0m";     // rojo
+            case "naranja":    return "\033[38;5;208m" + texto + "\033[0m"; // naranja
+            case "verde":      return "\033[0;32m" + texto + "\033[0m";     // verde
+            case "azul":       return "\033[0;34m" + texto + "\033[0m";     // azul
+            case "transporte": return "\033[1;37m" + texto + "\033[0m";     // blanco brillante
+            case "servicio":   return "\033[0;37m" + texto + "\033[0m";     // blanco
+            default:           return texto;
         }
     }
-
 
     @Override
     public String toString() {
@@ -225,8 +209,6 @@ public class Tablero {
         ArrayList<Casilla> norte = posiciones.get(NORTE);
         ArrayList<Casilla> oeste = posiciones.get(OESTE);
         ArrayList<Casilla> este = posiciones.get(ESTE);
-
-        int anchoCasilla = 14; // lo que ocupa cada casilla formateada
 
         // --- Línea superior (NORTE, de derecha a izquierda) ---
         for (int i = norte.size() - 1; i >= 0; i--) {
@@ -241,11 +223,11 @@ public class Tablero {
             if (i < oeste.size()) {
                 sb.append(formatCasilla(oeste.get(oeste.size() - 1 - i)));
             } else {
-                sb.append(" ".repeat(anchoCasilla));
+                sb.append(" ".repeat(12));
             }
 
-            // Espacios en el centro
-            sb.append(" ".repeat((norte.size() - 2) * anchoCasilla));
+            // Espacios en el centro (casillas norte - 2 esquinas)
+            sb.append(" ".repeat((norte.size() - 2) * 12));
 
             // ESTE (de arriba a abajo)
             if (i < este.size()) {
@@ -261,10 +243,9 @@ public class Tablero {
         sb.append("\n");
 
         return sb.toString();
-
     }
-    //Método usado para buscar la casilla con el nombre pasado como argumento:
-    public Casilla encontrar_casilla(String nombre){
+
+    public Casilla encontrar_casilla(String nombre) {
         for (ArrayList<Casilla> lado : posiciones) {
             for (Casilla c : lado) {
                 if (c.getNombre().equalsIgnoreCase(nombre)) {
