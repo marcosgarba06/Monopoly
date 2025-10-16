@@ -34,6 +34,7 @@ public class Menu {
         this.dado2 = new Dado();
         this.banca = new Jugador();
         int numJugadores;
+        tirado = false;
 
         Set<String> nombresUsados = new HashSet<>();
         Set<String> avataresUsados = new HashSet<>();
@@ -67,8 +68,13 @@ public class Menu {
                 }
             }
 
-            Casilla salida = null; // TODO: sustituir por tablero.getSalida()
+            Casilla salida = tablero.encontrar_casilla("Salida");// TODO: sustituir por tablero.getSalida()
             Jugador j = new Jugador(nombre, avatar, salida, avatares);
+            Avatar av = j.getAvatar(); // ← el avatar ya fue creado dentro del jugador
+            salida.anhadirAvatar(av); // ← lo colocas en la casilla de salida
+            avatares.add(av);         // ← lo añades a la lista global de avatares
+
+
             jugadores.add(j);
 
             System.out.println("Jugador " + nombre + " creado con avatar " + avatar);
@@ -91,6 +97,42 @@ public class Menu {
         System.out.println("}");
     }
 
+    private void lanzarDados() {
+        if (tirado) {
+            System.out.println("Ya has tirado los dados este turno.");
+            return;
+        }
+
+        int d1 = dado1.hacerTirada();
+        int d2 = dado2.hacerTirada();
+        int total = d1 + d2;
+
+        System.out.println("Has sacado " + d1 + " y " + d2 + " → total: " + total);
+
+        Jugador actual = jugadores.get(turno);
+        Avatar av = actual.getAvatar();
+        av.mover(total, tablero); // ← asegúrate de tener este método en Avatar
+
+        tirado = true;
+    }
+
+
+    public void iniciarJuego() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("¡Comienza el juego!");
+        System.out.println("¡Comandos: 'listar jugadores', 'jugador', 'acabar turno', 'ver tablero', 'describir <casilla>', 'describir jugador <nombre>', 'listar avatares', 'listar venta', 'tirar dado', 'comprar <casilla>', 'salir carcel' o 'salir'.\"");
+
+        while (true) {
+            Jugador actual = jugadores.get(turno);
+            System.out.println("\nTurno de " + actual.getNombre());
+            System.out.print("Comando: ");
+            String comando = sc.nextLine();
+
+            analizarComando(comando);
+        }
+    }
+
+
     public void analizarComando(String comando) {
         comando = comando.trim().toLowerCase();
         String[] partes = comando.split(" ");
@@ -104,14 +146,34 @@ public class Menu {
             System.exit(0);
         } else if (comando.equals("jugador")) {
             indicarTurno();
+        } else if (comando.equals("tirar dado")) {
+            lanzarDados();
+        } else if (partes.length == 2 && partes[0].equals("comprar")) {
+            comprar(partes[1]);
+        } else if (comando.equals("salir carcel")) {
+            salirCarcel();
+         } else if (comando.equals("listar venta")) {
+            listarVenta();
+        } else if (comando.equals("listar avatares")) {
+            listarAvatares();
         } else if (partes.length >= 3 && partes[0].equals("describir") && partes[1].equals("jugador")) {
             descJugador(partes);
+        } else if (partes.length == 2 && partes[0].equals("describir")) {
+            String nombreCasilla = partes[1];
+            Casilla casilla = tablero.encontrar_casilla(nombreCasilla);
+            if (casilla != null) {
+                System.out.println(casilla.describir());
+            } else {
+                System.out.println("No se encontró la casilla '" + nombreCasilla + "'.");
+            }
         } else if (comando.equals("acabar turno")) {
             acabarTurno();
         } else {
-            System.out.println("Comando no reconocido. Prueba con 'listar jugadores', 'jugador', 'acabar turno', 'ver tablero', 'describir jugador <nombre>' o 'salir'.");
+            System.out.println("Comando no reconocido. Prueba con: 'listar jugadores', 'jugador', 'acabar turno', 'ver tablero', 'describir <casilla>', 'describir jugador <nombre>', 'listar avatares', 'listar venta', 'tirar dado', 'comprar <casilla>', 'salir carcel' o 'salir'.");
+
         }
     }
+
 
     private void descJugador(String[] partes) {
         if (partes.length < 3) {
@@ -152,8 +214,6 @@ public class Menu {
     private void descCasilla(String nombre) {
     }
 
-    private void lanzarDados() {
-    }
 
     private void comprar(String nombre) {
     }
@@ -209,6 +269,7 @@ public class Menu {
         }
 
         turno = (turno + 1) % jugadores.size(); // Avanza al siguiente jugador, vuelve a 0 si llega al final
+        tirado = false;
 
         Jugador actual = jugadores.get(turno);
         System.out.println("Turno acabado. Ahora le toca a:");

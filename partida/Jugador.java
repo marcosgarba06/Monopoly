@@ -13,6 +13,7 @@ public class Jugador {
 
     //Atributos:
     private String nombre; //Nombre del jugador
+    private Jugador jugador;
     private Avatar avatar; //Avatar que tiene en la partida.
     private float fortuna; //Dinero que posee.
     private float gastos; //Gastos realizados a lo largo del juego.
@@ -20,6 +21,7 @@ public class Jugador {
     private int tiradasCarcel; //Cuando está en la carcel, contará las tiradas sin éxito que ha hecho allí para intentar salir (se usa para limitar el número de intentos).
     private int vueltas; //Cuenta las vueltas dadas al tablero.
     private ArrayList<Casilla> propiedades; //Propiedades que posee el jugador.
+    private Jugador propietario;
 
     //Constructor vacío. Se usará para crear la banca.
     public Jugador()  {
@@ -45,6 +47,7 @@ public class Jugador {
         Avatar nuevoAvatar = new Avatar(tipoAvatar,null, inicio, avCreados);
         this.avatar = nuevoAvatar;
         avCreados.add(nuevoAvatar); //se añade al arraylist como metodo para comprobar que el avatar no se repite
+
 
         this.fortuna = Valor.FORTUNA_INICIAL;
         this.gastos = 0;
@@ -83,6 +86,19 @@ public class Jugador {
         return vueltas;
     }
 
+    public Jugador getJugador() {
+        return jugador;
+    }
+    public Jugador getPropietario() {
+        return propietario;
+    }
+
+    public void setPropietario(Jugador propietario) {
+        this.propietario = propietario;
+    }
+
+
+
     public ArrayList<Casilla> getPropiedades() {
         return propiedades;
     }
@@ -91,13 +107,13 @@ public class Jugador {
     //Método para añadir una propiedad al jugador. Como parámetro, la casilla a añadir.
     public void anadirPropiedad(Casilla casilla) {
         if(!propiedades.contains(casilla)) {
-            propiedades.add(casilla);
+            this.propiedades.add(casilla);
         }
     }
 
     //Método para eliminar una propiedad del arraylist de propiedades de jugador.
     public void eliminarPropiedad(Casilla casilla) {
-        propiedades.remove(casilla);
+        this.propiedades.remove(casilla);
     }
 
     //Método para añadir fortuna a un jugador

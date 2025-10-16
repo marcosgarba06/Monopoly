@@ -13,6 +13,7 @@ public class Casilla {
     private Jugador duenho;
     private Grupo grupo;
     private float impuesto;
+    private Jugador propietario;
     private float hipoteca;
     private ArrayList<Avatar> avatares;
 
@@ -75,6 +76,7 @@ public class Casilla {
         return grupo;
     }
 
+
     public float getImpuesto() {
         return impuesto;
     }
@@ -90,6 +92,9 @@ public class Casilla {
     // --- SETTERS básicos ---
     public void setDuenho(Jugador duenho) {
         this.duenho = duenho;
+    }
+    public void setGrupo(Grupo grupo){
+        this.grupo = grupo;
     }
 
     // --- Métodos auxiliares ---
@@ -196,5 +201,105 @@ public class Casilla {
     public String toString() {
         return nombre;
     }
+
+    public void evaluar(Jugador jugador) {
+        System.out.println("Evaluando la casilla: " + this.nombre);
+
+        switch (this.tipo.toLowerCase()) {
+            case "solar":
+            case "transporte":
+            case "servicio":
+                if (this.propietario == null || this.propietario.getNombre().equalsIgnoreCase("Banca")) {
+                    System.out.println("La casilla está en venta por " + this.valor + ".");
+                } else if (!this.propietario.equals(jugador)) {
+                    System.out.println("La casilla pertenece a " + this.propietario.getNombre() + ". Debes pagar alquiler.");
+                    // Aquí podrías calcular y restar el alquiler
+                } else {
+                    System.out.println("Has caído en tu propia propiedad.");
+                }
+                break;
+
+            case "impuesto":
+                System.out.println("Debes pagar un impuesto de " + this.valor);
+                //jugador.pagar(renta, this.duenho);
+                break;
+
+            case "suerte":
+            case "caja":
+                System.out.println("Has caído en una casilla de " + this.tipo + ". Roba una carta (no implementado aún).");
+                break;
+
+            case "especial":
+                if (this.nombre.equalsIgnoreCase("IrCarcel")) {
+                    System.out.println("¡Vas a la cárcel!");
+                    jugador.irACarcel();
+                } else {
+                    System.out.println("Casilla especial: " + this.nombre);
+                }
+                break;
+
+            default:
+                System.out.println("Tipo de casilla desconocido.");
+        }
+    }
+
+    public String describir() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append("  tipo: ").append(tipo.toLowerCase()).append(",\n");
+
+        switch (tipo.toLowerCase()) {
+            case "solar":
+            case "servicio":
+            case "transporte":
+                if (grupo != null)
+                    sb.append("  grupo: ").append(grupo.getNombre()).append(",\n");
+                sb.append("  propietario: ").append(duenho != null ? duenho.getNombre() : "Sin propietario").append(",\n");
+                sb.append("  valor: ").append((int) valor).append(",\n");
+                sb.append("  alquiler: ").append((int) evaluarAlquiler(1)).append("\n"); // puedes ajustar tirada
+                break;
+
+            case "impuesto":
+                sb.append("  apagar: ").append((int) impuesto).append("\n");
+                break;
+            case "suerte":
+
+                break;
+
+            case "comunidad":
+
+                break;
+
+            case "especial":
+                if (nombre.equalsIgnoreCase("Parking")) {
+                    sb.append("  bote: ").append((int) valor).append(",\n");
+                    sb.append("  jugadores: [");
+                    for (int i = 0; i < avatares.size(); i++) {
+                        sb.append(avatares.get(i).getJugador().getNombre());
+                        if (i < avatares.size() - 1) sb.append(", ");
+                    }
+                    sb.append("]\n");
+                } else if (nombre.equalsIgnoreCase("Carcel")) {
+                    sb.append("  salir: 500000,\n"); // puedes parametrizarlo
+                    sb.append("  jugadores: ");
+                    for (Avatar av : avatares) {
+                        sb.append("[").append(av.getJugador().getNombre()).append(",").append(av.getJugador().getTiradasCarcel()).append("] ");
+                    }
+                    sb.append("\n");
+                } else {
+                    sb.append("  casilla especial sin descripción detallada\n");
+                }
+                break;
+
+            default:
+                sb.append("  casilla no reconocida\n");
+        }
+
+        sb.append("}");
+        return sb.toString();
+    }
+
+
+
 }
 

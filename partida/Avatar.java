@@ -92,8 +92,50 @@ public class Avatar {
         return id;
     }
 
-    public void moverAvatar(ArrayList<ArrayList<Casilla>> casillas, int valorTirada) {
+    public void mover(int pasos, Tablero tablero) {
+        int nuevaPos = (this.posicion + pasos) % 40; // tablero de 40 casillas
+        this.posicion = nuevaPos;
+
+        Casilla nuevaCasilla = tablero.getCasilla(nuevaPos); // método que devuelve la casilla por índice
+        if (this.lugar != null) {
+            this.lugar.eliminarAvatar(this); // quita el avatar de la casilla anterior
+        }
+
+        this.lugar = nuevaCasilla;
+        nuevaCasilla.anhadirAvatar(this); // añade el avatar a la nueva casilla
+
+        System.out.println("El avatar " + id + " se ha movido a la casilla " + nuevaCasilla.getNombre());
+
+        nuevaCasilla.evaluar(jugador); // activa la casilla (si tiene lógica de compra, pago, etc.)
     }
+
+
+    public void moverAvatar(ArrayList<ArrayList<Casilla>> casillas, int valorTirada) {
+        // Aplanar la matriz de casillas en una lista lineal
+        ArrayList<Casilla> todas = new ArrayList<>();
+        for (ArrayList<Casilla> lado : casillas) {
+            todas.addAll(lado);
+        }
+
+        int nuevaPos = (this.posicion + valorTirada) % todas.size(); // calcula nueva posición
+        Casilla nuevaCasilla = todas.get(nuevaPos);
+
+        // Eliminar de la casilla actual
+        if (this.lugar != null) {
+            this.lugar.eliminarAvatar(this);
+        }
+
+        // Añadir a la nueva casilla
+        nuevaCasilla.anhadirAvatar(this);
+        this.lugar = nuevaCasilla;
+        this.posicion = nuevaPos;
+
+        System.out.println("El avatar " + id + " se ha movido a la casilla " + nuevaCasilla.getNombre());
+
+        // Evaluar la casilla
+        nuevaCasilla.evaluar(jugador);
+    }
+
 
     /*Método que permite generar un ID para un avatar. Sólo lo usamos en esta clase (por ello es privado).
      * El ID generado será una letra mayúscula. Parámetros:
@@ -150,4 +192,8 @@ public class Avatar {
         return tipo + " (ID: " + id + ", en " + pos + ")";
     }
 
+
+    public Jugador getJugador() {
+        return jugador;
+    }
 }

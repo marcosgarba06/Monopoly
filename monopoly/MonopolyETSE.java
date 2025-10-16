@@ -13,6 +13,7 @@ public class MonopolyETSE {
         // Creamos el menú (que gestiona jugadores)
         Tablero tablero = new Tablero(banca);
         Menu menu = new Menu(tablero);
+        menu.iniciarJuego();
 
         Scanner sc = new Scanner(System.in);
 
@@ -20,7 +21,7 @@ public class MonopolyETSE {
 
         boolean continuar = true;
         while (continuar) {
-            System.out.println("Comandos disponibles: listar jugadores, jugador, acabar turno, ver tablero, describir jugador <nombre>, salir");
+            System.out.println("Comandos disponibles: 'listar jugadores', 'jugador', 'acabar turno', 'ver tablero', 'describir <casilla>', 'describir jugador <nombre>', 'listar avatares', 'listar venta', 'tirar dado', 'comprar <casilla>', 'salir carcel' o 'salir'");
             System.out.print("> ");
             String comando = sc.nextLine().trim();
 

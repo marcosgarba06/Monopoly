@@ -12,7 +12,7 @@ class Grupo {
     private int numCasillas; //Número de casillas del grupo.
 
     //Constructor vacío.
-    public Grupo() {
+    public Grupo(String colorGrupo) {
         this.miembros = new ArrayList<>();
         this.colorGrupo = "";
         this.numCasillas = 0;
@@ -59,11 +59,14 @@ class Grupo {
      */
 
     //TERMINAR CUANDO ESTE HECHO SI UN JUGADOR ES DUEÑO DE UNA CASILLA
-   /* public boolean esDuenhoGrupo(Jugador jugador) {
-        //for each
-        for (Casilla casilla : miembros) {
-        }
-    }*/
+   public boolean esDuenhoGrupo(Jugador jugador) {
+       for (Casilla casilla : miembros) {
+           if (casilla.getDuenho() == null || !casilla.getDuenho().equals(jugador)) {
+               return false;
+           }
+       }
+       return true;
+    }
 
     //getters
     public ArrayList<Casilla> getMiembros() {
@@ -74,7 +77,12 @@ class Grupo {
         return colorGrupo;
     }
 
+    public String getNombre() {
+        return colorGrupo;
+    }
+
     public int getNumCasillas() {
         return numCasillas;
     }
+
 }
