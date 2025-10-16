@@ -4,14 +4,52 @@ package monopoly;
 //ERRORES: me deja escoger el avatar por pantalla que quiera, sin ser uno de esos 4
 
 
+import java.awt.*;
 import java.util.Scanner;
 import partida.Jugador;
 
 public class MonopolyETSE {
 
     public static void main(String[] args) {
-        // Creamos la banca y el tablero
-        Jugador banca = new Jugador();
+        Menu menu = new Menu();
+        //Llamada al metodo para iniciar la partida
+        menu.iniciarPartida();
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Creamos la banca y el tablero
+        /*Jugador banca = new Jugador();
         // Creamos el menú (que gestiona jugadores)
         Tablero tablero = new Tablero(banca);
         Menu menu = new Menu(tablero);
@@ -34,9 +72,4 @@ public class MonopolyETSE {
                 menu.analizarComando(comando);
             }
         }
-
-        sc.close(); // Cerramos el scanner al final del programa
-    }
-}
-
-
+        sc.close(); // Cerramos el scanner al final del programa*/
