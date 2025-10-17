@@ -27,8 +27,8 @@ public class Menu {
     private boolean repetirTurno = false;
 
     // Sets para evitar nombres y avatares duplicados
-    private Set<String> nombresUsados = new HashSet<>();
-    private Set<String> avataresUsados = new HashSet<>();
+    private final Set<String> nombresUsados = new HashSet<>();
+    private final Set<String> avataresUsados = new HashSet<>();
 
 
     public Menu() {
