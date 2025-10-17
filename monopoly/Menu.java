@@ -5,6 +5,10 @@ import partida.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,22 +46,6 @@ public class Menu {
 
     public void iniciarPartida() {
         Scanner sc = new Scanner(System.in);
-        System.out.println("¡Comienza el juego!");
-        System.out.println("Comandos:");
-        System.out.println("- crear jugador <nombre> <avatar>");
-        System.out.println("- comandos [ruta]");
-        System.out.println("- listar jugadores | jugadores");
-        System.out.println("- jugador");
-        System.out.println("- tirar dado");
-        System.out.println("- acabar turno");
-        System.out.println("- ver tablero");
-        System.out.println("- describir <casilla>");
-        System.out.println("- describir jugador <nombre>");
-        System.out.println("- listar avatares");
-        System.out.println("- listar venta");
-        System.out.println("- comprar <casilla>");
-        System.out.println("- salir carcel");
-        System.out.println("- salir");
 
         // Creación de jugadores
         int numJugadores;
@@ -134,7 +122,7 @@ public class Menu {
     public void iniciarJuego() {
         Scanner sc = new Scanner(System.in);
         System.out.println("¡Comienza el juego!");
-        System.out.println("Comandos: 'listar jugadores', 'jugador', 'acabar turno', 'ver tablero', 'describir <casilla>', 'describir jugador <nombre>', 'listar avatares', 'listar venta', 'tirar dado', 'comprar <casilla>', 'salir carcel' o 'salir'.");
+        System.out.println("Comandos: 'listar jugadores', 'jugador', 'acabar turno', 'comandos <ruta/archivo>', 'ver tablero', 'describir <casilla>', 'describir jugador <nombre>', 'listar avatares', 'listar venta', 'tirar dado', 'comprar <casilla>', 'salir carcel' o 'salir'.");
 
         while (true) {
             Jugador actual = jugadores.get(turno);
@@ -151,28 +139,48 @@ public class Menu {
      * Parámetro: cadena de caracteres (el comando).
      */
     public void analizarComando(String comando) {
-        comando = comando.trim().toLowerCase();
-        String[] partes = comando.split(" ");
+        // Conserva el original para no romper rutas con mayúsculas
+        String comandoOriginal = comando.trim();
+        String comandoLC = comandoOriginal.toLowerCase(Locale.ROOT);
 
-        if (comando.equals("listar jugadores") || comando.equals("jugadores")) {
+        // Manejo del comando: "comandos <ruta/al/archivo.txt>"
+        if (comandoLC.startsWith("comandos")) {
+            // Dividimos en máximo 2 partes: la palabra 'comandos' y el resto (la ruta)
+            String[] partesCmd = comandoOriginal.split("\\s+", 2);
+
+            // Si no hay segunda parte (ruta) o está vacía, mostramos el uso correcto
+            if (partesCmd.length < 2 || partesCmd[1].isBlank()) {
+                System.out.println("Uso: comandos <ruta/al/archivo.txt>");
+            } else {
+                // Usamos la ruta tal cual (sin pasarla a minúsculas)
+                String ruta = partesCmd[1].trim();
+                ejecutarComandosDesdeArchivo(ruta);
+            }
+            // Terminamos aquí para no seguir procesando este comando en otros casos
+            return;
+        }
+        // A partir de aquí, tu lógica actual (usando minúsculas para comparar)
+        String[] partes = comandoLC.split("\\s+");
+
+        if (comandoLC.equals("listar jugadores") || comandoLC.equals("jugadores")) {
             listarJugadores();
-        } else if (comando.equals("ver tablero")) {
+        } else if (comandoLC.equals("ver tablero")) {
             System.out.println(tablero);
-        } else if (comando.equals("salir")) {
+        } else if (comandoLC.equals("salir")) {
             System.out.println("Saliendo del juego...");
             System.exit(0);
-        } else if (comando.equals("jugador")) {
+        } else if (comandoLC.equals("jugador")) {
             indicarTurno();
-        } else if (comando.equals("tirar dado")) {
+        } else if (comandoLC.equals("tirar dado")) {
             lanzarDados();
         } else if (partes.length == 2 && partes[0].equals("comprar")) {
             comprar(partes[1]);
-        } else if (comando.equals("salir carcel")) {
+        } else if (comandoLC.equals("salir carcel")) {
             Jugador actual = jugadores.get(turno);
             salirCarcel(actual);
-        } else if (comando.equals("listar venta")) {
+        } else if (comandoLC.equals("listar venta")) {
             listarVenta();
-        } else if (comando.equals("listar avatares")) {
+        } else if (comandoLC.equals("listar avatares")) {
             listarAvatares();
         } else if (partes.length >= 3 && partes[0].equals("describir") && partes[1].equals("jugador")) {
             descJugador(partes);
@@ -184,7 +192,7 @@ public class Menu {
             } else {
                 System.out.println("No se encontró la casilla '" + nombreCasilla + "'.");
             }
-        } else if (comando.equals("acabar turno")) {
+        } else if (comandoLC.equals("acabar turno")) {
             acabarTurno();
         } else if (partes.length == 2 && partes[0].equals("describir") && partes[1].startsWith("avatar")) {
             descAvatar(partes[1].substring(7)); // si usas 'describir avatarX'
@@ -193,6 +201,36 @@ public class Menu {
         }
     }
 
+    // Metodo helper para ejecutar comandos desde un archivo
+    private void ejecutarComandosDesdeArchivo(String rutaArchivo) {
+        // Crear un objeto Path a partir de la ruta recibida
+        Path path = Paths.get(rutaArchivo);
+        System.out.println("Intentando abrir archivo en: " + path.toAbsolutePath());
+
+        if (!Files.exists(path)) { //Si exsiste el archivo entonces
+            System.out.println("No se encontró el archivo: " + path.toAbsolutePath());
+            return;
+        }
+        // Usamos try catch para coger los posibles errores que nos saque el archivo
+        // Abrir un BufferedReader con UTF-8 usando try-with-resources (se cierra solo)
+        try (BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            String linea;
+            int numLinea = 0;
+
+            // Leer línea a línea hasta que no haya más (readLine() devuelve null cuando no hay más líneas)
+            while ((linea = br.readLine()) != null) {
+                numLinea++;
+                String comando = linea.strip(); //Eliminar los espacios al final \t, \n, ...
+
+                if (comando.isEmpty()) continue; // ignora líneas vacías
+                System.out.println("[archivo:" + numLinea + "] " + comando); //Mostrar que comando que ha leído e intentará usar
+                analizarComando(comando);
+            }
+        } catch (IOException e) {
+            // Captura errores de E/S (permiso, encoding, archivo bloqueado, etc.) y los muestra
+            System.out.println("Error leyendo el archivo: " + e.getMessage());
+        }
+    }
 
     /*Método que realiza las acciones asociadas al comando 'describir jugador'.
      * Parámetro: comando introducido
