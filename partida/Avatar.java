@@ -13,11 +13,10 @@ public class Avatar {
     private String id; //Identificador: una letra generada aleatoriamente.
     private String tipo; //Sombrero, Esfinge, Pelota, Coche
     private Jugador jugador; //Un jugador al que pertenece ese avatar.
-    private Casilla lugar; //Los avatares se sitúan en casillas del tablero.
+    private Casilla casilla; //Los avatares se sitúan en casillas del tablero.
     private int posicion;// se guarda en que asilla esta el avatar en el tablero, del 0 añl 39
     private boolean enCarcel;//indica si true encarcelado o false libre
     private int turnosEnCarcel = 0;
-    private Casilla casilla;
 
     //Constructor vacío, esto permite crear un avatar sin inicializarlo
     public Avatar() {
@@ -32,7 +31,7 @@ public class Avatar {
 
         this.tipo = tipo;
         this.jugador = jugador;
-        this.lugar = lugar;
+        this.casilla = casilla;
 
         generarId(avCreados); //generamos un id
         avCreados.add(this); //añadimos el id nuevo para el cual lo creamos
@@ -91,7 +90,7 @@ public class Avatar {
         }
     }
     public String toString() {
-        String pos = (lugar != null) ? lugar.getNombre() : "sin posición";
+        String pos = (casilla != null) ? casilla.getNombre() : "sin posición";
         return tipo + " (ID: " + id + ", en " + pos + ")";
     }
 
@@ -129,12 +128,15 @@ public class Avatar {
     }
 
     public void setCasilla(Casilla c) {
-        if (this.lugar != null) this.lugar.eliminarAvatar(this);
-        this.lugar = c;
+        if (this.casilla != null) this.casilla.eliminarAvatar(this);
         this.casilla = c;
         if (c != null) c.anhadirAvatar(this);
     }
 
+
+    public String getTipo() {
+        return tipo;
+    }
 
     public boolean estaEnCarcel() {
         return enCarcel;

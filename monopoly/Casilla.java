@@ -20,6 +20,7 @@ public class Casilla {
 
     public Casilla() {
         this.avatares = new ArrayList<>();
+
     }
 
     // Solares / Servicio / Transporte
@@ -27,7 +28,11 @@ public class Casilla {
         this.nombre = nombre;
         this.tipo = tipo;
         this.posicion = posicion;
-        this.valor = valor;
+        if ("impuesto".equalsIgnoreCase(tipo)) {
+            this.impuesto = valor; // ✅ ahora sí se guarda como impuesto
+        } else {
+            this.valor = valor;
+        }
         this.duenho = null;        // al crearse, no tiene dueño (banca no cuenta como dueño)
         this.avatares = new ArrayList<>();
     }
@@ -120,20 +125,57 @@ public class Casilla {
                 break;
 
             case "impuesto":
-                System.out.println("Debes pagar un impuesto de " + (long)this.impuesto + ".");
-                // jugador.pagar(this.impuesto, banca); // si tienes referencia a banca
+                System.out.println("Debes pagar un impuesto de " + (long)this.impuesto + "€.");
+                jugador.restarFortuna(this.impuesto);
+                jugador.sumarGastos(this.impuesto);
+
+                if (this.tablero != null) {
+                    this.tablero.añadirAlParking(this.impuesto);
+                    System.out.println("El dinero se ha depositado en el parking. Total acumulado: " + (long)this.tablero.getFondoParking() + "€.");
+                } else {
+                    System.out.println("Error: tablero no asignado en la casilla.");
+                }
                 break;
 
+
             case "suerte":
-            case "caja":
-                System.out.println("Has caído en " + this.tipo + ". Roba una carta (pendiente).");
+                System.out.println("Has caído en Suerte. Robas una carta...");
+                if (tablero != null) {
+                    Carta cartaS = tablero.robarCarta("suerte");
+                    cartaS.aplicarAccion(jugador, tablero);
+                } else {
+                    System.out.println("Error: tablero no asignado.");
+                }
                 break;
+
+            case "caja":
+                System.out.println("Has caído en Caja de Comunidad. Robas una carta...");
+                if (tablero != null) {
+                    Carta cartaC = tablero.robarCarta("caja");
+                    cartaC.aplicarAccion(jugador, tablero);
+                } else {
+                    System.out.println("Error: tablero no asignado.");
+                }
+                break;
+
 
             case "especial":
                 if ("ircarcel".equalsIgnoreCase(this.nombre)) {
                     System.out.println("¡Vas a la cárcel!");
                     if (this.tablero != null) {
                         jugador.irACarcel(this.tablero);
+                    } else {
+                        System.out.println("Error: tablero no asignado en la casilla.");
+                    }
+                } else if ("parking".equalsIgnoreCase(this.nombre)) {
+                    if (this.tablero != null) {
+                        float premio = this.tablero.recogerParking();
+                        if (premio > 0) {
+                            jugador.sumarFortuna(premio);
+                            System.out.println("¡Has recogido " + (long)premio + "€ del parking gratuito!");
+                        } else {
+                            System.out.println("El parking está vacío. No hay premio.");
+                        }
                     } else {
                         System.out.println("Error: tablero no asignado en la casilla.");
                     }
@@ -154,6 +196,12 @@ public class Casilla {
     }
 
     // ====== Compra ======
+
+    public boolean estaEnVenta() {
+        String t = (this.tipo == null) ? "" : this.tipo.toLowerCase();
+        return (t.equals("solar") || t.equals("servicio") || t.equals("transporte")) && duenho == null;
+    }
+
 
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
         String t = (this.tipo == null) ? "" : this.tipo.toLowerCase();

@@ -3,6 +3,8 @@ package monopoly;
 import partida.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
+
 
 public class Tablero {
 
@@ -16,6 +18,7 @@ public class Tablero {
     private ArrayList<ArrayList<Casilla>> posiciones;
     private HashMap<String, Grupo> grupos;
     private Jugador banca;
+    private float fondoParking = 0;
 
     // Constructor
     public Tablero(Jugador banca) {
@@ -119,14 +122,14 @@ public class Tablero {
         grupos.clear();
 
         String[][] def = {
-                {"marron",   "Sol1", "Sol2"},
-                {"cian",     "Sol3", "Sol4", "Sol5"},
-                {"magenta",  "Sol6", "Sol7", "Sol8"},
+                {"marron", "Sol1", "Sol2"},
+                {"cian", "Sol3", "Sol4", "Sol5"},
+                {"magenta", "Sol6", "Sol7", "Sol8"},
                 {"amarillo", "Sol9", "Sol10", "Sol11"},
-                {"rojo",     "Sol12", "Sol13", "Sol14"},
-                {"naranja",  "Sol15", "Sol16", "Sol17"},
-                {"verde",    "Sol18", "Sol19", "Sol20"},
-                {"azul",     "Sol21", "Sol22"},
+                {"rojo", "Sol12", "Sol13", "Sol14"},
+                {"naranja", "Sol15", "Sol16", "Sol17"},
+                {"verde", "Sol18", "Sol19", "Sol20"},
+                {"azul", "Sol21", "Sol22"},
                 {"transporte", "Tran1", "Tran2", "Tran3", "Tran4"},
                 {"servicio", "Serv1", "Serv2"}
         };
@@ -187,19 +190,31 @@ public class Tablero {
         if (colorGrupo == null) return texto;
         String k = colorGrupo.toLowerCase();
         switch (k) {
-            case "marron":     return "\033[38;5;94m" + texto + "\033[0m";  // marrón
-            case "cian":       return "\033[0;36m" + texto + "\033[0m";     // cian
-            case "magenta":    return "\033[0;35m" + texto + "\033[0m";     // magenta
-            case "amarillo":   return "\033[0;33m" + texto + "\033[0m";     // amarillo
-            case "rojo":       return "\033[0;31m" + texto + "\033[0m";     // rojo
-            case "naranja":    return "\033[38;5;208m" + texto + "\033[0m"; // naranja
-            case "verde":      return "\033[0;32m" + texto + "\033[0m";     // verde
-            case "azul":       return "\033[0;34m" + texto + "\033[0m";     // azul
-            case "transporte": return "\033[1;37m" + texto + "\033[0m";     // blanco brillante
-            case "servicio":   return "\033[0;37m" + texto + "\033[0m";     // blanco
-            default:           return texto;
+            case "marron":
+                return "\033[38;5;94m" + texto + "\033[0m";  // marrón
+            case "cian":
+                return "\033[0;36m" + texto + "\033[0m";     // cian
+            case "magenta":
+                return "\033[0;35m" + texto + "\033[0m";     // magenta
+            case "amarillo":
+                return "\033[0;33m" + texto + "\033[0m";     // amarillo
+            case "rojo":
+                return "\033[0;31m" + texto + "\033[0m";     // rojo
+            case "naranja":
+                return "\033[38;5;208m" + texto + "\033[0m"; // naranja
+            case "verde":
+                return "\033[0;32m" + texto + "\033[0m";     // verde
+            case "azul":
+                return "\033[0;34m" + texto + "\033[0m";     // azul
+            case "transporte":
+                return "\033[1;37m" + texto + "\033[0m";     // blanco brillante
+            case "servicio":
+                return "\033[0;37m" + texto + "\033[0m";     // blanco
+            default:
+                return texto;
         }
     }
+
 
     @Override
     public String toString() {
@@ -245,6 +260,18 @@ public class Tablero {
         return sb.toString();
     }
 
+    public ArrayList<Casilla> getCasillasEnVenta() {
+        ArrayList<Casilla> disponibles = new ArrayList<>();
+        for (ArrayList<Casilla> lado : posiciones) {
+            for (Casilla c : lado) {
+                if (c.estaEnVenta()) {
+                    disponibles.add(c);
+                }
+            }
+        }
+        return disponibles;
+    }
+
     public Casilla encontrar_casilla(String nombre) {
         for (ArrayList<Casilla> lado : posiciones) {
             for (Casilla c : lado) {
@@ -254,5 +281,43 @@ public class Tablero {
             }
         }
         return null;
+
+    }
+
+    private ArrayList<Carta> mazoSuerte = new ArrayList<>();
+    private ArrayList<Carta> mazoCaja = new ArrayList<>();
+
+    public void inicializarCartas() {
+        mazoSuerte.add(new Carta("Recibes 1.000.000€ por inversión exitosa", "suerte"));
+        mazoSuerte.add(new Carta("Paga 500.000€ por reparación de propiedades", "suerte"));
+        mazoSuerte.add(new Carta("Ve directamente a la cárcel", "suerte"));
+        mazoSuerte.add(new Carta("Has ganado una carta para salir de la cárcel", "suerte"));
+
+        mazoCaja.add(new Carta("Recibes 200.000€ por devolución de impuestos", "caja"));
+        mazoCaja.add(new Carta("Paga 300.000€ por gastos médicos", "caja"));
+        mazoCaja.add(new Carta("Avanza a la casilla 'Sol10'", "caja"));
+    }
+
+    public Carta robarCarta(String tipo) {
+        Random r = new Random();
+        if (tipo.equals("suerte")) {
+            return mazoSuerte.get(r.nextInt(mazoSuerte.size()));
+        } else {
+            return mazoCaja.get(r.nextInt(mazoCaja.size()));
+        }
+    }
+
+    public void añadirAlParking(float cantidad) {
+        fondoParking += cantidad;
+    }
+
+    public float recogerParking() {
+        float cantidad = fondoParking;
+        fondoParking = 0;
+        return cantidad;
+    }
+
+    public float getFondoParking() {
+        return fondoParking;
     }
 }

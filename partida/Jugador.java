@@ -7,15 +7,16 @@ public class Jugador {
 
     //Atributos:
     private String nombre;
+    private int cartasSalirCarcel = 0;
     private Avatar avatar;
     private float fortuna;
     private float gastos;
     private boolean enCarcel;
-    private int tiradasCarcel; // No se usa actualmente, se puede eliminar o usar en el futuro
+    private int tiradasCarcel;
     private int vueltas;
     private ArrayList<Casilla> propiedades;
     private boolean bancarrota;
-    private boolean tieneCartaSalirCarcel;
+    private boolean tieneCartaSalirCarcel = false;
 
     //Constructor vacío. Se usará para crear la banca.
     public Jugador() {
@@ -110,7 +111,30 @@ public class Jugador {
 
     public void restarFortuna(float cantidad) {
         this.fortuna -= cantidad;
+        if (fortuna < cantidad) {
+            this.bancarrota = true;
+            System.out.println(nombre + " ha caído en bancarrota.");
+            // Transferir propiedades, eliminar del juego, etc.
+        }
+
     }
+
+    public void añadirCartaSalirCarcel() {
+        cartasSalirCarcel++;
+    }
+
+    public boolean usarCartaSalirCarcel() {
+        if (cartasSalirCarcel > 0) {
+            cartasSalirCarcel--;
+            return true;
+        }
+        return false;
+    }
+
+    public int getCartasSalirCarcel() {
+        return cartasSalirCarcel;
+    }
+
 
     public void sumarGastos(float valor) {
         this.gastos += valor;
@@ -132,12 +156,16 @@ public class Jugador {
         this.tieneCartaSalirCarcel = true;
     }
 
-    public boolean usarCartaSalirCarcel() {
-        if (!tieneCartaSalirCarcel) {
-            return false;
-        }
-        tieneCartaSalirCarcel = false;
-        return true;
+    public boolean tienePropiedades() {
+        return !propiedades.isEmpty();
+    }
+
+    public void setTieneCartaSalirCarcel(boolean valor) {
+        tieneCartaSalirCarcel = valor;
+    }
+
+    public boolean getTieneCartaSalirCarcel() {
+        return tieneCartaSalirCarcel;
     }
 
     // Método para enviar al jugador a la cárcel

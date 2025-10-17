@@ -49,7 +49,7 @@ class Grupo {
     * Parámetro: casilla que se quiere añadir.
      */
     public void anhadirCasilla(Casilla miembro) {
-        if (miembros.size() < 3) {
+        if (miembros.size() <= 4) {
             this.miembros.add(miembro);
             this.numCasillas = miembros.size();
         }else {
