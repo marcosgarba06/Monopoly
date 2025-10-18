@@ -128,6 +128,7 @@ public class Menu { // la clase menu
         System.out.println("  - 'listar jugadores' / 'jugadores'");
         System.out.println("  - 'jugador' (ver turno actual)");
         System.out.println("  - 'tirar dados'");
+        System.out.println("  - 'forzar valor dados'");
         System.out.println("  - 'acabar turno'");
         System.out.println("  - 'ver tablero'");
         System.out.println("  - 'describir <casilla>'");
@@ -197,7 +198,8 @@ public class Menu { // la clase menu
             indicarTurno();
         } else if (comandoLC.equals("tirar dados")) {
             lanzarDados();
-
+        } else if (comandoLC.equals("forzar valor dados")) {
+            forzarDados();
         } else if (partes.length == 2 && partes[0].equals("comprar")) {
             comprar(partes[1]);
         } else if (comandoLC.equals("salir carcel")) {
@@ -481,6 +483,87 @@ public class Menu { // la clase menu
 
         return total;
     }
+
+    private int forzarDados() {
+        if (jugadores == null || jugadores.isEmpty()) {
+            System.out.println("No hay jugadores en la partida.");
+            return 0;
+        }
+
+        if (tirado) {
+            System.out.println("Ya has tirado los dados este turno.");
+            return 0;
+        }
+
+        Jugador actual = jugadores.get(turno);
+        Avatar av = actual.getAvatar();
+
+        // Si está en la cárcel, abre menú de opciones
+        if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
+            salirCarcel(actual);
+            return 0;
+        }
+
+        Scanner sc = new Scanner(System.in);
+        int d1, d2;
+
+        // 🔹 Pedir valor del dado 1
+        while (true) {
+            System.out.print("Forzar valor dado1 (1-6): ");
+            d1 = sc.nextInt();
+            if (d1 >= 1 && d1 <= 6) break;
+            System.out.println("Valor inválido, debe estar entre 1 y 6.");
+        }
+
+        // 🔹 Pedir valor del dado 2
+        while (true) {
+            System.out.print("Forzar valor dado2 (1-6): ");
+            d2 = sc.nextInt();
+            if (d2 >= 1 && d2 <= 6) break;
+            System.out.println("Valor inválido, debe estar entre 1 y 6.");
+        }
+
+        // Guardar valores en los dados
+        dado1.setValor(d1);
+        dado2.setValor(d2);
+
+        int total = d1 + d2;
+        tablero.setUltimaTirada(total);
+        System.out.println("Has forzado " + d1 + " y " + d2 + " → total: " + total);
+
+        // 🔹 Reglas de dobles
+        if (d1 == d2) {
+            contadorDobles++;
+            System.out.println("¡Dados dobles! (" + contadorDobles + " seguidos)");
+            if (contadorDobles == 3) {
+                System.out.println("¡Tres dobles seguidos! Vas directo a la cárcel.");
+                actual.irACarcel(tablero);
+                contadorDobles = 0;
+                salirCarcel(actual);
+                return total;
+            }
+        } else {
+            contadorDobles = 0;
+        }
+
+        // 🔹 Mover avatar
+        av.moverAvatar(total, tablero);
+
+        // Si al movernos hemos acabado en cárcel, abrir menú ya
+        if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
+            salirCarcel(actual);
+            return total;
+        }
+
+        // 🔹 Marcar tirada
+        tirado = true;
+        if (d1 == d2 && contadorDobles < 3) {
+            tirado = false; // puede repetir
+        }
+
+        return total;
+    }
+
 
 
     /*Método que ejecuta todas las acciones realizadas con el comando 'comprar nombre_casilla'.
