@@ -321,12 +321,24 @@ public class Menu { // la clase menu
                 if (j.getPropiedades().isEmpty()) {
                     System.out.println("propiedades: -,");
                 } else {
-                    String props = j.getPropiedades().stream().map(Casilla::getNombre).collect(Collectors.joining(", "));
+                    String props = j.getPropiedades().stream().map(c -> c.getNombre() + (c.estaHipotecada() ? " (hipotecada)" : "")).collect(Collectors.joining(", "));
                     System.out.println("propiedades: [" + props + "],");
                 }
 
-                System.out.println("hipotecas: -,");
-                //implementar
+                List<String> hipotecas = new ArrayList<>();
+
+                for (Casilla c : j.getPropiedades()) {
+                    if (c.estaHipotecada()) {
+                        hipotecas.add(c.getNombre());
+                    }
+                }
+
+                if (hipotecas.isEmpty()) {
+                    System.out.println("hipotecas: -,");
+                } else {
+                    System.out.println("hipotecas: [" + String.join(", ", hipotecas) + "],");
+                }
+
                 System.out.print("edificios: ");
                 boolean tieneEdificios = false;
 
