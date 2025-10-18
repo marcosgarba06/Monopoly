@@ -1,9 +1,6 @@
 package monopoly;
 
 
-//ERRORES: me deja escoger el avatar por pantalla que quiera, sin ser uno de esos 4
-
-
 import java.awt.*;
 import java.util.Scanner;
 import partida.Jugador;

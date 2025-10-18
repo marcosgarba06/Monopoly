@@ -131,6 +131,8 @@ public class Menu {
             String comando = sc.nextLine();
 
             analizarComando(comando);
+            tablero.inicializarCartas();
+
         }
     }
 
@@ -173,6 +175,7 @@ public class Menu {
             indicarTurno();
         } else if (comandoLC.equals("tirar dado")) {
             lanzarDados();
+
         } else if (partes.length == 2 && partes[0].equals("comprar")) {
             comprar(partes[1]);
         } else if (comandoLC.equals("salir carcel")) {
@@ -196,7 +199,11 @@ public class Menu {
             acabarTurno();
         } else if (partes.length == 2 && partes[0].equals("describir") && partes[1].startsWith("avatar")) {
             descAvatar(partes[1].substring(7)); // si usas 'describir avatarX'
-        } else {
+        } else if (partes.length >= 2 && partes[0].equals("edificar")) {
+        String tipo = partes[1];
+        int cantidad = (partes.length > 2) ? Integer.parseInt(partes[2]) : 1;
+        edificar(tipo, cantidad);
+        }else {
             System.out.println("Comando no reconocido. Prueba con: 'listar jugadores', 'jugador', 'acabar turno', 'ver tablero', 'describir <casilla>', 'describir jugador <nombre>', 'listar avatares', 'listar venta', 'tirar dado', 'comprar <casilla>', 'salir carcel' o 'salir'.");
         }
     }
@@ -310,18 +317,15 @@ public class Menu {
     }
 
 
-
-
-    //Metodo que se usa para lazar dados y mover el icono
-    private void lanzarDados() {
+    private int lanzarDados() {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
-            return;
+            return 0;
         }
 
         if (tirado) {
             System.out.println("Ya has tirado los dados este turno.");
-            return;
+            return 0;
         }
 
         Jugador actual = jugadores.get(turno);
@@ -330,13 +334,13 @@ public class Menu {
         // Si está en la cárcel, abre menú de opciones
         if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
             salirCarcel(actual);
-            return;
+            return 0;
         }
 
         int d1 = dado1.hacerTirada();
         int d2 = dado2.hacerTirada();
         int total = d1 + d2;
-
+        tablero.setUltimaTirada(total);
         System.out.println("Has sacado " + d1 + " y " + d2 + " → total: " + total);
 
         if (d1 == d2) {
@@ -347,7 +351,7 @@ public class Menu {
                 actual.irACarcel(tablero);
                 contadorDobles = 0;
                 salirCarcel(actual);
-                return;
+                return total;
             }
         } else {
             contadorDobles = 0;
@@ -358,7 +362,7 @@ public class Menu {
         // Si al movernos hemos acabado en cárcel, abrir menú ya
         if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
             salirCarcel(actual);
-            return;
+            return total;
         }
 
         // Si no estamos en cárcel, seguimos normal
@@ -366,22 +370,45 @@ public class Menu {
         if (d1 == d2 && contadorDobles < 3) {
             tirado = false; // puede repetir
         }
+
+        return total;
     }
 
 
     /*Método que ejecuta todas las acciones realizadas con el comando 'comprar nombre_casilla'.
      * Parámetro: cadena de caracteres con el nombre de la casilla.
      */
-    private void comprar(String nombre) {
-        Casilla casilla = tablero.encontrar_casilla(nombre);
-        if (casilla == null) {
-            System.out.println("No se encontró la casilla '" + nombre + "'.");
+    public void comprar(String nombreCasilla) {
+        Jugador jugador = jugadores.get(turno);
+        Casilla casillaActual = jugador.getAvatar().getCasilla();
+
+        if (!casillaActual.getNombre().equalsIgnoreCase(nombreCasilla)) {
+            System.out.println("Solo puedes comprar la casilla en la que estás: " + casillaActual.getNombre());
             return;
         }
 
-        Jugador actual = jugadores.get(turno);
-        casilla.comprarCasilla(actual, banca);
+        if (casillaActual.getDuenho() != null) {
+            System.out.println("La casilla ya tiene dueño.");
+            return;
+        }
+
+        if (!"solar".equalsIgnoreCase(casillaActual.getTipo())) {
+            System.out.println("Esta casilla no se puede comprar.");
+            return;
+        }
+
+        float precio = casillaActual.getValor();
+        if (jugador.getFortuna() < precio) {
+            System.out.println("No tienes suficiente dinero para comprar esta casilla.");
+            return;
+        }
+
+        jugador.restarFortuna(precio);
+        casillaActual.setDuenho(jugador);
+        jugador.anhadirPropiedad(casillaActual);
+        System.out.println(jugador.getNombre() + " ha comprado " + casillaActual.getNombre() + " por " + (long)precio + "€");
     }
+
 
 
     //Método que ejecuta todas las acciones relacionadas con el comando 'salir carcel'.
@@ -494,22 +521,72 @@ public class Menu {
         System.out.println("avatar: " + actual.getAvatar().getId());
         System.out.println("}");
     }
-
-
-    // Método que realiza las acciones asociadas al comando 'listar enventa'.
     private void listarVenta() {
-        ArrayList<Casilla> enVenta = tablero.getCasillasEnVenta(); // Asegúrate de tener este método en Tablero
+        ArrayList<Casilla> enVenta = tablero.getCasillasEnVenta();
 
         if (enVenta.isEmpty()) {
-            System.out.println("No hay casillas en venta.");
+            System.out.println("No hay propiedades en venta.");
             return;
         }
 
-        System.out.println("$> listar venta");
+        System.out.println("$> listar enventa");
         for (Casilla c : enVenta) {
-            System.out.println(c.casEnVenta());
+            System.out.println("{");
+            System.out.println("tipo: " + c.getTipo() + ",");
+            if ("solar".equalsIgnoreCase(c.getTipo())) {
+                System.out.println("grupo: " + c.getGrupo() + ",");
+            }
+            System.out.println("valor: " + (long)c.getValor());
+            System.out.println("},");
         }
     }
+    private void construir(String tipo, String nombreCasilla, int cantidad) {
+        Casilla c = tablero.encontrar_casilla(nombreCasilla);
+        Jugador jugador = jugadores.get(turno);
+
+        if (!"Solar".equalsIgnoreCase(c.getTipo()) || c.getDuenho() != jugador) {
+            System.out.println("No puedes construir en esta casilla.");
+            return;
+        }
+
+        switch (tipo.toLowerCase()) {
+            case "casa":
+                if (c.puedeConstruirCasa(jugador)) {
+                    c.construirCasas(jugador, cantidad);
+                    System.out.println("Has construido " + cantidad + " casa(s) en " + nombreCasilla);
+                } else {
+                    System.out.println("No puedes construir casas aquí.");
+                }
+                break;
+            case "hotel":
+                if (c.puedeConstruirHotel()) {
+                    c.construirHotel(jugador);
+                    System.out.println("Has construido un hotel en " + nombreCasilla);
+                } else {
+                    System.out.println("No puedes construir un hotel aquí.");
+                }
+                break;
+            case "piscina":
+                if (c.puedeConstruirPiscina()) {
+                    c.construirPiscina(jugador);
+                    System.out.println("Has construido una piscina en " + nombreCasilla);
+                } else {
+                    System.out.println("No puedes construir una piscina aquí.");
+                }
+                break;
+            case "pista":
+                if (c.puedeConstruirPista()) {
+                    c.construirPista(jugador);
+                    System.out.println("Has construido una pista de deporte en " + nombreCasilla);
+                } else {
+                    System.out.println("No puedes construir una pista aquí.");
+                }
+                break;
+            default:
+                System.out.println("Tipo de edificación no reconocido.");
+        }
+    }
+
 
 
 
@@ -546,6 +623,64 @@ public class Menu {
             } else {
                 System.out.println();
             }
+        }
+    }
+
+
+    public void edificar(String tipo, int cantidad) {
+        Jugador jugador = jugadores.get(turno);
+        Casilla casilla = jugador.getAvatar().getCasilla();
+
+        if (!"solar".equalsIgnoreCase(casilla.getTipo())) {
+            System.out.println("Solo se puede edificar en solares.");
+            return;
+        }
+
+        if (!jugador.equals(casilla.getDuenho())) {
+            System.out.println("No eres dueño de esta casilla.");
+            return;
+        }
+
+        if (!jugador.poseeGrupoCompleto(casilla, tablero)) {
+            System.out.println("No puedes edificar. No posees todo el grupo.");
+            return;
+        }
+
+        switch (tipo.toLowerCase()) {
+            case "casa":
+                if (casilla.puedeConstruirCasa(jugador)) {
+                    casilla.construirCasas(jugador, cantidad);
+                    System.out.println("Has construido " + cantidad + " casa(s) en " + casilla.getNombre());
+                } else {
+                    System.out.println("No puedes construir casas aquí.");
+                }
+                break;
+            case "hotel":
+                if (casilla.puedeConstruirHotel()) {
+                    casilla.construirHotel(jugador);
+                    System.out.println("Has construido un hotel en " + casilla.getNombre());
+                } else {
+                    System.out.println("No puedes construir un hotel aquí.");
+                }
+                break;
+            case "piscina":
+                if (casilla.puedeConstruirPiscina()) {
+                    casilla.construirPiscina(jugador);
+                    System.out.println("Has construido una piscina en " + casilla.getNombre());
+                } else {
+                    System.out.println("No puedes construir una piscina aquí.");
+                }
+                break;
+            case "pista":
+                if (casilla.puedeConstruirPista()) {
+                    casilla.construirPista(jugador);
+                    System.out.println("Has construido una pista de deporte en " + casilla.getNombre());
+                } else {
+                    System.out.println("No puedes construir una pista aquí.");
+                }
+                break;
+            default:
+                System.out.println("Tipo de edificación no reconocido.");
         }
     }
 
@@ -594,4 +729,49 @@ public class Menu {
         System.out.println("avatar: " + actual.getAvatar().getId());
         System.out.println("}");
     }
+
+    private Jugador verificarGanador() {
+        ArrayList<Jugador> activos = new ArrayList<>();
+        for (Jugador j : jugadores) {
+            if (j.estaActivo()) {
+                activos.add(j);
+            }
+        }
+        return (activos.size() == 1) ? activos.get(0) : null;
+    }
+
+    public void verificarGanadorTrasBancarrota() {
+        Jugador ganador = verificarGanador();
+        if (ganador != null) {
+            System.out.println("🎉 ¡" + ganador.getNombre() + " ha ganado la partida! 🎉");
+            System.out.println("Fortuna final: " + (long)ganador.getFortuna() + "€");
+            System.out.println("Propiedades: " + ganador.getPropiedades().size());
+            System.out.println("Gastos totales: " + (long)ganador.getGastos() + "€");
+            // Aquí puedes terminar el juego o bloquear más comandos
+        }
+    }
+
+    public void ofrecerConstruccion(Jugador jugador, Casilla casilla) {
+        if (!"solar".equalsIgnoreCase(casilla.getTipo())) return;
+        if (!casilla.getDuenho().equals(jugador)) return;
+
+        if (!jugador.poseeGrupoCompleto(casilla, tablero)) {
+            System.out.println("No puedes construir aquí. No posees todo el grupo.");
+            return;
+        }
+
+        System.out.println("¿Quieres construir en " + casilla.getNombre() + "?");
+
+        System.out.println("Opciones disponibles:");
+
+        if (casilla.puedeConstruirCasa(jugador)) System.out.println("1. Construir casas");
+        if (casilla.puedeConstruirHotel()) System.out.println("2. Construir hotel");
+        if (casilla.puedeConstruirPiscina()) System.out.println("3. Construir piscina");
+        if (casilla.puedeConstruirPista()) System.out.println("4. Construir pista de deporte");
+
+        // Aquí puedes leer la opción del usuario y llamar al método correspondiente
+    }
+
+
+
 }
