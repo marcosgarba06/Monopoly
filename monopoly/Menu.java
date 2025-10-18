@@ -533,8 +533,9 @@ public class Menu { // la clase menu
 
     //Método que ejecuta todas las acciones relacionadas con el comando 'salir carcel'.
     private void salirCarcel(Jugador jugador) {
+
         if (!jugador.isEnCarcel() && !jugador.getAvatar().estaEnCarcel()) {
-            System.out.println("No estás en la cárcel. No necesitas salir.");
+            System.out.println("No estás en la cárcel.");
             return;
         }
         Avatar av = jugador.getAvatar();
@@ -652,6 +653,7 @@ public class Menu { // la clase menu
         System.out.println("$> listar enventa");
         for (Casilla c : enVenta) {
             System.out.println("{");
+            System.out.println("nombre: " + c.getNombre() + ",");
             System.out.println("tipo: " + c.getTipo() + ",");
             if ("solar".equalsIgnoreCase(c.getTipo())) {
                 System.out.println("grupo: " + c.getGrupo() + ",");
@@ -661,6 +663,7 @@ public class Menu { // la clase menu
         }
     }
     private void construir(String tipo, String nombreCasilla, int cantidad) {
+
         Casilla c = tablero.encontrar_casilla(nombreCasilla);
         Jugador jugador = jugadores.get(turno);
 
@@ -735,8 +738,9 @@ public class Menu { // la clase menu
             }
 
             System.out.println("hipotecas: -,");
+//implementar
             System.out.println("edificios: -");
-
+//implementar
             System.out.print("}");
             if (i < jugadores.size() - 1) {
                 System.out.println(",");
@@ -748,6 +752,7 @@ public class Menu { // la clase menu
 
 
     public void edificar(String nombreCasilla, String tipo, int cantidad) {
+
         Jugador jugador = jugadores.get(turno);
         Casilla casilla = tablero.encontrar_casilla(nombreCasilla);
 
@@ -895,7 +900,5 @@ public class Menu { // la clase menu
 
         // Aquí puedes leer la opción del usuario y llamar al método correspondiente
     }
-
-
 
 }
