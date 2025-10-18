@@ -12,21 +12,21 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Menu {
+public class Menu { // la clase menu
 
     // Atributos
     private Tablero tablero;
     private Jugador banca;
-    private ArrayList<Jugador> jugadores;
-    private ArrayList<Avatar> avatares;
+    private ArrayList<Jugador> jugadores; //lista de jugadores
+    private ArrayList<Avatar> avatares; //lista de avatares
 
-    private int lanzamientos;
+    //private int lanzamientos;
     private Dado dado1;
     private Dado dado2;
 
     private int turno = 0;
     private boolean tirado = false;
-    private boolean solvente;
+    //private boolean solvente;
     private int contadorDobles = 0;
     private boolean repetirTurno = false;
 
@@ -38,6 +38,7 @@ public class Menu {
     public Menu() {
         this.banca = new Jugador();
         this.tablero = new Tablero(banca);
+        this.tablero.setMenu(this);
         this.jugadores = new ArrayList<>();
         this.avatares = new ArrayList<>();
         this.dado1 = new Dado();
@@ -45,6 +46,7 @@ public class Menu {
     }
 
     public void iniciarPartida() {
+
         Scanner sc = new Scanner(System.in);
 
         // Creación de jugadores
@@ -72,7 +74,7 @@ public class Menu {
 
             String avatarElegido;
             String[] avataresPermitidos = {"coche", "sombrero", "pelota", "esfinge"};
-            Set<String> avataresUsados = new HashSet<>(); // Mueve esto FUERA del bucle principal
+//            Set<String> avataresUsados = new HashSet<>(); // Mueve esto FUERA del bucle principal
 
             while (true) {
                 System.out.println("Elige un avatar (coche, sombrero, pelota, esfinge):");
@@ -125,7 +127,7 @@ public class Menu {
         System.out.println("Comandos disponibles:");
         System.out.println("  - 'listar jugadores' / 'jugadores'");
         System.out.println("  - 'jugador' (ver turno actual)");
-        System.out.println("  - 'tirar dado'");
+        System.out.println("  - 'tirar dados'");
         System.out.println("  - 'acabar turno'");
         System.out.println("  - 'ver tablero'");
         System.out.println("  - 'describir <casilla>'");
@@ -139,7 +141,6 @@ public class Menu {
         System.out.println("  - 'salir carcel'");
         System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
         System.out.println("  - 'salir' (cerrar el juego)");
-        System.out.print("> ");
         while (true) {
             Jugador actual = jugadores.get(turno);
             System.out.println("\nTurno de " + actual.getNombre());
@@ -147,7 +148,6 @@ public class Menu {
             String comando = sc.nextLine();
 
             analizarComando(comando);
-            tablero.inicializarCartas();
 
         }
     }
@@ -189,7 +189,7 @@ public class Menu {
             System.exit(0);
         } else if (comandoLC.equals("jugador")) {
             indicarTurno();
-        } else if (comandoLC.equals("tirar dado")) {
+        } else if (comandoLC.equals("tirar dados")) {
             lanzarDados();
 
         } else if (partes.length == 2 && partes[0].equals("comprar")) {
@@ -217,16 +217,23 @@ public class Menu {
             hipotecar();
         }else if (partes.length == 2 && partes[0].equals("describir") && partes[1].startsWith("avatar")) {
             descAvatar(partes[1].substring(7)); // si usas 'describir avatarX'
-        } else if (partes.length >= 4 && partes[0].equals("edificar")) {
-            String nombreCasilla = partes[1];
-            String tipo = partes[2];
-            int cantidad = Integer.parseInt(partes[3]);
-            edificar(nombreCasilla, tipo, cantidad);
-        }else {
+        }else if (partes.length >= 4 && partes[0].equals("edificar")) {
+                String nombreCasilla = partes[1];
+                String tipo = partes[2];
+
+                try {
+                    int cantidad = Integer.parseInt(partes[3]);
+                    edificar(nombreCasilla, tipo, cantidad);
+                } catch (NumberFormatException e) {
+                    System.out.println("Error: La cantidad debe ser un número válido.");
+                    System.out.println("Uso: edificar <casilla> <tipo> <cantidad>");
+                    System.out.println("Ejemplo: edificar Sol1 casa 2");
+                }
+        } else {
             System.out.println("Comando no reconocido. Prueba con alguno de estos:");
             System.out.println("  - 'listar jugadores' / 'jugadores'");
             System.out.println("  - 'jugador' (ver turno actual)");
-            System.out.println("  - 'tirar dado'");
+            System.out.println("  - 'tirar dados'");
             System.out.println("  - 'acabar turno'");
             System.out.println("  - 'ver tablero'");
             System.out.println("  - 'describir <casilla>'");

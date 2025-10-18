@@ -30,6 +30,7 @@ public class Tablero {
         for (int i = 0; i < 4; i++) this.posiciones.add(new ArrayList<>());
         this.grupos = new HashMap<>();
         generarCasillas();
+        inicializarCartas();
     }
 
     // ======== Generación del tablero ========
@@ -659,5 +660,7 @@ public class Tablero {
 
 
 
-
+    public void setMenu(Menu menu) {
+        this.menu = menu;
+    }
 }

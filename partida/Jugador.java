@@ -111,15 +111,15 @@ public class Jugador {
         this.fortuna += valor;
     }
 
+
     public void restarFortuna(float cantidad) {
         this.fortuna -= cantidad;
-        if (fortuna < cantidad) {
+        if (fortuna < 0) { // ✅ Correcto
             this.bancarrota = true;
             System.out.println(nombre + " ha caído en bancarrota.");
-            // Transferir propiedades, eliminar del juego, etc.
         }
-
     }
+
 
     public void añadirCartaSalirCarcel() {
         cartasSalirCarcel++;

@@ -31,7 +31,7 @@ public class Avatar {
 
         this.tipo = tipo;
         this.jugador = jugador;
-        this.casilla = casilla;
+        this.casilla = lugar;
 
         generarId(avCreados); //generamos un id
         avCreados.add(this); //añadimos el id nuevo para el cual lo creamos

@@ -36,7 +36,6 @@ public class Casilla {
     private boolean tieneHotel = false;
     private boolean tienePiscina = false;
     private boolean tienePista = false;
-    private int casas = 0;
     private int hotel = 0;
     private int piscina = 0;
     private int pista = 0;
@@ -446,7 +445,7 @@ public class Casilla {
                 numCasas < 4;
     }
     public String resumenEdificaciones() {
-        return "Casas: " + casas + ", Hotel: " + hotel + ", Piscina: " + piscina + ", Pista: " + pista;
+        return "Casas: " + numCasas + ", Hotel: " + hotel + ", Piscina: " + piscina + ", Pista: " + pista;
     }
 
 
@@ -486,7 +485,7 @@ public class Casilla {
 
     public void construirCasas(Jugador jugador, int cantidad) {
         if (puedeConstruirCasa(jugador)) {
-            casas += cantidad;
+            numCasas += cantidad;
             jugador.restarFortuna(costeCasa * cantidad);
         } else {
             System.out.println("No se pueden construir más casas aquí.");
@@ -501,8 +500,8 @@ public class Casilla {
 
 
     public void construirHotel(Jugador jugador) {
-        if (casas == 4 && hotel == 0) {
-            casas = 0;
+        if (numCasas == 4 && hotel == 0) {
+            numCasas = 0;
             hotel = 1;
             jugador.restarFortuna(costeHotel);
             System.out.println("Construido hotel en " + nombre);
