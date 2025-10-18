@@ -491,10 +491,12 @@ public class Tablero {
 
         // Limitar nombre a 7 caracteres y avatares a 5
         String nombreCorto = String.format("%-7.7s", nombre);
-        String avataresCorto = String.format("%-5.5s", avatares.toString());
+        String avataresCorto = String.format("%-8.8s", avatares.toString());
 
         String texto = nombreCorto + avataresCorto;
-        return colorTexto(texto, color);
+        String casillaDelimitada = "[" + texto + "]";
+
+        return colorTexto(casillaDelimitada, color);
     }
 
     private String colorTexto(String texto, String colorGrupo) {
@@ -553,7 +555,7 @@ public class Tablero {
             }
 
             // Espacios en el centro (casillas norte - 2 esquinas)
-            sb.append(" ".repeat((norte.size() - 2) * 12));
+            sb.append(" ".repeat((norte.size() +1) * 12));
 
             // ESTE (de arriba a abajo)
             if (i < este.size()) {
