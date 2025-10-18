@@ -244,7 +244,7 @@ public class Casilla {
             case "suerte":
                 System.out.println("Has caído en Suerte. Robas una carta...");
                 if (tablero != null) {
-                    Carta cartaS = tablero.robarCarta("suerte");
+                    Carta cartaS = tablero.sacarCarta("suerte");
                     cartaS.aplicarAccion(jugador, tablero);
                 } else {
                     System.out.println("Error: tablero no asignado.");
@@ -254,7 +254,7 @@ public class Casilla {
             case "caja":
                 System.out.println("Has caído en Caja de Comunidad. Robas una carta...");
                 if (tablero != null) {
-                    Carta cartaC = tablero.robarCarta("caja");
+                    Carta cartaC = tablero.sacarCarta("caja");
                     cartaC.aplicarAccion(jugador, tablero);
                 } else {
                     System.out.println("Error: tablero no asignado.");

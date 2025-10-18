@@ -22,7 +22,8 @@ public class Tablero {
     private HashMap<String, Grupo> grupos;
     private Jugador banca;
     private float fondoParking = 0;
-
+    private ArrayList<Carta> mazoSuerte = new ArrayList<>();
+    private ArrayList<Carta> mazoCaja = new ArrayList<>();
     // Constructor
     public Tablero(Jugador banca) {
         this.banca = banca;
@@ -477,6 +478,25 @@ public class Tablero {
         }
     }
 
+    public void inicializarCartas() {
+        mazoSuerte.add(new Carta("Recibes 1.000.000€ por inversión exitosa", "suerte"));
+        mazoSuerte.add(new Carta("Paga 500.000€ por reparación de propiedades", "suerte"));
+        mazoSuerte.add(new Carta("Ve directamente a la cárcel", "suerte"));
+        mazoSuerte.add(new Carta("Has ganado una carta para salir de la cárcel", "suerte"));
+
+        mazoCaja.add(new Carta("Recibes 200.000€ por devolución de impuestos", "caja"));
+        mazoCaja.add(new Carta("Paga 300.000€ por gastos médicos", "caja"));
+        mazoCaja.add(new Carta("Avanza a la casilla 'Sol10'", "caja"));
+    }
+
+    public Carta sacarCarta(String tipo) {
+        Random r = new Random();
+        if (tipo.equalsIgnoreCase("suerte")) {
+            return mazoSuerte.get(r.nextInt(mazoSuerte.size()));
+        } else {
+            return mazoCaja.get(r.nextInt(mazoCaja.size()));
+        }
+    }
 
     // ======== Utilidades de impresión ========
     private String formatCasilla(Casilla c) {
@@ -615,28 +635,8 @@ public class Tablero {
         return banca;
     }
 
-    private ArrayList<Carta> mazoSuerte = new ArrayList<>();
-    private ArrayList<Carta> mazoCaja = new ArrayList<>();
 
-    public void inicializarCartas() {
-        mazoSuerte.add(new Carta("Recibes 1.000.000€ por inversión exitosa", "suerte"));
-        mazoSuerte.add(new Carta("Paga 500.000€ por reparación de propiedades", "suerte"));
-        mazoSuerte.add(new Carta("Ve directamente a la cárcel", "suerte"));
-        mazoSuerte.add(new Carta("Has ganado una carta para salir de la cárcel", "suerte"));
 
-        mazoCaja.add(new Carta("Recibes 200.000€ por devolución de impuestos", "caja"));
-        mazoCaja.add(new Carta("Paga 300.000€ por gastos médicos", "caja"));
-        mazoCaja.add(new Carta("Avanza a la casilla 'Sol10'", "caja"));
-    }
-
-    public Carta robarCarta(String tipo) {
-        Random r = new Random();
-        if (tipo.equals("suerte")) {
-            return mazoSuerte.get(r.nextInt(mazoSuerte.size()));
-        } else {
-            return mazoCaja.get(r.nextInt(mazoCaja.size()));
-        }
-    }
 
     public void añadirAlParking(float cantidad) {
         fondoParking += cantidad;

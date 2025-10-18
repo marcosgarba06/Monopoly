@@ -1,6 +1,8 @@
 package partida;
 
 import java.util.ArrayList;
+import java.util.Random;
+
 import monopoly.*;
 
 public class Jugador {
@@ -19,6 +21,9 @@ public class Jugador {
     private boolean tieneCartaSalirCarcel = false;
     private boolean activo = true;
 
+    private ArrayList<Carta> mazoSuerte = new ArrayList<>();
+    private ArrayList<Carta> mazoCaja = new ArrayList<>();
+    private Tablero tablero;
 
     //Constructor vacío. Se usará para crear la banca.
     public Jugador() {
@@ -52,59 +57,7 @@ public class Jugador {
         this.tieneCartaSalirCarcel = false;
     }
 
-    // Getters
-    public String getNombre() {
-        return nombre;
-    }
 
-    public Avatar getAvatar() {
-        return avatar;
-    }
-
-    public float getFortuna() {
-        return fortuna;
-    }
-
-    public float getGastos() {
-        return gastos;
-    }
-
-    public boolean isEnCarcel() {
-        return enCarcel;
-    }
-
-    public int getTiradasCarcel() {
-        return tiradasCarcel;
-    }
-
-    public int getVueltas() {
-        return vueltas;
-    }
-
-    public ArrayList<Casilla> getPropiedades() {
-        return propiedades;
-    }
-
-    public boolean isBancarrota() {
-        return bancarrota;
-    }
-
-    public boolean tieneCartaSalirCarcel() {
-        return tieneCartaSalirCarcel;
-    }
-
-    // Setters
-    public void setEnCarcel(boolean enCarcel) {
-        this.enCarcel = enCarcel;
-    }
-
-    public void setBancarrota(boolean bancarrota) {
-        this.bancarrota = bancarrota;
-    }
-
-    public void incrementarVueltas() {
-        this.vueltas++;
-    }
 
     // Métodos de fortuna
     public void sumarFortuna(float valor) {
@@ -162,13 +115,7 @@ public class Jugador {
         return !propiedades.isEmpty();
     }
 
-    public void setTieneCartaSalirCarcel(boolean valor) {
-        tieneCartaSalirCarcel = valor;
-    }
 
-    public boolean getTieneCartaSalirCarcel() {
-        return tieneCartaSalirCarcel;
-    }
 
     // Método para enviar al jugador a la cárcel
     public void irACarcel(Tablero tablero) {
@@ -213,11 +160,17 @@ public class Jugador {
         pagador.sumarGastos(cantidad);
     }
 
-    // Método para robar carta (placeholder)
+
+
+
+
     public void robarCarta(String tipo) {
-        System.out.println(nombre + " roba una carta de tipo " + tipo);
-        // Aquí se implementaría la lógica del mazo de cartas
+        Carta carta = tablero.sacarCarta(tipo);
+        System.out.println(nombre + " roba una carta: " + carta.getDescripcion());
+        carta.aplicarAccion(this, tablero);
     }
+
+
 
 
     public void anhadirPropiedad(Casilla c) {
@@ -244,19 +197,6 @@ public class Jugador {
         return activo;
     }
 
-    public void setActivo(boolean estado) {
-        this.activo = estado;
-    }
-    private Tablero tablero;
-
-
-
-    public void setTablero(Tablero t) {
-        this.tablero = t;
-    }
-
-
-
 
     public boolean poseeGrupoCompleto(Casilla casilla, Tablero tablero) {
         String nombreGrupo = casilla.getGrupo().getNombre();
@@ -268,8 +208,63 @@ public class Jugador {
                 propias++;
             }
         }
-
         return propias == total;
+    }
+
+    // Getters
+
+    public String getNombre() {
+        return nombre;
+    }
+    public Avatar getAvatar() {
+        return avatar;
+    }
+    public float getFortuna() {
+        return fortuna;
+    }
+    public float getGastos() {
+        return gastos;
+    }
+    public boolean isEnCarcel() {
+        return enCarcel;
+    }
+    public int getTiradasCarcel() {
+        return tiradasCarcel;
+    }
+    public int getVueltas() {
+        return vueltas;
+    }
+    public ArrayList<Casilla> getPropiedades() {
+        return propiedades;
+    }
+    public boolean isBancarrota() {
+        return bancarrota;
+    }
+    public boolean tieneCartaSalirCarcel() {
+        return tieneCartaSalirCarcel;
+    }
+    public boolean getTieneCartaSalirCarcel() {
+        return tieneCartaSalirCarcel;
+    }
+    // Setters
+
+    public void setTieneCartaSalirCarcel(boolean valor) {
+        tieneCartaSalirCarcel = valor;
+    }
+    public void setEnCarcel(boolean enCarcel) {
+        this.enCarcel = enCarcel;
+    }
+    public void setBancarrota(boolean bancarrota) {
+        this.bancarrota = bancarrota;
+    }
+    public void incrementarVueltas() {
+        this.vueltas++;
+    }
+    public void setActivo(boolean estado) {
+        this.activo = estado;
+    }
+    public void setTablero(Tablero t) {
+        this.tablero = t;
     }
 
 
