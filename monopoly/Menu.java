@@ -58,6 +58,9 @@ public class Menu {
             }
         } while (numJugadores < 2 || numJugadores > 4);
 
+        String[] avataresPermitidos = {"coche", "sombrero", "pelota", "esfinge"};
+        Set<String> avataresUsados = new HashSet<>(); // ✅ ahora está fuera del for
+
         for (int i = 0; i < numJugadores; i++) {
             String nombre;
             while (true) {
@@ -71,9 +74,6 @@ public class Menu {
             }
 
             String avatarElegido;
-            String[] avataresPermitidos = {"coche", "sombrero", "pelota", "esfinge"};
-            Set<String> avataresUsados = new HashSet<>(); // Mueve esto FUERA del bucle principal
-
             while (true) {
                 System.out.println("Elige un avatar (coche, sombrero, pelota, esfinge):");
                 avatarElegido = sc.nextLine().trim().toLowerCase();
@@ -100,8 +100,6 @@ public class Menu {
                 break; // Avatar válido y no repetido → salimos del bucle
             }
 
-
-
             Casilla salida = tablero.encontrar_casilla("Salida");
             Jugador j = new Jugador(nombre, avatarElegido, salida, avatares);
             Avatar av = j.getAvatar();
@@ -113,6 +111,7 @@ public class Menu {
             System.out.println("Jugador " + nombre + " creado con avatar " + avatarElegido);
         }
 
+
         System.out.println("Jugadores creados correctamente.\n");
 
         // Iniciar el bucle del juego
@@ -122,6 +121,10 @@ public class Menu {
     public void iniciarJuego() {
         Scanner sc = new Scanner(System.in);
         System.out.println("¡Comienza el juego!");
+        System.out.println("Tablero:");
+        System.out.println("-----------------------------");
+        System.out.println(tablero);
+        System.out.println("----------------------------");
         System.out.println("Comandos: 'listar jugadores', 'jugador', 'acabar turno', 'comandos <ruta/archivo>', 'ver tablero', 'describir <casilla>', 'describir jugador <nombre>', 'listar avatares', 'listar venta', 'tirar dado', 'comprar <casilla>', 'salir carcel' o 'salir'.");
 
         while (true) {
@@ -594,4 +597,7 @@ public class Menu {
         System.out.println("avatar: " + actual.getAvatar().getId());
         System.out.println("}");
     }
+
+
 }
+

@@ -1,9 +1,6 @@
 package monopoly;
 
 
-//ERRORES: me deja escoger el avatar por pantalla que quiera, sin ser uno de esos 4
-
-
 import java.awt.*;
 import java.util.Scanner;
 import partida.Jugador;
@@ -18,17 +15,20 @@ public class MonopolyETSE {
         Jugador banca = new Jugador();
         // Creamos el menú (que gestiona jugadores)
         Tablero tablero = new Tablero(banca);
-        //Menu menu = new Menu(tablero);
+
         menu.iniciarJuego();
 
         Scanner sc = new Scanner(System.in);
 
         System.out.println("Bienvenido a Monopoly ETSE.");
 
+
         boolean continuar = true;
         while (continuar) {
+
             System.out.println("Comandos disponibles: 'listar jugadores', 'jugador', 'acabar turno', 'ver tablero', 'describir <casilla>', 'describir jugador <nombre>', 'listar venta', 'tirar dado', 'salir carcel' o 'salir'");
             System.out.print("> ");
+
             String comando = sc.nextLine().trim();
 
             if (comando.equalsIgnoreCase("salir")) {
