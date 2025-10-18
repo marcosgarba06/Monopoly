@@ -17,6 +17,8 @@ public class Jugador {
     private ArrayList<Casilla> propiedades;
     private boolean bancarrota;
     private boolean tieneCartaSalirCarcel = false;
+    private boolean activo = true;
+
 
     //Constructor vacío. Se usará para crear la banca.
     public Jugador() {
@@ -109,15 +111,15 @@ public class Jugador {
         this.fortuna += valor;
     }
 
+
     public void restarFortuna(float cantidad) {
         this.fortuna -= cantidad;
-        if (fortuna < cantidad) {
+        if (fortuna < 0) { // ✅ Correcto
             this.bancarrota = true;
             System.out.println(nombre + " ha caído en bancarrota.");
-            // Transferir propiedades, eliminar del juego, etc.
         }
-
     }
+
 
     public void añadirCartaSalirCarcel() {
         cartasSalirCarcel++;
@@ -216,4 +218,59 @@ public class Jugador {
         System.out.println(nombre + " roba una carta de tipo " + tipo);
         // Aquí se implementaría la lógica del mazo de cartas
     }
+
+
+    public void anhadirPropiedad(Casilla c) {
+        propiedades.add(c);
+    }
+
+    public void declararBancarrota(Jugador acreedor) {
+        System.out.println(this.nombre + " se ha declarado en bancarrota.");
+
+        // Transferir propiedades
+        for (Casilla propiedad : propiedades) {
+            propiedad.setDuenho(acreedor);
+            acreedor.anhadirPropiedad(propiedad);
+        }
+
+        propiedades.clear();
+        fortuna = 0;
+        activo = false;
+
+        // si usas un flag para saber si sigue en juego
+    }
+
+    public boolean estaActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean estado) {
+        this.activo = estado;
+    }
+    private Tablero tablero;
+
+
+
+    public void setTablero(Tablero t) {
+        this.tablero = t;
+    }
+
+
+
+
+    public boolean poseeGrupoCompleto(Casilla casilla, Tablero tablero) {
+        String nombreGrupo = casilla.getGrupo().getNombre();
+        int total = tablero.getCantidadCasillasGrupo(nombreGrupo);
+
+        int propias = 0;
+        for (Casilla c : propiedades) {
+            if (c.getGrupo().getNombre().equalsIgnoreCase(nombreGrupo)) {
+                propias++;
+            }
+        }
+
+        return propias == total;
+    }
+
+
 }

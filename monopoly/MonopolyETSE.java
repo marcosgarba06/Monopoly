@@ -8,26 +8,23 @@ import partida.Jugador;
 public class MonopolyETSE {
 
     public static void main(String[] args) {
-        Menu menu = new Menu();
-        //Llamada al metodo para iniciar la partida
-        menu.iniciarPartida();
+        Menu menu = new Menu(); //creamos el objeto menu que gestiona los comandos
+        menu.iniciarPartida();// inicamos la partida
 
-        Jugador banca = new Jugador();
-        // Creamos el menú (que gestiona jugadores)
-        Tablero tablero = new Tablero(banca);
-        //Menu menu = new Menu(tablero);
-        menu.iniciarJuego();
+        Jugador banca = new Jugador(); //se crea el jugado de la banca
+        Tablero tablero = new Tablero(banca); // se inicializa el tablero
 
         Scanner sc = new Scanner(System.in);
 
         System.out.println("Bienvenido a Monopoly ETSE.");
 
         boolean continuar = true;
+        //el bucle se repetira hasta que se introduzca el comando salir
         while (continuar) {
             System.out.println("Comandos disponibles:");
             System.out.println("  - 'listar jugadores' / 'jugadores'");
             System.out.println("  - 'jugador' (ver turno actual)");
-            System.out.println("  - 'tirar dado'");
+            System.out.println("  - 'tirar dados'");
             System.out.println("  - 'acabar turno'");
             System.out.println("  - 'ver tablero'");
             System.out.println("  - 'describir <casilla>'");
@@ -41,7 +38,7 @@ public class MonopolyETSE {
             System.out.println("  - 'salir carcel'");
             System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
             System.out.println("  - 'salir' (cerrar el juego)");
-            String comando = sc.nextLine().trim();
+            String comando = sc.nextLine().trim(); // se lee lo que escribe el usuario y se limbia espacion innecesarios
 
             if (comando.equalsIgnoreCase("salir")) {
                 System.out.println("Saliendo del juego...");
@@ -50,9 +47,11 @@ public class MonopolyETSE {
                 menu.analizarComando(comando);
             }
         }
-        sc.close(); // Cerramos el scanner al final del programa
+        sc.close();
     }
 }
+
+
 
 
 

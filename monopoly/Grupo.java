@@ -4,7 +4,7 @@ import partida.*;
 import java.util.ArrayList;
 
 
-class Grupo {
+public class Grupo {
 
     //Atributos
     private ArrayList<Casilla> miembros; //Casillas miembros del grupo.
@@ -84,6 +84,13 @@ class Grupo {
 
     public int getNumCasillas() {
         return numCasillas;
+    }
+
+    public boolean perteneceEnteramenteA(Jugador jugador) {
+        for (Casilla c : miembros) {
+            if (c.getDuenho() != jugador) return false;
+        }
+        return true;
     }
 
 }
