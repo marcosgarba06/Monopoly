@@ -141,7 +141,13 @@ public class Menu { // la clase menu
         System.out.println("  - 'salir carcel'");
         System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
         System.out.println("  - 'salir' (cerrar el juego)");
+
         while (true) {
+
+            System.out.println("TABLERO:");
+            System.out.println("-----------------------------------");
+            System.out.println(tablero);
+            System.out.println("-----------------------------------");
             Jugador actual = jugadores.get(turno);
             System.out.println("\nTurno de " + actual.getNombre());
             System.out.print("> ");
