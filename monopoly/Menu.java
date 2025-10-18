@@ -136,7 +136,7 @@ public class Menu { // la clase menu
         System.out.println("  - 'listar venta' (casillas disponibles)");
         System.out.println("  - 'listar avatares'");
         System.out.println("  - 'comprar <casilla>'");
-        System.out.println("  - 'hipotecar' (solo si estás en bancarrota)");
+        System.out.println("  - 'hipotecar <casilla>' (solo si estás en bancarrota)");
         System.out.println("  - 'edificar <solar> <tipo> [cantidad]' (casa, hotel, piscina, pista)");
         System.out.println("  - 'salir carcel'");
         System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
@@ -163,9 +163,9 @@ public class Menu { // la clase menu
      * Parámetro: cadena de caracteres (el comando).
      */
     public void analizarComando(String comando) {
-        // Conserva el original para no romper rutas con mayúsculas
-        String comandoOriginal = comando.trim();
-        String comandoLC = comandoOriginal.toLowerCase(Locale.ROOT);
+
+        String comandoOriginal = comando.trim(); //quita espacio del principio y del final
+        String comandoLC = comandoOriginal.toLowerCase(Locale.ROOT);// pone todo en minusculas
 
         // Manejo del comando: "comandos <ruta/al/archivo.txt>"
         if (comandoLC.startsWith("comandos")) {
@@ -219,8 +219,13 @@ public class Menu { // la clase menu
             }
         } else if (comandoLC.equals("acabar turno")) {
             acabarTurno();
-        } else if (comandoLC.equals("hipotecar")) {
-            hipotecar();
+        } else if (comandoLC.startsWith("hipotecar")) {
+            if (partes.length < 2 || partes[1].isBlank()) {
+                System.out.println("Uso: hipotecar <nombre de la casilla>");
+            } else {
+                String nombreCasilla = partes[1].trim();
+                hipotecar(nombreCasilla);
+            }
         }else if (partes.length == 2 && partes[0].equals("describir") && partes[1].startsWith("avatar")) {
             descAvatar(partes[1].substring(7)); // si usas 'describir avatarX'
         }else if (partes.length >= 4 && partes[0].equals("edificar")) {
@@ -248,7 +253,7 @@ public class Menu { // la clase menu
             System.out.println("  - 'listar venta' (casillas disponibles)");
             System.out.println("  - 'listar avatares'");
             System.out.println("  - 'comprar <casilla>'");
-            System.out.println("  - 'hipotecar' (solo si estás en bancarrota)");
+            System.out.println("  - 'hipotecar <casilla>' (solo si estás en bancarrota)");
             System.out.println("  - 'edificar <tipo> [cantidad]' (casa, hotel, piscina, pista)");
             System.out.println("  - 'salir carcel'");
             System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
@@ -318,6 +323,7 @@ public class Menu { // la clase menu
                 }
 
                 System.out.println("hipotecas: -,");
+                //implementar
                 System.out.print("edificios: ");
                 boolean tieneEdificios = false;
 
@@ -387,7 +393,7 @@ public class Menu { // la clase menu
         }
     }
 
-    public void hipotecar() {
+    public void hipotecar(String nombreCasilla) {
         Jugador jugador = jugadores.get(turno);
 
         if (!jugador.isBancarrota()) {
@@ -395,7 +401,7 @@ public class Menu { // la clase menu
             return;
         }
 
-        Casilla casilla = jugador.getAvatar().getCasilla();
+        Casilla casilla = tablero.encontrar_casilla(nombreCasilla);
 
         if (!jugador.equals(casilla.getDuenho())) {
             System.out.println("No eres dueño de esta casilla.");
@@ -417,8 +423,6 @@ public class Menu { // la clase menu
         casilla.hipotecar();
         System.out.println("Has hipotecado " + casilla.getNombre() + " y recibes " + (long)valorHipoteca + "€.");
     }
-
-
 
 
     private int lanzarDados() {
@@ -483,6 +487,7 @@ public class Menu { // la clase menu
      * Parámetro: cadena de caracteres con el nombre de la casilla.
      */
     public void comprar(String nombreCasilla) {
+
         Jugador jugador = jugadores.get(turno);
         Casilla casilla = tablero.encontrar_casilla(nombreCasilla);
 
