@@ -91,6 +91,9 @@ public class Grupo {
             if (c.getDuenho() != jugador) return false;
         }
         return true;
-    }
+   }
+   public String toString() {
+        return colorGrupo;
+   }
 
 }
