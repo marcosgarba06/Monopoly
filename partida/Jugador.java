@@ -129,6 +129,7 @@ public class Jugador {
 
         // Colocar el avatar en la cárcel
         avatar.setCasilla(carcel);
+        avatar.setPosicion(carcel.getPosicion());
         carcel.anhadirAvatar(avatar);
         avatar.setEnCarcel(true);
         avatar.setTurnosEnCarcel(0);

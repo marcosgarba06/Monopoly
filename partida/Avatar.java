@@ -46,7 +46,15 @@ public class Avatar {
      */
 
     public void moverAvatar(int pasos, Tablero tablero) {
-        int nuevaPos = (this.posicion + pasos) % 40;
+        int posicionActual = this.posicion;
+        int nuevaPos = (posicionActual + pasos) % 40;//calcular la nueva posición del avatar en el tablero, asegurándose de que no se salga del rango de casillas.
+
+        // Si la nueva posición es menor que la actual, significa que pasó por la salida
+        if (nuevaPos < posicionActual) {
+            jugador.sumarFortuna(2000000);
+            System.out.println("Has pasado por la casilla de salida. Recibes 2.000.000€.");
+        }
+
         this.posicion = nuevaPos;
 
         Casilla nuevaCasilla = tablero.getCasilla(nuevaPos);
@@ -55,6 +63,7 @@ public class Avatar {
         System.out.println("El avatar " + id + " ha avanzado hasta la casilla " + nuevaCasilla.getNombre());
         nuevaCasilla.evaluarCasilla(jugador);
     }
+
 
 
 
