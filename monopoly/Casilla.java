@@ -18,6 +18,8 @@ public class Casilla {
     private float alquiler;
     private boolean hipotecable = true;
 
+    private boolean hipotecada = false;
+
 
 
     private float hipoteca;
@@ -155,6 +157,7 @@ public class Casilla {
             case "solar":
                 if (this.getDuenho() == null) {
                     System.out.println("La casilla está en venta por " + (long)this.valor + "€.");
+                    System.out.println("Puedes comprarla con el comando: comprar " + this.nombre);
                 } else if (!this.getDuenho().equals(jugador)) {
                     System.out.println("La casilla pertenece a " + this.getDuenho().getNombre() + ". Debes pagar alquiler.");
 
@@ -165,7 +168,6 @@ public class Casilla {
                         System.out.println("No puedes pagar el alquiler. Te declaras en bancarrota.");
                         jugador.declararBancarrota(this.getDuenho());
 
-                        // Notificar al sistema que ocurrió una bancarrota
                         if (tablero != null) {
                             tablero.notificarBancarrota(jugador);
                         }
@@ -176,21 +178,20 @@ public class Casilla {
                 } else {
                     System.out.println("Has caído en tu propia propiedad.");
                 }
+
                 break;
 
             case "transporte":
                 if (this.getDuenho() == null) {
                     System.out.println("La casilla de transporte está en venta por " + (long)this.valor + "€.");
-                    // Aquí podrías ofrecer la opción de compra al jugador
+                    System.out.println("Puedes comprarla con el comando: comprar " + this.nombre);
                 } else if (!this.getDuenho().equals(jugador)) {
                     float alquilerTotal = 0;
-
                     for (Casilla propiedad : this.getDuenho().getPropiedades()) {
                         if ("transporte".equalsIgnoreCase(propiedad.getTipo())) {
-                            alquilerTotal += propiedad.getAlquiler(); // Asegúrate de tener getAlquiler() definido
+                            alquilerTotal += propiedad.getAlquiler();
                         }
                     }
-
                     System.out.println("Debes pagar " + (long)alquilerTotal + "€ por el uso del transporte.");
                     jugador.pagar(alquilerTotal, this.getDuenho());
                 } else {
@@ -202,27 +203,18 @@ public class Casilla {
             case "servicio":
                 if (this.getDuenho() == null) {
                     System.out.println("La casilla de servicio está en venta por " + (long)this.valor + "€.");
-                    // Aquí podrías ofrecer la opción de compra al jugador
+                    System.out.println("Puedes comprarla con el comando: comprar " + this.nombre);
                 } else if (!this.getDuenho().equals(jugador)) {
-                    int tirada = tablero.getUltimaTirada(); // Asegúrate de tener este método en Tablero
-                    int numServicios = 0;
-
-                    // Contar cuántas casillas de tipo servicio posee el dueño
-                    for (Casilla propiedad : this.getDuenho().getPropiedades()) {
-                        if ("servicio".equalsIgnoreCase(propiedad.getTipo())) {
-                            numServicios++;
-                        }
-                    }
-
-                    int factor = (numServicios == 2) ? 10 : 4;
-                    float alquiler = tirada * factor * 10000f; // Puedes ajustar el multiplicador base
-
-                    System.out.println("Debes pagar " + (long)alquiler + "€ por el uso del servicio.");
+                    int tirada = tablero.getUltimaTirada();
+                    float alquiler = this.evaluarAlquiler(tirada);
+                    System.out.println("Debes pagar " + (long)alquiler + "€ por el servicio.");
                     jugador.pagar(alquiler, this.getDuenho());
                 } else {
                     System.out.println("Has caído en tu propio servicio.");
                 }
                 break;
+
+
             case "impuesto":
                 System.out.println("Debes pagar un impuesto de " + (long)this.impuesto + "€.");
 
@@ -443,6 +435,18 @@ public class Casilla {
     }
 
 
+    public boolean estaHipotecada() {
+        return hipotecada;
+    }
+
+    public void hipotecar() {
+        hipotecada = true;
+    }
+
+    public void deshipotecar() {
+        hipotecada = false;
+    }
+
     public boolean puedeConstruirHotel() {
         return numCasas == 4 && !tieneHotel;
     }
@@ -489,6 +493,10 @@ public class Casilla {
         } else {
             System.out.println("No se puede construir hotel aquí.");
         }
+    }
+
+    public boolean esHipotecable() {
+        return hipotecable;
     }
 
 }
