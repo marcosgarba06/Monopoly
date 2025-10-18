@@ -489,8 +489,8 @@ public class Tablero {
             avatares.append("&").append(av.getId());
         }
 
-        // Limitar nombre a 7 caracteres y avatares a 5
-        String nombreCorto = String.format("%-7.7s", nombre);
+        // Limitar nombre a 8 caracteres y avatares a 8
+        String nombreCorto = String.format("%-8.8s", nombre);
         String avataresCorto = String.format("%-8.8s", avatares.toString());
 
         String texto = nombreCorto + avataresCorto;
@@ -555,7 +555,7 @@ public class Tablero {
             }
 
             // Espacios en el centro (casillas norte - 2 esquinas)
-            sb.append(" ".repeat((norte.size() +1) * 12));
+            sb.append(" ".repeat((norte.size() - 2) * 18));
 
             // ESTE (de arriba a abajo)
             if (i < este.size()) {
