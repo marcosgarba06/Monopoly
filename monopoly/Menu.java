@@ -305,7 +305,30 @@ public class Menu {
                 }
 
                 System.out.println("hipotecas: -,");
-                System.out.println("edificios: -");
+                System.out.print("edificios: ");
+                boolean tieneEdificios = false;
+
+                for (Casilla c : j.getPropiedades()) {
+                    if ("solar".equalsIgnoreCase(c.getTipo())) {
+                        List<String> detalles = new ArrayList<>();
+                        if (c.getNumCasas() > 0) detalles.add("casa x" + c.getNumCasas());
+                        if (c.tieneHotel()) detalles.add("hotel x1");
+                        if (c.tienePiscina()) detalles.add("piscina x1");
+                        if (c.tienePista()) detalles.add("pista x1");
+
+                        if (!detalles.isEmpty()) {
+                            tieneEdificios = true;
+                            System.out.print(c.getNombre() + ": " + String.join(", ", detalles) + "; ");
+                        }
+                    }
+                }
+
+                if (!tieneEdificios) {
+                    System.out.println("-");
+                } else {
+                    System.out.println();
+                }
+
                 System.out.println("}");
                 return;
             }
@@ -767,7 +790,6 @@ public class Menu {
                 System.out.println("Tipo de edificación no reconocido.");
         }
     }
-
 
     // Método que realiza las acciones asociadas al comando 'listar avatares'.
     private void listarAvatares() {

@@ -150,6 +150,7 @@ public class Tablero {
         norte.add(sol12);
 
         norte.add(new Casilla("Parking", "Especial", 20, banca));
+
     }
 
     // SUR (izquierda->derecha visual, indices 0..10)

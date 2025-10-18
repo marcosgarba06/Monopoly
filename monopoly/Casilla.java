@@ -125,6 +125,9 @@ public class Casilla {
         if (tienePista) total += this.getAlquilerPista();
         return total;
     }
+    public float getAlquilerTransporte() {
+        return alquilerBase; // o alquilerTransporte si lo has definido aparte
+    }
 
 
     public float evaluarAlquiler(int tirada) {
@@ -309,7 +312,19 @@ public class Casilla {
         return (t.equals("solar") || t.equals("servicio") || t.equals("transporte")) && duenho == null;
     }
     public float getAlquiler() {
-        return this.alquiler; // o el atributo que uses para el coste de uso
+        switch (tipo.toLowerCase()) {
+            case "transporte":
+                return alquilerBase;
+            case "solar":
+                float total = alquilerBase;
+                total += numCasas * alquilerCasa;
+                if (hotel > 0) total += alquilerHotel;
+                if (piscina > 0) total += alquilerPiscina;
+                if (pista > 0) total += alquilerPista;
+                return total;
+            default:
+                return 0;
+        }
     }
 
 
@@ -484,6 +499,7 @@ public class Casilla {
 
 
 
+
     public void construirHotel(Jugador jugador) {
         if (casas == 4 && hotel == 0) {
             casas = 0;
@@ -494,9 +510,30 @@ public class Casilla {
             System.out.println("No se puede construir hotel aquí.");
         }
     }
+    public boolean tieneHotel() {
+        return hotel > 0;
+    }
+
+    public boolean tienePiscina() {
+        return piscina > 0;
+    }
+
+    public boolean tienePista() {
+        return pista > 0;
+    }
+
+
 
     public boolean esHipotecable() {
         return hipotecable;
+    }
+
+    public int getNumCasas() {
+        return numCasas;
+    }
+
+    public void setNumCasas(int numCasas) {
+        this.numCasas = numCasas;
     }
 
 }
