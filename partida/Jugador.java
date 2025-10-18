@@ -57,13 +57,10 @@ public class Jugador {
         this.tieneCartaSalirCarcel = false;
     }
 
-
-
     // Métodos de fortuna
     public void sumarFortuna(float valor) {
         this.fortuna += valor;
     }
-
 
     public void restarFortuna(float cantidad) {
         this.fortuna -= cantidad;
@@ -72,7 +69,6 @@ public class Jugador {
             System.out.println(nombre + " ha caído en bancarrota.");
         }
     }
-
 
     public void añadirCartaSalirCarcel() {
         cartasSalirCarcel++;
@@ -89,7 +85,6 @@ public class Jugador {
     public int getCartasSalirCarcel() {
         return cartasSalirCarcel;
     }
-
 
     public void sumarGastos(float valor) {
         this.gastos += valor;
@@ -114,7 +109,6 @@ public class Jugador {
     public boolean tienePropiedades() {
         return !propiedades.isEmpty();
     }
-
 
 
     // Método para enviar al jugador a la cárcel
@@ -143,6 +137,7 @@ public class Jugador {
     }
 
     // Métodos de pago
+
     public void pagar(float cantidad, Jugador receptor) {
         if (fortuna >= cantidad) {
             this.fortuna -= cantidad;

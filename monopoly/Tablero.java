@@ -499,6 +499,7 @@ public class Tablero {
     }
 
     // ======== Utilidades de impresión ========
+
     private String formatCasilla(Casilla c) {
         String nombre = c.getNombre();
         String color = (c.getGrupo() != null) ? c.getGrupo().getColorGrupo() : "";

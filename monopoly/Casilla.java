@@ -239,8 +239,6 @@ public class Casilla {
                 System.out.println("El dinero se ha depositado en el parking. Total acumulado: " + (long)tablero.getFondoParking() + "€.");
                 break;
 
-
-
             case "suerte":
                 System.out.println("Has caído en Suerte. Robas una carta...");
                 if (tablero != null) {
@@ -495,8 +493,6 @@ public class Casilla {
     public void setHipotecable(boolean valor) {
         this.hipotecable = valor;
     }
-
-
 
 
     public void construirHotel(Jugador jugador) {
