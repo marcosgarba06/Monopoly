@@ -97,7 +97,7 @@ public class Menu { // la clase menu
 
         while (true) {
 
-            System.out.println("TABLERO:");
+            System.out.println("TABLERO:"); //mostrar el tablero y quien tiene el turno todo el tiempo
             System.out.println("-----------------------------------");
             System.out.println(tablero);
             System.out.println("-----------------------------------");
@@ -141,6 +141,7 @@ public class Menu { // la clase menu
         // A partir de aquí, tu lógica actual (usando minúsculas para comparar)
         String[] partes = comandoLC.split("\\s+");
 
+        //Implementaciones de los comandos que se pueden usar
         if (comandoLC.equals("listar jugadores") || comandoLC.equals("jugadores")) {
             listarJugadores();
         } else if (comandoLC.equals("ver tablero")) {
@@ -169,12 +170,11 @@ public class Menu { // la clase menu
         } else if (partes.length >= 3 && partes[0].equals("describir") && partes[1].equals("jugador")) {
             descJugador(partes);
         } else if (partes.length == 2 && partes[0].equals("describir")) {
-            String nombreCasilla = partes[1];
-            Casilla casilla = tablero.encontrar_casilla(nombreCasilla);
-            if (casilla != null) {
-                System.out.println(casilla.describir());
+            String nombreCasilla = comandoOriginal.substring(comandoOriginal.indexOf(' ') + 1).trim(); //Coge todo lo que hay despies de la separacion como nombre de la casilla
+            if (nombreCasilla.isEmpty()) {
+                System.out.println("Uso: describir <casilla>");
             } else {
-                System.out.println("No se encontró la casilla '" + nombreCasilla + "'.");
+                descCasilla(nombreCasilla);
             }
         } else if (comandoLC.equals("acabar turno")) {
             acabarTurno();
@@ -247,7 +247,7 @@ public class Menu { // la clase menu
 
     //metodo para crear un jugador con su avatar asociado
     private void crearJugador(String nombre, String avatarElegido) {
-        if (jugadores.size() >= 4) {
+        if (jugadores.size() >= 4) { //no crea mas si hay 4
             System.out.println("Ya hay 4 jugadores. No se pueden crear más.");
             return;
         }
@@ -257,7 +257,7 @@ public class Menu { // la clase menu
         }
 
         boolean valido = false;
-        for (String avatar : avataresPermitidos) {
+        for (String avatar : avataresPermitidos) { //un for each para recorrer los avatares permitidos y ver si valen o no
             if (avatar.equalsIgnoreCase(avatarElegido)) {
                 valido = true;
                 break;
@@ -268,17 +268,19 @@ public class Menu { // la clase menu
             return;
         }
 
-        if (!nombresUsados.add(nombre.toLowerCase(Locale.ROOT))) {
+        if (!nombresUsados.add(nombre.toLowerCase(Locale.ROOT))) { //garantiza que el nombre es unico
             System.out.println("Ese nombre ya está en uso. Elige otro.");
             return;
         }
         if (!avataresUsados.add(avatarElegido.toLowerCase(Locale.ROOT))) {
             System.out.println("Ese avatar ya está en uso. Elige otro.");
             nombresUsados.remove(nombre.toLowerCase(Locale.ROOT));
+            //Si esta usado se quita de la memoria que guarda los nombres usados
             return;
         }
 
-        Casilla salida = tablero.encontrar_casilla("Salida");
+        //Poner en la salida
+        Casilla salida = tablero.encontrar_casilla("Salida"); //Pomer en la salida
         Jugador j = new Jugador(nombre, avatarElegido.toLowerCase(Locale.ROOT), salida, avatares);
         Avatar av = j.getAvatar();
         salida.anhadirAvatar(av);
@@ -300,22 +302,22 @@ public class Menu { // la clase menu
             return;
         }
         // Usamos try catch para coger los posibles errores que nos saque el archivo
-        // Abrir un BufferedReader con UTF-8 usando try-with-resources (se cierra solo)
+        // Abrir un BufferedReader con UTF-8 (se cierra solo)
         try (BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             String linea;
             int numLinea = 0;
 
-            // Leer línea a línea hasta que no haya más (readLine() devuelve null cuando no hay más líneas)
+            // Leer línea a línea hasta que no haya más
             while ((linea = br.readLine()) != null) {
                 numLinea++;
-                String comando = linea.strip(); //Eliminar los espacios al final \t, \n, ...
+                String comando = linea.strip(); //Elimina los espacios al final
 
-                if (comando.isEmpty()) continue; // ignora líneas vacías
+                if (comando.isEmpty()) continue; // Ignora líneas vacías
                 System.out.println("[archivo:" + numLinea + "] " + comando); //Mostrar que comando que ha leído e intentará usar
                 analizarComando(comando);
             }
         } catch (IOException e) {
-            // Captura errores de E/S (permiso, encoding, archivo bloqueado, etc.) y los muestra
+            // Captura errores y los muestra
             System.out.println("Error leyendo el archivo: " + e.getMessage());
         }
     }
@@ -331,9 +333,9 @@ public class Menu { // la clase menu
 
         String nombreBuscado = partes[2].toLowerCase();
 
-        for (Jugador j : jugadores) {
+        for (Jugador j : jugadores) { //un for each para encontrar el jugador entre los que hay en la partida
 
-            if (j.getNombre().toLowerCase().equals(nombreBuscado)) {
+            if (j.getNombre().toLowerCase().equals(nombreBuscado)) { //si lo encuentra lo imprime
                 System.out.println("$> describir jugador " + j.getNombre());
                 System.out.println("{");
                 System.out.println("nombre: " + j.getNombre() + ",");
@@ -350,51 +352,12 @@ public class Menu { // la clase menu
                     System.out.println("propiedades: [" + props + "],");
                 }
 
-                List<String> hipotecas = new ArrayList<>();
-
-                for (Casilla c : j.getPropiedades()) {
-                    if (c.estaHipotecada()) {
-                        hipotecas.add(c.getNombre());
-                    }
-                }
-
-                if (hipotecas.isEmpty()) {
-                    System.out.println("hipotecas: -,");
-                } else {
-                    //System.out.println("hipotecas: [" + String.join(", ", hipotecas) + "],"); --> LO IMPLEMENTAREMOS EN FUTURAS ENTREGAS
-                    System.out.println("hipotecas: -");
-                }
-
-                System.out.print("edificios: ");
-                boolean tieneEdificios = false;
-
-                for (Casilla c : j.getPropiedades()) {
-                    if ("solar".equalsIgnoreCase(c.getTipo())) {
-                        List<String> detalles = new ArrayList<>();
-                        if (c.getNumCasas() > 0) detalles.add("casa x" + c.getNumCasas());
-                        if (c.tieneHotel()) detalles.add("hotel x1");
-                        if (c.tienePiscina()) detalles.add("piscina x1");
-                        if (c.tienePista()) detalles.add("pista x1");
-
-                        if (!detalles.isEmpty()) {
-                            tieneEdificios = true;
-                            //System.out.print(c.getNombre() + ": " + String.join(", ", detalles) + "; "); --> LO IMPLEMENTAREMOS EN FUTURAS ENTREGAS
-                            System.out.println("-");
-                        }
-                    }
-                }
-
-                if (!tieneEdificios) {
-                    System.out.println("-");
-                } else {
-                    System.out.println();
-                }
-
+                System.out.println("hipotecas: -,");
+                System.out.print("edificios: -");
                 System.out.println("}");
                 return;
             }
         }
-
         System.out.println("No se encontró ningún jugador con el nombre '" + nombreBuscado + "'.");
     }
 
