@@ -25,6 +25,7 @@ public class MonopolyETSE {
             System.out.println("  - 'listar jugadores' / 'jugadores'");
             System.out.println("  - 'jugador' (ver turno actual)");
             System.out.println("  - 'tirar dados'");
+            System.out.println("  - 'forzar dados'");
             System.out.println("  - 'acabar turno'");
             System.out.println("  - 'describir <casilla>'");
             System.out.println("  - 'describir jugador <nombre>'");

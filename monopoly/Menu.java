@@ -83,7 +83,7 @@ public class Menu { // la clase menu
         System.out.println("  - 'listar jugadores' / 'jugadores'");
         System.out.println("  - 'jugador' (ver turno actual)");
         System.out.println("  - 'tirar dados'");
-        System.out.println("  - 'forzar valor dados'");
+        System.out.println("  - 'forzar dados'");
         System.out.println("  - 'acabar turno'");
         System.out.println("  - 'describir <casilla>'");
         System.out.println("  - 'describir jugador <nombre>'");
@@ -152,7 +152,7 @@ public class Menu { // la clase menu
             indicarTurno();
         } else if (comandoLC.equals("tirar dados")) {
             lanzarDados();
-        } else if (comandoLC.equals("forzar valor dados")) {
+        } else if (comandoLC.equals("forzar dados")) {
             forzarDados();
         } else if (partes.length == 2 && partes[0].equals("comprar")) {
             comprar(partes[1]);
@@ -183,6 +183,7 @@ public class Menu { // la clase menu
             System.out.println("  - 'listar jugadores' / 'jugadores'");
             System.out.println("  - 'jugador' (ver turno actual)");
             System.out.println("  - 'tirar dados'");
+            System.out.println("  - 'forzar dados'");
             System.out.println("  - 'acabar turno'");
             System.out.println("  - 'describir <casilla>'");
             System.out.println("  - 'describir jugador <nombre>'");
@@ -360,7 +361,8 @@ public class Menu { // la clase menu
                 if (hipotecas.isEmpty()) {
                     System.out.println("hipotecas: -,");
                 } else {
-                    System.out.println("hipotecas: [" + String.join(", ", hipotecas) + "],");
+                    //System.out.println("hipotecas: [" + String.join(", ", hipotecas) + "],"); --> LO IMPLEMENTAREMOS EN FUTURAS ENTREGAS
+                    System.out.println("hipotecas: -");
                 }
 
                 System.out.print("edificios: ");
@@ -376,7 +378,8 @@ public class Menu { // la clase menu
 
                         if (!detalles.isEmpty()) {
                             tieneEdificios = true;
-                            System.out.print(c.getNombre() + ": " + String.join(", ", detalles) + "; ");
+                            //System.out.print(c.getNombre() + ": " + String.join(", ", detalles) + "; "); --> LO IMPLEMENTAREMOS EN FUTURAS ENTREGAS
+                            System.out.println("-");
                         }
                     }
                 }
