@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public class Menu { // la clase menu
 
     // Atributos
+    private boolean partidaFinalizada = false;
     private Tablero tablero;
     private Jugador banca;
     private ArrayList<Jugador> jugadores; //lista de jugadores
@@ -87,7 +88,7 @@ public class Menu { // la clase menu
         System.out.println("  - 'acabar turno'");
         System.out.println("  - 'describir <casilla>'");
         System.out.println("  - 'describir jugador <nombre>'");
-        System.out.println("  - 'describir avatarX'");
+        System.out.println("  - 'describir avatar X'");
         System.out.println("  - 'listar venta' (casillas disponibles)");
         System.out.println("  - 'listar avatares'");
         System.out.println("  - 'comprar <casilla>'");
@@ -172,12 +173,7 @@ public class Menu { // la clase menu
             descJugador(partes);
         } else if (partes.length == 2 && partes[0].equals("describir")) {
             String nombreCasilla = partes[1];
-            Casilla casilla = tablero.encontrar_casilla(nombreCasilla);
-            if (casilla != null) {
-                System.out.println(casilla.describir());
-            } else {
-                System.out.println("No se encontró la casilla '" + nombreCasilla + "'.");
-            }
+            descCasilla(nombreCasilla);
         } else if (comandoLC.equals("acabar turno")) {
             acabarTurno();
         } else if (comandoLC.startsWith("hipotecar")) {
@@ -298,6 +294,10 @@ public class Menu { // la clase menu
             System.out.println("Ese avatar ya está en uso. Elige otro.");
             nombresUsados.remove(nombre.toLowerCase(Locale.ROOT));
             return;
+        }
+        if (partidaFinalizada) {
+            System.out.println("La partida ha terminado. Cerrando el juego...");
+            System.exit(0);
         }
 
         Casilla salida = tablero.encontrar_casilla("Salida");
@@ -485,6 +485,7 @@ public class Menu { // la clase menu
     }
 
 
+
     private int lanzarDados() {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
@@ -517,8 +518,8 @@ public class Menu { // la clase menu
             if (contadorDobles == 3) {
                 System.out.println("¡Tres dobles seguidos! Vas directo a la cárcel.");
                 actual.irACarcel(tablero);
-                contadorDobles = 0;
-                salirCarcel(actual);
+                contadorDobles = 0; // ✅ Reiniciar contador
+                tirado = true;
                 return total;
             }
         } else {
@@ -527,9 +528,10 @@ public class Menu { // la clase menu
 
         av.moverAvatar(total, tablero);
 
-        // Si al movernos hemos acabado en cárcel, abrir menú ya
+        // ✅ Si después de mover caíste en la cárcel, reiniciar contador de dobles
         if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
-            salirCarcel(actual);
+            contadorDobles = 0;
+            tirado = true;
             return total;
         }
 
@@ -541,6 +543,8 @@ public class Menu { // la clase menu
 
         return total;
     }
+
+// 2️⃣ Modificar forzarDados() de la misma manera
 
     private int forzarDados() {
         if (jugadores == null || jugadores.isEmpty()) {
@@ -565,7 +569,6 @@ public class Menu { // la clase menu
         Scanner sc = new Scanner(System.in);
         int d1, d2;
 
-        // 🔹 Pedir valor del dado 1
         while (true) {
             System.out.print("Forzar valor dado1 (1-6): ");
             d1 = sc.nextInt();
@@ -573,7 +576,6 @@ public class Menu { // la clase menu
             System.out.println("Valor inválido, debe estar entre 1 y 6.");
         }
 
-        // 🔹 Pedir valor del dado 2
         while (true) {
             System.out.print("Forzar valor dado2 (1-6): ");
             d2 = sc.nextInt();
@@ -581,7 +583,6 @@ public class Menu { // la clase menu
             System.out.println("Valor inválido, debe estar entre 1 y 6.");
         }
 
-        // Guardar valores en los dados
         dado1.setValor(d1);
         dado2.setValor(d2);
 
@@ -589,39 +590,38 @@ public class Menu { // la clase menu
         tablero.setUltimaTirada(total);
         System.out.println("Has forzado " + d1 + " y " + d2 + " → total: " + total);
 
-        // 🔹 Reglas de dobles
         if (d1 == d2) {
             contadorDobles++;
             System.out.println("¡Dados dobles! (" + contadorDobles + " seguidos)");
             if (contadorDobles == 3) {
                 System.out.println("¡Tres dobles seguidos! Vas directo a la cárcel.");
                 actual.irACarcel(tablero);
-                contadorDobles = 0;
-                salirCarcel(actual);
+                contadorDobles = 0; // ✅ Reiniciar contador
+                tirado = true;
                 return total;
             }
         } else {
             contadorDobles = 0;
         }
 
-        // Mover avatar
         av.moverAvatar(total, tablero);
 
-        // Si al movernos hemos acabado en cárcel, abrir menú ya
+        // ✅ Si después de mover caíste en la cárcel, reiniciar contador de dobles
         if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
-            salirCarcel(actual);
+            contadorDobles = 0;
+            tirado = true;
             return total;
         }
 
-        // Marcar tirada
         tirado = true;
         if (d1 == d2 && contadorDobles < 3) {
-            tirado = false; // puede repetir
+            tirado = false;
         }
 
         return total;
     }
 
+// 3️⃣ Modificar acabarTurno() para reiniciar la bandera
 
 
     /*Método que ejecuta todas las acciones realizadas con el comando 'comprar nombre_casilla'.
@@ -678,23 +678,25 @@ public class Menu { // la clase menu
             System.out.println("No estás en la cárcel. No necesitas salir.");
             return;
         }
+
         Avatar av = jugador.getAvatar();
 
         if (intentoSalirCarcel) {
             System.out.println("Ya has intentado salir de la cárcel este turno.");
             return;
         }
+
         // Después de 3 turnos en la cárcel, pago obligatorio
         if (av.getTurnosEnCarcel() >= 3) {
             System.out.println("Has estado 3 turnos en la cárcel. Pago obligatorio de 500.000€ y avanzas.");
-            if (jugador.getFortuna() < 500000) { //Si no tiene 500.000 de fortuna -> bancarrota
+            if (jugador.getFortuna() < 500000) {
                 System.out.println("No puedes pagar. Bancarrota.");
                 jugador.setBancarrota(true);
                 tirado = true;
+                intentoSalirCarcel = true;
                 return;
             }
 
-            //Se le resta 500.000 al jugador y tira los dados
             jugador.restarFortuna(500000);
             jugador.sumarGastos(500000);
             av.setEnCarcel(false);
@@ -707,76 +709,72 @@ public class Menu { // la clase menu
             System.out.println("Has sacado " + d1 + " y " + d2 + " → total: " + total);
             av.moverAvatar(total, tablero);
             tirado = true;
+            intentoSalirCarcel = true;
             return;
         }
 
-        //Si aun no ha estado 3 turnos se dan las 3 opciones de salir, pagar, carta o dobles
+        // Menú de opciones
         java.util.Scanner sc = new java.util.Scanner(System.in);
-        while (true) {
-            System.out.println("\nEstás en la cárcel (Turno " + (av.getTurnosEnCarcel() + 1) + "/3). Elige opción:");
-            System.out.println("1) Pagar 500.000€ (sales, sin mover)");
-            System.out.println("2) Usar carta de 'Salir de la cárcel'");
-            System.out.println("3) Tirar buscando dobles");
-            System.out.print("Opción: ");
+        System.out.println("\nEstás en la cárcel (Turno " + (av.getTurnosEnCarcel() + 1) + "/3). Elige opción:");
+        System.out.println("1) Pagar 500.000€ (sales, sin mover)");
+        System.out.println("2) Usar carta de 'Salir de la cárcel'");
+        System.out.println("3) Tirar buscando dobles");
+        System.out.print("Opción: ");
 
-            String op = sc.nextLine().trim();
+        String op = sc.nextLine().trim();
 
-            if (op.equals("1")) { //Si el jugador elige la opcion 1 entonces paga
-                if (jugador.getFortuna() >= 500000) {
-                    jugador.restarFortuna(500000);
-                    jugador.sumarGastos(500000);
-                    av.setEnCarcel(false);
-                    jugador.setEnCarcel(false);
-                    av.setTurnosEnCarcel(0);
-                    System.out.println("Has salido de la cárcel pagando 500.000€ (no te mueves este turno).");
-                    tirado = true;
-                    intentoSalirCarcel = true;
-                } else {
-                    System.out.println("No tienes suficiente dinero para pagar.");
-                }
-                break;
-
-            } else if (op.equals("2")) { //Si elige la opcion 2 y tiene carta sale si no no sale
-                if (jugador.usarCartaSalirCarcel()) {
-                    av.setEnCarcel(false);
-                    jugador.setEnCarcel(false);
-                    av.setTurnosEnCarcel(0);
-                    System.out.println("Has salido de la cárcel usando una carta (no te mueves este turno).");
-                    tirado = true;
-                    intentoSalirCarcel = true;
-                } else {
-                    System.out.println("No tienes carta de 'Salir de la cárcel'.");
-                }
-                break;
-
-            } else if (op.equals("3")) { //Si elige la opcion 3 tira los dados
-                int d1 = dado1.hacerTirada();
-                int d2 = dado2.hacerTirada();
-                System.out.println("Has sacado " + d1 + " y " + d2);
-
-                if (d1 == d2) {
-                    av.setEnCarcel(false);
-                    jugador.setEnCarcel(false);
-                    av.setTurnosEnCarcel(0);
-                    System.out.println("¡Dobles! Sales y avanzas " + (d1 + d2));
-                    av.moverAvatar(d1 + d2, tablero);
-                    intentoSalirCarcel = true;
-                } else {
-                    av.incrementarTurnosEnCarcel();
-                    System.out.println("No son dobles. Permaneces en la cárcel y pierdes este turno.");
-                    System.out.println("Turnos en cárcel: " + av.getTurnosEnCarcel() + "/3");
-                    intentoSalirCarcel = true;
-                }
+        if (op.equals("1")) {
+            if (jugador.getFortuna() >= 500000) {
+                jugador.restarFortuna(500000);
+                jugador.sumarGastos(500000);
+                av.setEnCarcel(false);
+                jugador.setEnCarcel(false);
+                av.setTurnosEnCarcel(0);
+                System.out.println("Has salido de la cárcel pagando 500.000€ (no te mueves este turno).");
                 tirado = true;
-                break;
+                intentoSalirCarcel = true;
             } else {
-                System.out.println("Opción inválida.");
+                System.out.println("No tienes suficiente dinero para pagar.");
             }
+
+        } else if (op.equals("2")) {
+            if (jugador.usarCartaSalirCarcel()) {
+                av.setEnCarcel(false);
+                jugador.setEnCarcel(false);
+                av.setTurnosEnCarcel(0);
+                System.out.println("Has salido de la cárcel usando una carta (no te mueves este turno).");
+                tirado = true;
+                intentoSalirCarcel = true;
+            } else {
+                System.out.println("No tienes carta de 'Salir de la cárcel'.");
+            }
+
+        } else if (op.equals("3")) {
+            int d1 = dado1.hacerTirada();
+            int d2 = dado2.hacerTirada();
+            System.out.println("Has sacado " + d1 + " y " + d2);
+
+            if (d1 == d2) {
+                av.setEnCarcel(false);
+                jugador.setEnCarcel(false);
+                av.setTurnosEnCarcel(0);
+                System.out.println("¡Dobles! Sales y avanzas " + (d1 + d2));
+                av.moverAvatar(d1 + d2, tablero);
+            } else {
+                av.incrementarTurnosEnCarcel();
+                System.out.println("No son dobles. Permaneces en la cárcel y pierdes este turno.");
+                System.out.println("Turnos en cárcel: " + av.getTurnosEnCarcel() + "/3");
+            }
+            tirado = true;
+            intentoSalirCarcel = true;
+
+        } else {
+            System.out.println("Opción inválida.");
         }
     }
 
 
-    //Metodo que indica el jugador que tiene el turno
+
     private void indicarTurno() {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
@@ -784,7 +782,7 @@ public class Menu { // la clase menu
         }
 
         Jugador actual = jugadores.get(turno);
-        intentoSalirCarcel = false; // ← reinicia el intento al comenzar turno
+        intentoSalirCarcel = false; // ✅ Reinicia al mostrar el turno
 
         System.out.println("$> jugador");
         System.out.println("{");
@@ -794,7 +792,7 @@ public class Menu { // la clase menu
 
         // Si está en la cárcel, ejecutar automáticamente salirCarcel
         if (actual.isEnCarcel() || actual.getAvatar().estaEnCarcel()) {
-            salirCarcel(actual); // solo se ejecuta una vez por turno
+            salirCarcel(actual);
         }
     }
 
@@ -1036,19 +1034,25 @@ public class Menu { // la clase menu
 
 
     // Método que realiza las acciones asociadas al comando 'acabar turno'.
+
     private void acabarTurno() {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
             return;
         }
+
         if (!tirado) {
             System.out.println("No puedes acabar el turno sin tirar los dados.");
             return;
         }
 
-        if (contadorDobles > 0) {
-            System.out.println("Has sacado dobles. Debes volver a tirar antes de acabar el turno.");
-            return;
+        // ✅ Si estás en la cárcel, no aplica la regla de dobles
+        Jugador actual = jugadores.get(turno);
+        if (!actual.isEnCarcel() && !actual.getAvatar().estaEnCarcel()) {
+            if (contadorDobles > 0) {
+                System.out.println("Has sacado dobles. Debes volver a tirar antes de acabar el turno.");
+                return;
+            }
         }
 
         if (!repetirTurno) {
@@ -1059,9 +1063,10 @@ public class Menu { // la clase menu
 
         tirado = false;
         repetirTurno = false;
-        contadorDobles = 0;
+        contadorDobles = 0; // ✅ Siempre reiniciar al acabar turno
+        intentoSalirCarcel = false;
 
-        Jugador actual = jugadores.get(turno);
+        actual = jugadores.get(turno);
         System.out.println("Turno acabado. Ahora le toca a:");
         System.out.println("$> jugador");
         System.out.println("{");
@@ -1081,13 +1086,73 @@ public class Menu { // la clase menu
     }
 
     public void verificarGanadorTrasBancarrota() {
-        Jugador ganador = verificarGanador();
-        if (ganador != null) {
+        // Buscar jugadores en bancarrota
+        for (Jugador jugador : jugadores) {
+            if (jugador.isBancarrota() && !jugador.estaActivo()) {
+                Scanner sc = new Scanner(System.in);
+                System.out.println("\n⚠️ " + jugador.getNombre() + ", estás en bancarrota.");
+                System.out.println("¿Quieres intentar hipotecar alguna propiedad para evitarlo?");
+                System.out.print("Escribe 'sí' para hipotecar o cualquier otra cosa para continuar: ");
+                String respuesta = sc.nextLine().trim().toLowerCase();
+
+                if (respuesta.equals("sí")) {
+                    List<Casilla> propiedades = jugador.getPropiedades();
+                    List<Casilla> hipotecables = new ArrayList<>();
+
+                    for (Casilla c : propiedades) {
+                        if (c.esHipotecable() && !c.estaHipotecada()) {
+                            hipotecables.add(c);
+                        }
+                    }
+
+                    if (hipotecables.isEmpty()) {
+                        System.out.println("No tienes propiedades disponibles para hipotecar.");
+                    } else {
+                        while (jugador.isBancarrota()) {
+                            System.out.println("Estas son tus propiedades disponibles:");
+                            for (Casilla c : hipotecables) {
+                                System.out.println(" - " + c.getNombre() + " (" + c.getValor() + "€)");
+                            }
+
+                            System.out.print("Escribe el nombre de la casilla que quieres hipotecar (o 'salir' para terminar): ");
+                            String nombreCasilla = sc.nextLine().trim();
+
+                            if (nombreCasilla.equalsIgnoreCase("salir")) {
+                                break;
+                            }
+
+                            hipotecar(nombreCasilla);
+
+                            if (jugador.getFortuna() >= 0) {
+                                jugador.setBancarrota(false);
+                                jugador.setActivo(true);
+                                System.out.println("✅ Ya no estás en bancarrota.");
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    System.out.println("No has querido hipotecar. Permaneces en bancarrota.");
+                }
+            }
+        }
+
+        // Verificar si solo queda un jugador activo
+        ArrayList<Jugador> activos = new ArrayList<>();
+        for (Jugador j : jugadores) {
+            if (j.estaActivo()) {
+                activos.add(j);
+            }
+        }
+
+        if (activos.size() == 1) {
+            Jugador ganador = activos.get(0);
             System.out.println("🎉 ¡" + ganador.getNombre() + " ha ganado la partida! 🎉");
             System.out.println("Fortuna final: " + (long)ganador.getFortuna() + "€");
             System.out.println("Propiedades: " + ganador.getPropiedades().size());
             System.out.println("Gastos totales: " + (long)ganador.getGastos() + "€");
-            // Aquí puedes terminar el juego o bloquear más comandos
+            partidaFinalizada = true;
         }
     }
+
 }

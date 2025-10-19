@@ -58,9 +58,23 @@ public class Carta {
             case "Avanza a la casilla 'Sol10'":
                 Casilla destino = tablero.encontrar_casilla("Sol10");
                 if (destino != null) {
-                    jugador.getAvatar().setCasilla(destino);
-                    destino.evaluarCasilla(jugador);
+                    // Mensaje ANTES de mover y evaluar
                     System.out.println("Avanzas a la casilla Sol10.");
+
+                    // Eliminar avatar de casilla actual
+                    Casilla casillaActual = jugador.getAvatar().getCasilla();
+                    if (casillaActual != null) {
+                        casillaActual.eliminarAvatar(jugador.getAvatar());
+                    }
+
+                    // Mover avatar a la nueva casilla
+                    jugador.getAvatar().setCasilla(destino);
+                    jugador.getAvatar().setPosicion(destino.getPosicion());
+
+                    // Evaluar la nueva casilla
+                    destino.evaluarCasilla(jugador);
+                } else {
+                    System.out.println("Error: No se encontró la casilla Sol10.");
                 }
                 break;
 
