@@ -399,14 +399,13 @@ public class Menu { // la clase menu
         }
     }
 
-    //Método usado para tirar los dados
     private int lanzarDados() {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
             return 0;
         }
 
-        if (tirado) { //no permite volver a tirar si ya se han tirado los dados
+        if (tirado) {
             System.out.println("Ya has tirado los dados este turno.");
             return 0;
         }
@@ -414,39 +413,42 @@ public class Menu { // la clase menu
         Jugador actual = jugadores.get(turno);
         Avatar av = actual.getAvatar();
 
-        // Si está en la cárcel, abre menú de opciones
+        // Si está en la cárcel, abrir menú de opciones
         if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
             salirCarcel(actual);
             return 0;
         }
 
-        //Tirada aleatoria de los dados
+        // Tirada aleatoria de los dados
         int d1 = dado1.hacerTirada();
         int d2 = dado2.hacerTirada();
         int total = d1 + d2;
         tablero.setUltimaTirada(total);
         System.out.println("Has sacado " + d1 + " y " + d2 + " → total: " + total);
 
-        //Gestor de dobles y contador del numero que salen
+        // Gestor de dobles y contador del numero que salen
         if (d1 == d2) {
             contadorDobles++;
             System.out.println("¡Dados dobles! (" + contadorDobles + " seguidos)");
-            if (contadorDobles == 3) { //3 dobles a la carcel
+            if (contadorDobles == 3) {
                 System.out.println("¡Tres dobles seguidos! Vas directo a la cárcel.");
                 actual.irACarcel(tablero);
                 contadorDobles = 0;
-                salirCarcel(actual);
+                tirado = true;
+                // NO llamar a salirCarcel aquí - esperamos al siguiente turno
                 return total;
             }
         } else {
-            contadorDobles = 0; //Reinicia el contador de dobles si no hay mas
+            contadorDobles = 0;
         }
 
         av.moverAvatar(total, tablero);
 
-        // Si al movernos hemos acabado en cárcel, abrir menú ya
+        // Si al movernos acabamos en "IrCarcel", NO intentar salir en este turno
         if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
-            salirCarcel(actual);
+            System.out.println("Estás en la cárcel. Intenta salir con el comando 'salir carcel.");
+            tirado = true;
+            contadorDobles = 0; // Reset dobles al ir a cárcel
             return total;
         }
 
@@ -473,7 +475,7 @@ public class Menu { // la clase menu
         Jugador actual = jugadores.get(turno);
         Avatar av = actual.getAvatar();
 
-        // Si está en la cárcel, abre menú de opciones
+        // Si está en la cárcel, abrir menú de opciones
         if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
             salirCarcel(actual);
             return 0;
@@ -514,7 +516,8 @@ public class Menu { // la clase menu
                 System.out.println("¡Tres dobles seguidos! Vas directo a la cárcel.");
                 actual.irACarcel(tablero);
                 contadorDobles = 0;
-                salirCarcel(actual);
+                tirado = true;
+                // NO llamar a salirCarcel aquí - esperamos al siguiente turno
                 return total;
             }
         } else {
@@ -524,9 +527,11 @@ public class Menu { // la clase menu
         // Mover avatar
         av.moverAvatar(total, tablero);
 
-        // Si al movernos hemos acabado en cárcel, abrir menú ya
+        // Si al movernos acabamos en "IrCarcel", NO intentar salir en este turno
         if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
-            salirCarcel(actual);
+            System.out.println("Estás en la cárcel. Intenta salir en tu próximo turno.");
+            tirado = true;
+            contadorDobles = 0; // Reset dobles al ir a cárcel
             return total;
         }
 
@@ -795,19 +800,18 @@ public class Menu { // la clase menu
 
 
     // Método que realiza las acciones asociadas al comando 'acabar turno'.
+
     private void acabarTurno() {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
             return;
         }
         if (!tirado) {
-            // Impide acabar turno sin haber tirado (salvo que reglas específicas lo permitan)
             System.out.println("No puedes acabar el turno sin tirar los dados.");
             return;
         }
 
         if (contadorDobles > 0) {
-            // Si ha sacado dobles debe tirar de nuevo
             System.out.println("Has sacado dobles. Debes volver a tirar antes de acabar el turno.");
             return;
         }
@@ -819,10 +823,12 @@ public class Menu { // la clase menu
             } while (jugadores.get(turno).isBancarrota());
         }
 
-        // Reset de estado de tirada y dobles para el siguiente jugador
+        // Reset de estado de tirada, dobles e intento de salir de cárcel
         tirado = false;
         repetirTurno = false;
         contadorDobles = 0;
+        intentoSalirCarcel = false; // ← IMPORTANTE: resetear aquí
+
         // Nuevo jugador al que le toca
         Jugador actual = jugadores.get(turno);
         System.out.println("Turno acabado. Ahora le toca a:");
