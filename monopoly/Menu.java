@@ -367,8 +367,8 @@ public class Menu { // la clase menu
      */
     private void descAvatar(String ID) {
 
-        for (Avatar av : avatares) {
-            if (av.getId().equalsIgnoreCase(ID)) {
+        for (Avatar av : avatares) { //for each para recorrer los avatares de los jugadores creados
+            if (av.getId().equalsIgnoreCase(ID)) { //si lo encuentra imprime su tipo, el jugador y la casilla en la que esta
                 System.out.println("$> describir avatar " + ID);
                 System.out.println("{");
                 System.out.println("tipo: " + av.getJugador().getAvatar().getTipo() + ",");
@@ -388,6 +388,7 @@ public class Menu { // la clase menu
      * Parámetros: nombre de la casilla a describir.
      */
     private void descCasilla(String nombre) {
+        //Busca la casilla en el tablero
         Casilla casilla = tablero.encontrar_casilla(nombre);
         if (casilla != null) {
             System.out.println(casilla.describir());
@@ -396,14 +397,14 @@ public class Menu { // la clase menu
         }
     }
 
-
+    //Método usado para tirar los dados
     private int lanzarDados() {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
             return 0;
         }
 
-        if (tirado) {
+        if (tirado) { //no permite volver a tirar si ya se han tirado los dados
             System.out.println("Ya has tirado los dados este turno.");
             return 0;
         }
@@ -417,16 +418,18 @@ public class Menu { // la clase menu
             return 0;
         }
 
+        //Tirada aleatoria de los dados
         int d1 = dado1.hacerTirada();
         int d2 = dado2.hacerTirada();
         int total = d1 + d2;
         tablero.setUltimaTirada(total);
         System.out.println("Has sacado " + d1 + " y " + d2 + " → total: " + total);
 
+        //Gestor de dobles y contador del numero que salen
         if (d1 == d2) {
             contadorDobles++;
             System.out.println("¡Dados dobles! (" + contadorDobles + " seguidos)");
-            if (contadorDobles == 3) {
+            if (contadorDobles == 3) { //3 dobles a la carcel
                 System.out.println("¡Tres dobles seguidos! Vas directo a la cárcel.");
                 actual.irACarcel(tablero);
                 contadorDobles = 0;
@@ -434,7 +437,7 @@ public class Menu { // la clase menu
                 return total;
             }
         } else {
-            contadorDobles = 0;
+            contadorDobles = 0; //Reinicia el contador de dobles si no hay mas
         }
 
         av.moverAvatar(total, tablero);
@@ -477,7 +480,7 @@ public class Menu { // la clase menu
         Scanner sc = new Scanner(System.in);
         int d1, d2;
 
-        // 🔹 Pedir valor del dado 1
+        // Pedir valor del dado 1
         while (true) {
             System.out.print("Forzar valor dado1 (1-6): ");
             d1 = sc.nextInt();
@@ -485,7 +488,7 @@ public class Menu { // la clase menu
             System.out.println("Valor inválido, debe estar entre 1 y 6.");
         }
 
-        // 🔹 Pedir valor del dado 2
+        // Pedir valor del dado 2
         while (true) {
             System.out.print("Forzar valor dado2 (1-6): ");
             d2 = sc.nextInt();
@@ -501,7 +504,7 @@ public class Menu { // la clase menu
         tablero.setUltimaTirada(total);
         System.out.println("Has forzado " + d1 + " y " + d2 + " → total: " + total);
 
-        // 🔹 Reglas de dobles
+        // Reglas de dobles
         if (d1 == d2) {
             contadorDobles++;
             System.out.println("¡Dados dobles! (" + contadorDobles + " seguidos)");
@@ -540,7 +543,7 @@ public class Menu { // la clase menu
      * Parámetro: cadena de caracteres con el nombre de la casilla.
      */
     public void comprar(String nombreCasilla) {
-
+        //Jugador y casilla actuales
         Jugador jugador = jugadores.get(turno);
         Casilla casilla = tablero.encontrar_casilla(nombreCasilla);
 
@@ -586,13 +589,13 @@ public class Menu { // la clase menu
 
     //Método que ejecuta todas las acciones relacionadas con el comando 'salir carcel'.
     private void salirCarcel(Jugador jugador) {
-        if (!jugador.isEnCarcel() && !jugador.getAvatar().estaEnCarcel()) {
+        if (!jugador.isEnCarcel() && !jugador.getAvatar().estaEnCarcel()) { //Si no esta en la carcel no puedes salir
             System.out.println("No estás en la cárcel. No necesitas salir.");
             return;
         }
         Avatar av = jugador.getAvatar();
 
-        if (intentoSalirCarcel) {
+        if (intentoSalirCarcel) { //Solo puedes hacer un intento en este turno
             System.out.println("Ya has intentado salir de la cárcel este turno.");
             return;
         }
@@ -696,7 +699,7 @@ public class Menu { // la clase menu
         }
 
         Jugador actual = jugadores.get(turno);
-        intentoSalirCarcel = false; // ← reinicia el intento al comenzar turno
+        intentoSalirCarcel = false; // reinicia el intento al comenzar turno
 
         System.out.println("$> jugador");
         System.out.println("{");
@@ -710,6 +713,7 @@ public class Menu { // la clase menu
         }
     }
 
+    //Metodo que muestra las casillas que están a la venta actualmente
     private void listarVenta() {
         ArrayList<Casilla> enVenta = tablero.getCasillasEnVenta();
 
@@ -719,7 +723,7 @@ public class Menu { // la clase menu
         }
 
         System.out.println("$> listar enventa");
-        for (Casilla c : enVenta) {
+        for (Casilla c : enVenta) { //for each para encontrar las casillas en venta e imprimirlas
             System.out.println("{");
             System.out.println("nombre: " + c.getNombre() + ",");
             System.out.println("tipo: " + c.getTipo() + ",");
@@ -746,6 +750,7 @@ public class Menu { // la clase menu
 
             System.out.println("{");
             System.out.println("nombre: " + j.getNombre() + ",");
+            // toString del Avatar debe ser informativo; en caso contrario, imprimir id y tipo por separado
             System.out.println("avatar: " + (j.getAvatar() != null ? j.getAvatar().toString() : "-") + ",");
             System.out.println("fortuna: " + (long) j.getFortuna() + ",");
 
@@ -756,14 +761,15 @@ public class Menu { // la clase menu
                 System.out.println("propiedades: [" + props + "],");
             }
 
+            // Por ahora, imprime guiones para hipotecas y edificios
             System.out.println("hipotecas: -,");
             System.out.println("edificios: -");
 
             System.out.print("}");
             if (i < jugadores.size() - 1) {
-                System.out.println(",");
+                System.out.println(","); //separa los jugadores con ","
             } else {
-                System.out.println();
+                System.out.println();  // Última entrada sin coma final
             }
         }
     }
@@ -776,7 +782,7 @@ public class Menu { // la clase menu
         }
 
         System.out.println("$> listar avatares");
-        for (Avatar av : avatares) {
+        for (Avatar av : avatares) { //busca los avatares y los va imprimiendo con un for each
             System.out.println("{");
             System.out.println("id: " + av.getId() + ",");
             System.out.println("tipo: " + av.getJugador().getAvatar().getTipo() + ",");
@@ -795,25 +801,29 @@ public class Menu { // la clase menu
             return;
         }
         if (!tirado) {
+            // Impide acabar turno sin haber tirado (salvo que reglas específicas lo permitan)
             System.out.println("No puedes acabar el turno sin tirar los dados.");
             return;
         }
 
         if (contadorDobles > 0) {
+            // Si ha sacado dobles debe tirar de nuevo
             System.out.println("Has sacado dobles. Debes volver a tirar antes de acabar el turno.");
             return;
         }
 
         if (!repetirTurno) {
+            // Avanza el turno al siguiente jugador activo (omite bancarrotas)
             do {
                 turno = (turno + 1) % jugadores.size();
             } while (jugadores.get(turno).isBancarrota());
         }
 
+        // Reset de estado de tirada y dobles para el siguiente jugador
         tirado = false;
         repetirTurno = false;
         contadorDobles = 0;
-
+        // Nuevo jugador al que le toca
         Jugador actual = jugadores.get(turno);
         System.out.println("Turno acabado. Ahora le toca a:");
         System.out.println("$> jugador");
@@ -823,6 +833,7 @@ public class Menu { // la clase menu
         System.out.println("}");
     }
 
+    // Determina si hay un único jugador activo (no en bancarrota) y lo retorna como ganador.
     private Jugador verificarGanador() {
         ArrayList<Jugador> activos = new ArrayList<>();
         for (Jugador j : jugadores) {
@@ -830,9 +841,10 @@ public class Menu { // la clase menu
                 activos.add(j);
             }
         }
-        return (activos.size() == 1) ? activos.get(0) : null;
+        return (activos.size() == 1) ? activos.get(0) : null; //si hay un solo jugador no en bancarrota lo devuelve, si no devuelve null
     }
 
+    //Comprueba si hay ganador, es decir si queda uno solo sin bancarrota, en caso de que haya uno imprime los resultados finales
     public void verificarGanadorTrasBancarrota() {
         Jugador ganador = verificarGanador();
         if (ganador != null) {
