@@ -54,8 +54,7 @@ public class Casilla {
 
     }
 
-    public Casilla(String nombre, String tipo, int posicion, float valor,
-                   float costeCasa, float costeHotel, float costePiscina, float costePista,
+    public Casilla(String nombre, String tipo, int posicion, float valor, float costeCasa, float costeHotel, float costePiscina, float costePista,
                    Jugador banca) {
         this.nombre = nombre;
         this.tipo = tipo;
@@ -236,22 +235,10 @@ public class Casilla {
 
             case "suerte":
                 System.out.println("Has caído en Suerte. Robas una carta...");
-                if (tablero != null) {
-                    Carta cartaS = tablero.sacarCarta("suerte");
-                    cartaS.aplicarAccion(jugador, tablero);
-                } else {
-                    System.out.println("Error: tablero no asignado.");
-                }
                 break;
 
             case "caja":
                 System.out.println("Has caído en Caja de Comunidad. Robas una carta...");
-                if (tablero != null) {
-                    Carta cartaC = tablero.sacarCarta("caja");
-                    cartaC.aplicarAccion(jugador, tablero);
-                } else {
-                    System.out.println("Error: tablero no asignado.");
-                }
                 break;
 
 
@@ -407,7 +394,11 @@ public class Casilla {
 
     }
 
-    public float getHipoteca() { return hipoteca; }
+
+
+    public boolean estaHipotecada() {
+        return hipotecada;
+    }
     public float getAlquilerBase() { return alquilerBase; }
 
 
@@ -425,35 +416,7 @@ public class Casilla {
     public void setPrecioPista(float p) { precioPista = p; }
 
 
-    public boolean estaHipotecada() {
-        return hipotecada;
-    }
 
-    public boolean tieneHotel() {
-        return hotel > 0;
-    }
-
-    public boolean tienePiscina() {
-        return piscina > 0;
-    }
-
-    public boolean tienePista() {
-        return pista > 0;
-    }
-
-
-
-    public boolean esHipotecable() {
-        return hipotecable;
-    }
-
-    public int getNumCasas() {
-        return numCasas;
-    }
-
-    public void setNumCasas(int numCasas) {
-        this.numCasas = numCasas;
-    }
 
 }
 

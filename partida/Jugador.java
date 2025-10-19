@@ -20,9 +20,6 @@ public class Jugador {
     private boolean bancarrota;
     private boolean tieneCartaSalirCarcel = false;
     private boolean activo = true;
-
-    private ArrayList<Carta> mazoSuerte = new ArrayList<>();
-    private ArrayList<Carta> mazoCaja = new ArrayList<>();
     private Tablero tablero;
 
     //Constructor vacío. Se usará para crear la banca.
@@ -64,7 +61,7 @@ public class Jugador {
 
     public void restarFortuna(float cantidad) {
         this.fortuna -= cantidad;
-        if (fortuna < 0) { // ✅ Correcto
+        if (fortuna < 0) { //
             this.bancarrota = true;
             System.out.println(nombre + " ha caído en bancarrota.");
         }
@@ -101,7 +98,7 @@ public class Jugador {
         this.propiedades.remove(casilla);
     }
 
-    // Métodos de cartas
+
     public void darCartaSalirCarcel() {
         this.tieneCartaSalirCarcel = true;
     }
@@ -157,15 +154,6 @@ public class Jugador {
     }
 
 
-    public void robarCarta(String tipo) {
-        Carta carta = tablero.sacarCarta(tipo);
-        System.out.println(nombre + " roba una carta: " + carta.getDescripcion());
-        carta.aplicarAccion(this, tablero);
-    }
-
-
-
-
     public void anhadirPropiedad(Casilla c) {
         propiedades.add(c);
     }
@@ -190,27 +178,6 @@ public class Jugador {
         return activo;
     }
 
-
-    // Reemplazar el método poseeGrupoCompleto en Jugador.java:
-
-    public boolean poseeGrupoCompleto(Casilla casilla, Tablero tablero) {
-        //  Verificar que la casilla tenga grupo
-        if (casilla.getGrupo() == null) {
-            return false;
-        }
-
-        String nombreGrupo = casilla.getGrupo().getNombre();
-        int total = tablero.getCantidadCasillasGrupo(nombreGrupo);
-
-        int propias = 0;
-        for (Casilla c : propiedades) {
-            // Verificar que cada propiedad tenga grupo antes de comparar
-            if (c.getGrupo() != null && c.getGrupo().getNombre().equalsIgnoreCase(nombreGrupo)) {
-                propias++;
-            }
-        }
-        return propias == total;
-    }
     // Getters
 
     public String getNombre() {

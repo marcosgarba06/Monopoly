@@ -82,6 +82,7 @@ public class Menu { // la clase menu
         System.out.println("Comandos disponibles:");
         System.out.println("  - 'listar jugadores' / 'jugadores'");
         System.out.println("  - 'jugador' (ver turno actual)");
+        System.out.println("  - 'ver tablero'");
         System.out.println("  - 'tirar dados'");
         System.out.println("  - 'forzar dados'");
         System.out.println("  - 'acabar turno'");
@@ -186,6 +187,7 @@ public class Menu { // la clase menu
             System.out.println("  - 'forzar dados'");
             System.out.println("  - 'acabar turno'");
             System.out.println("  - 'describir <casilla>'");
+            System.out.println("  - 'ver tablero'");
             System.out.println("  - 'describir jugador <nombre>'");
             System.out.println("  - 'describir avatar X'");
             System.out.println("  - 'listar venta' (casillas disponibles)");
@@ -195,6 +197,52 @@ public class Menu { // la clase menu
             System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
             System.out.println("  - 'salir' (cerrar el juego)");
         }
+    }
+
+    //metodo para crear un jugador con su avatar asociado
+    private void crearJugador(String nombre, String avatarElegido) {
+        if (jugadores.size() >= 4) { //no crea mas si hay 4
+            System.out.println("Ya hay 4 jugadores. No se pueden crear más.");
+            return;
+        }
+        if (nombre == null || nombre.isBlank()) {
+            System.out.println("El nombre no puede estar vacío.");
+            return;
+        }
+
+        boolean valido = false;
+        for (String avatar : avataresPermitidos) { //un for each para recorrer los avatares permitidos y ver si valen o no
+            if (avatar.equalsIgnoreCase(avatarElegido)) {
+                valido = true;
+                break;
+            }
+        }
+        if (!valido) {
+            System.out.println("Avatar no válido. Avatares permitidos: coche, sombrero, pelota, esfinge");
+            return;
+        }
+
+        if (!nombresUsados.add(nombre.toLowerCase(Locale.ROOT))) { //garantiza que el nombre es unico
+            System.out.println("Ese nombre ya está en uso. Elige otro.");
+            return;
+        }
+        if (!avataresUsados.add(avatarElegido.toLowerCase(Locale.ROOT))) {
+            System.out.println("Ese avatar ya está en uso. Elige otro.");
+            nombresUsados.remove(nombre.toLowerCase(Locale.ROOT));
+            //Si esta usado se quita de la memoria que guarda los nombres usados
+            return;
+        }
+
+        //Poner en la salida
+        Casilla salida = tablero.encontrar_casilla("Salida"); //Poner en la salida
+        Jugador j = new Jugador(nombre, avatarElegido.toLowerCase(Locale.ROOT), salida, avatares);
+        Avatar av = j.getAvatar();
+        salida.anhadirAvatar(av);
+        avatares.add(av);
+        jugadores.add(j);
+
+        System.out.println("Jugador " + nombre + " creado con avatar " + avatarElegido.toLowerCase(Locale.ROOT));
+        System.out.println("Jugadores totales: " + jugadores.size() + " (mínimo 2, máximo 4)");
     }
 
     //Método para analizar comandos en la parte de setup (en la que se pueden crear personajes)
@@ -243,52 +291,6 @@ public class Menu { // la clase menu
             System.out.println("- 'empezar' (con 2-4 jugadores)");
             System.out.println("- 'salir'");
         }
-    }
-
-    //metodo para crear un jugador con su avatar asociado
-    private void crearJugador(String nombre, String avatarElegido) {
-        if (jugadores.size() >= 4) { //no crea mas si hay 4
-            System.out.println("Ya hay 4 jugadores. No se pueden crear más.");
-            return;
-        }
-        if (nombre == null || nombre.isBlank()) {
-            System.out.println("El nombre no puede estar vacío.");
-            return;
-        }
-
-        boolean valido = false;
-        for (String avatar : avataresPermitidos) { //un for each para recorrer los avatares permitidos y ver si valen o no
-            if (avatar.equalsIgnoreCase(avatarElegido)) {
-                valido = true;
-                break;
-            }
-        }
-        if (!valido) {
-            System.out.println("Avatar no válido. Avatares permitidos: coche, sombrero, pelota, esfinge");
-            return;
-        }
-
-        if (!nombresUsados.add(nombre.toLowerCase(Locale.ROOT))) { //garantiza que el nombre es unico
-            System.out.println("Ese nombre ya está en uso. Elige otro.");
-            return;
-        }
-        if (!avataresUsados.add(avatarElegido.toLowerCase(Locale.ROOT))) {
-            System.out.println("Ese avatar ya está en uso. Elige otro.");
-            nombresUsados.remove(nombre.toLowerCase(Locale.ROOT));
-            //Si esta usado se quita de la memoria que guarda los nombres usados
-            return;
-        }
-
-        //Poner en la salida
-        Casilla salida = tablero.encontrar_casilla("Salida"); //Pomer en la salida
-        Jugador j = new Jugador(nombre, avatarElegido.toLowerCase(Locale.ROOT), salida, avatares);
-        Avatar av = j.getAvatar();
-        salida.anhadirAvatar(av);
-        avatares.add(av);
-        jugadores.add(j);
-
-        System.out.println("Jugador " + nombre + " creado con avatar " + avatarElegido.toLowerCase(Locale.ROOT));
-        System.out.println("Jugadores totales: " + jugadores.size() + " (mínimo 2, máximo 4)");
     }
 
     // Metodo helper para ejecutar comandos desde un archivo
@@ -536,8 +538,6 @@ public class Menu { // la clase menu
 
         return total;
     }
-
-
 
     /*Método que ejecuta todas las acciones realizadas con el comando 'comprar nombre_casilla'.
      * Parámetro: cadena de caracteres con el nombre de la casilla.
@@ -846,9 +846,9 @@ public class Menu { // la clase menu
 
     //Comprueba si hay ganador, es decir si queda uno solo sin bancarrota, en caso de que haya uno imprime los resultados finales
     public void verificarGanadorTrasBancarrota() {
-        Jugador ganador = verificarGanador();
+        Jugador ganador = verificarGanador(); //en la funcion verificar ganador, si solo queda uno devuleve el nombre de ese jugador, si no null
         if (ganador != null) {
-            System.out.println("🎉 ¡" + ganador.getNombre() + " ha ganado la partida! 🎉");
+            System.out.println("¡" + ganador.getNombre() + " ha ganado la partida!");
             System.out.println("Fortuna final: " + (long)ganador.getFortuna() + "€");
             System.out.println("Propiedades: " + ganador.getPropiedades().size());
             System.out.println("Gastos totales: " + (long)ganador.getGastos() + "€");
