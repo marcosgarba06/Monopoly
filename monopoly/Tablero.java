@@ -594,9 +594,11 @@ public class Tablero {
         return sb.toString();
     }
 
+
     public int getCantidadCasillasGrupo(String nombreGrupo) {
         int total = 0;
         for (Casilla c : casillas) {
+            // ✅ Verificar que la casilla tenga grupo antes de acceder a él
             if (c.getGrupo() != null && c.getGrupo().getNombre().equalsIgnoreCase(nombreGrupo)) {
                 total++;
             }

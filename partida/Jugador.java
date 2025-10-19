@@ -194,9 +194,12 @@ public class Jugador {
     }
 
 
+    // Reemplazar el método poseeGrupoCompleto en Jugador.java:
+
     public boolean poseeGrupoCompleto(Casilla casilla, Tablero tablero) {
+        //  Verificar que la casilla tenga grupo
         if (casilla.getGrupo() == null) {
-            return false;  // Las casillas sin grupo no permiten edificar
+            return false;
         }
 
         String nombreGrupo = casilla.getGrupo().getNombre();
@@ -204,13 +207,13 @@ public class Jugador {
 
         int propias = 0;
         for (Casilla c : propiedades) {
+            // Verificar que cada propiedad tenga grupo antes de comparar
             if (c.getGrupo() != null && c.getGrupo().getNombre().equalsIgnoreCase(nombreGrupo)) {
                 propias++;
             }
         }
         return propias == total;
     }
-
     // Getters
 
     public String getNombre() {
