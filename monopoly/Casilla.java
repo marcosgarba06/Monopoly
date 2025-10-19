@@ -17,7 +17,6 @@ public class Casilla {
     private ArrayList<Avatar> avatares;
     private float alquiler;
     private boolean hipotecable = true;
-
     private boolean hipotecada = false;
 
 
@@ -118,10 +117,6 @@ public class Casilla {
 
     public float calcularAlquilerTotal() {
         float total = this.getAlquilerBase();
-        total += numCasas * this.getAlquilerCasa();
-        if (tieneHotel) total += this.getAlquilerHotel();
-        if (tienePiscina) total += this.getAlquilerPiscina();
-        if (tienePista) total += this.getAlquilerPista();
         return total;
     }
     public float getAlquilerTransporte() {
@@ -414,15 +409,8 @@ public class Casilla {
 
     public float getHipoteca() { return hipoteca; }
     public float getAlquilerBase() { return alquilerBase; }
-    public float getAlquilerCasa() { return alquilerCasa; }
-    public float getAlquilerHotel() { return alquilerHotel; }
-    public float getAlquilerPiscina() { return alquilerPiscina; }
-    public float getAlquilerPista() { return alquilerPista; }
 
-    public float getPrecioCasa() { return precioCasa; }
-    public float getPrecioHotel() { return precioHotel; }
-    public float getPrecioPiscina() { return precioPiscina; }
-    public float getPrecioPista() { return precioPista; }
+
 
     public void setHipoteca(float h) { hipoteca = h; }
     public void setAlquilerBase(float a) { alquilerBase = a; }
@@ -436,75 +424,11 @@ public class Casilla {
     public void setPrecioPiscina(float p) { precioPiscina = p; }
     public void setPrecioPista(float p) { precioPista = p; }
 
-    public boolean puedeConstruirCasa(Jugador jugador) {
-        return this.getDuenho() == jugador &&
-                this.getGrupo().perteneceEnteramenteA(jugador) &&
-                !tieneHotel &&
-                numCasas < 4;
-    }
-    public String resumenEdificaciones() {
-        return "Casas: " + numCasas + ", Hotel: " + hotel + ", Piscina: " + piscina + ", Pista: " + pista;
-    }
-
 
     public boolean estaHipotecada() {
         return hipotecada;
     }
 
-    public void hipotecar() {
-        hipotecada = true;
-    }
-
-    public void deshipotecar() {
-        hipotecada = false;
-    }
-
-    public boolean puedeConstruirHotel() {
-        return numCasas == 4 && !tieneHotel;
-    }
-
-
-
-    public boolean puedeConstruirPiscina() {
-        return tieneHotel && !tienePiscina;
-    }
-
-    public void construirPiscina(Jugador jugador) {
-        tienePiscina = true;
-    }
-
-    public boolean puedeConstruirPista() {
-        return tieneHotel && tienePiscina && !tienePista;
-    }
-
-    public void construirPista(Jugador jugador) {
-        tienePista = true;
-    }
-
-    public void construirCasas(Jugador jugador, int cantidad) {
-        if (puedeConstruirCasa(jugador)) {
-            numCasas += cantidad;
-            jugador.restarFortuna(costeCasa * cantidad);
-        } else {
-            System.out.println("No se pueden construir más casas aquí.");
-        }
-    }
-
-    public void setHipotecable(boolean valor) {
-        this.hipotecable = valor;
-    }
-
-
-    public void construirHotel(Jugador jugador) {
-        if (numCasas == 4 && hotel == 0) {
-            numCasas = 0;
-            hotel = 1;
-            jugador.restarFortuna(costeHotel);
-            System.out.println("Construido hotel en " + nombre);
-        } else {
-            System.out.println("No se puede construir hotel aquí.");
-        }
-    }
     public boolean tieneHotel() {
         return hotel > 0;
     }

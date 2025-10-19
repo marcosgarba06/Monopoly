@@ -157,9 +157,6 @@ public class Jugador {
     }
 
 
-
-
-
     public void robarCarta(String tipo) {
         Carta carta = tablero.sacarCarta(tipo);
         System.out.println(nombre + " roba una carta: " + carta.getDescripcion());
