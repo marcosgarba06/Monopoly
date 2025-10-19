@@ -463,22 +463,31 @@ public class Casilla {
         return numCasas == 4 && !tieneHotel;
     }
 
-
-
     public boolean puedeConstruirPiscina() {
         return tieneHotel && !tienePiscina;
     }
 
-    public void construirPiscina(Jugador jugador) {
-        tienePiscina = true;
-    }
 
     public boolean puedeConstruirPista() {
         return tieneHotel && tienePiscina && !tienePista;
     }
 
+    public void construirPiscina(Jugador jugador) {
+        if (puedeConstruirPiscina()) {
+            piscina = 1;
+            tienePiscina = true;
+            jugador.restarFortuna(costePiscina);
+            System.out.println("Construida piscina en " + nombre);
+        }
+    }
+
     public void construirPista(Jugador jugador) {
-        tienePista = true;
+        if (puedeConstruirPista()) {
+            pista = 1;
+            tienePista = true;
+            jugador.restarFortuna(costePista);
+            System.out.println("Construida pista en " + nombre);
+        }
     }
 
     public void construirCasas(Jugador jugador, int cantidad) {

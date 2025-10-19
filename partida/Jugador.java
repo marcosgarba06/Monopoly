@@ -195,12 +195,16 @@ public class Jugador {
 
 
     public boolean poseeGrupoCompleto(Casilla casilla, Tablero tablero) {
+        if (casilla.getGrupo() == null) {
+            return false;  // Las casillas sin grupo no permiten edificar
+        }
+
         String nombreGrupo = casilla.getGrupo().getNombre();
         int total = tablero.getCantidadCasillasGrupo(nombreGrupo);
 
         int propias = 0;
         for (Casilla c : propiedades) {
-            if (c.getGrupo().getNombre().equalsIgnoreCase(nombreGrupo)) {
+            if (c.getGrupo() != null && c.getGrupo().getNombre().equalsIgnoreCase(nombreGrupo)) {
                 propias++;
             }
         }

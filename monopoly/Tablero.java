@@ -597,7 +597,7 @@ public class Tablero {
     public int getCantidadCasillasGrupo(String nombreGrupo) {
         int total = 0;
         for (Casilla c : casillas) {
-            if (c.getGrupo().getNombre().equalsIgnoreCase(nombreGrupo)) {
+            if (c.getGrupo() != null && c.getGrupo().getNombre().equalsIgnoreCase(nombreGrupo)) {
                 total++;
             }
         }

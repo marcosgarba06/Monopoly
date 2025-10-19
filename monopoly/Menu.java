@@ -856,7 +856,6 @@ public class Menu { // la clase menu
         }
     }
 
-
     public void edificar(String nombreCasilla, String tipo, int cantidad) {
         Jugador jugadorActual = jugadores.get(turno);
         Casilla casilla = tablero.encontrar_casilla(nombreCasilla);
@@ -881,49 +880,116 @@ public class Menu { // la clase menu
             return;
         }
 
-        for (int i = 0; i < cantidad; i++) {
-            switch (tipo.toLowerCase()) {
-                case "casa":
-                    if (casilla.puedeConstruirCasa(jugadorActual)) {
-                        casilla.construirCasas(jugadorActual, cantidad);
-                        System.out.println("Construida casa en " + casilla.getNombre());
-                    } else {
-                        System.out.println("No se puede construir más casas en " + casilla.getNombre());
-                        return;
-                    }
-                    break;
-                case "hotel":
-                    if (casilla.puedeConstruirHotel()) {
-                        casilla.construirHotel(jugadorActual);
-                        System.out.println("Construido hotel en " + casilla.getNombre());
-                    } else {
-                        System.out.println("No se puede construir hotel en " + casilla.getNombre());
-                        return;
-                    }
-                    break;
-                case "piscina":
-                    if (casilla.puedeConstruirPiscina()) {
-                        casilla.construirPiscina(jugadorActual);
-                        System.out.println("Construida piscina en " + casilla.getNombre());
-                    } else {
-                        System.out.println("No se puede construir piscina en " + casilla.getNombre());
-                        return;
-                    }
-                    break;
-                case "pista":
-                    if (casilla.puedeConstruirPista()) {
-                        casilla.construirPista(jugadorActual);
-                        System.out.println("Construida pista en " + casilla.getNombre());
-                    } else {
-                        System.out.println("No se puede construir pista en " + casilla.getNombre());
-                        return;
-                    }
-                    break;
-                default:
-                    System.out.println("Tipo de construcción no reconocido: " + tipo);
-                    return;
-            }
+        // ✅ Verificar que no esté hipotecada
+        if (casilla.estaHipotecada()) {
+            System.out.println("No puedes edificar en una casilla hipotecada.");
+            return;
         }
+
+        switch (tipo.toLowerCase()) {
+            case "casa":
+                if (cantidad < 1 || cantidad > 4) {
+                    System.out.println("Cantidad inválida. Puedes construir entre 1 y 4 casas.");
+                    return;
+                }
+
+                int casasActuales = casilla.getNumCasas();
+                if (casasActuales + cantidad > 4) {
+                    System.out.println("No puedes tener más de 4 casas. Actualmente tienes " + casasActuales);
+                    return;
+                }
+
+                if (casilla.tieneHotel()) {
+                    System.out.println("Ya hay un hotel en esta casilla.");
+                    return;
+                }
+
+                // ✅ Verificar dinero suficiente
+                float costeTotal = casilla.getPrecioCasa() * cantidad;
+                if (jugadorActual.getFortuna() < costeTotal) {
+                    System.out.println("No tienes suficiente dinero. Necesitas " + (long)costeTotal + "€");
+                    return;
+                }
+
+                casilla.construirCasas(jugadorActual, cantidad);
+                System.out.println("Construidas " + cantidad + " casa(s) en " + casilla.getNombre() +
+                        " por " + (long)costeTotal + "€");
+                break;
+
+            case "hotel":
+                if (cantidad != 1) {
+                    System.out.println("Solo puedes construir 1 hotel.");
+                    return;
+                }
+
+                if (!casilla.puedeConstruirHotel()) {
+                    System.out.println("Necesitas 4 casas para construir un hotel. Tienes: " +
+                            casilla.getNumCasas());
+                    return;
+                }
+
+                float costeHotel = casilla.getPrecioHotel();
+                if (jugadorActual.getFortuna() < costeHotel) {
+                    System.out.println("No tienes suficiente dinero. Necesitas " + (long)costeHotel + "€");
+                    return;
+                }
+
+                casilla.construirHotel(jugadorActual);
+                System.out.println("Construido hotel en " + casilla.getNombre() +
+                        " por " + (long)costeHotel + "€");
+                break;
+
+            case "piscina":
+                if (cantidad != 1) {
+                    System.out.println("Solo puedes construir 1 piscina.");
+                    return;
+                }
+
+                if (!casilla.puedeConstruirPiscina()) {
+                    System.out.println("Necesitas un hotel para construir una piscina.");
+                    return;
+                }
+
+                float costePiscina = casilla.getPrecioPiscina();
+                if (jugadorActual.getFortuna() < costePiscina) {
+                    System.out.println("No tienes suficiente dinero. Necesitas " + (long)costePiscina + "€");
+                    return;
+                }
+
+                casilla.construirPiscina(jugadorActual);
+                jugadorActual.restarFortuna(costePiscina);
+                System.out.println("Construida piscina en " + casilla.getNombre() +
+                        " por " + (long)costePiscina + "€");
+                break;
+
+            case "pista":
+                if (cantidad != 1) {
+                    System.out.println("Solo puedes construir 1 pista.");
+                    return;
+                }
+
+                if (!casilla.puedeConstruirPista()) {
+                    System.out.println("Necesitas un hotel y una piscina para construir una pista.");
+                    return;
+                }
+
+                float costePista = casilla.getPrecioPista();
+                if (jugadorActual.getFortuna() < costePista) {
+                    System.out.println("No tienes suficiente dinero. Necesitas " + (long)costePista + "€");
+                    return;
+                }
+
+                casilla.construirPista(jugadorActual);
+                jugadorActual.restarFortuna(costePista);
+                System.out.println("Construida pista en " + casilla.getNombre() +
+                        " por " + (long)costePista + "€");
+                break;
+
+            default:
+                System.out.println("Tipo de construcción no reconocido: " + tipo);
+                System.out.println("Tipos válidos: casa, hotel, piscina, pista");
+        }
+
     }
 
     // Método que realiza las acciones asociadas al comando 'listar avatares'.
