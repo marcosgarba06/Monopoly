@@ -54,6 +54,7 @@ public class Casilla {
 
     }
 
+    // Solares
     public Casilla(String nombre, String tipo, int posicion, float valor, float costeCasa, float costeHotel, float costePiscina, float costePista,
                    Jugador banca) {
         this.nombre = nombre;
@@ -75,7 +76,6 @@ public class Casilla {
         this.costePista = costePista;
     }
 
-
     // Especial / Suerte / Caja
     public Casilla(String nombre, String tipo, int posicion, Jugador banca) {
         this.nombre = nombre;
@@ -84,6 +84,7 @@ public class Casilla {
         this.duenho = null;
         this.avatares = new ArrayList<>();
     }
+
     public Casilla(String nombre, String tipo, int posicion, float valor, Jugador banca) {
         this(nombre, tipo, posicion, valor, 50f, 100f, 75f, 120f, banca); // valores por defecto
     }
@@ -305,7 +306,6 @@ public class Casilla {
                 return 0;
         }
     }
-
 
 
     public void comprarCasilla(Jugador solicitante, Jugador banca) {

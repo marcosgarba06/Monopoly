@@ -2,8 +2,9 @@ package monopoly;
 
 import partida.*;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -57,150 +58,37 @@ public class Menu { // la clase menu
 
     public void iniciarPartida() {
 
-        System.out.println("Modo configuración de partida:"); //comandos que se pueden usar si la partida no está empezada
-        System.out.println("- 'crear jugador <nombre> <avatar>' (avatares: sombrero, coche, esfinge, pelota)");
-        System.out.println("- 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
-        System.out.println("- 'listar jugadores'");
-        System.out.println("- 'empezar' (requiere entre 2 y 4 jugadores)");
-        System.out.println("- 'salir'");
-
+        menuSetUp();
         Scanner sc = new Scanner(System.in);
         while (!juegoIniciado) { //si aun no se ha iniciado la partida
             System.out.print("[setup]> ");
             String comando = sc.nextLine();
             analizarComando(comando); // redirige a analizarComandoSetup() mientras no haya empezado el juego
         }
-
         // Cuando hay 2-4 jugadores y se ejecuta 'empezar', arranca la fase de juego
         iniciarJuego();
     }
 
     public void iniciarJuego() {
+
         juegoIniciado = true; //El juego ha iniciado correctamente
         Scanner sc = new Scanner(System.in);
-        System.out.println("¡Comienza el juego!");
         System.out.println("Comandos disponibles:");
-        System.out.println("  - 'listar jugadores' / 'jugadores'");
-        System.out.println("  - 'jugador' (ver turno actual)");
-        System.out.println("  - 'ver tablero'");
-        System.out.println("  - 'tirar dados'");
-        System.out.println("  - 'forzar dados'");
-        System.out.println("  - 'acabar turno'");
-        System.out.println("  - 'describir <casilla>'");
-        System.out.println("  - 'describir jugador <nombre>'");
-        System.out.println("  - 'describir avatarX'");
-        System.out.println("  - 'listar venta' (casillas disponibles)");
-        System.out.println("  - 'listar avatares'");
-        System.out.println("  - 'comprar <casilla>'");
-        System.out.println("  - 'salir carcel'");
-        System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
-        System.out.println("  - 'salir' (cerrar el juego)");
+        menuComandos();
 
         while (true) {
-
-            System.out.println("TABLERO:"); //mostrar el tablero y quien tiene el turno todo el tiempo
-            System.out.println("-----------------------------------");
-            System.out.println(tablero);
-            System.out.println("-----------------------------------");
             Jugador actual = jugadores.get(turno);
             System.out.println("\nTurno de " + actual.getNombre());
             System.out.print("> ");
             String comando = sc.nextLine();
 
             analizarComando(comando);
-
-        }
-    }
-
-    /*Método que interpreta el comando introducido y toma la accion correspondiente.
-     * Parámetro: cadena de caracteres (el comando).
-    < */
-    public void analizarComando(String comando) {
-        if (!juegoIniciado) { //Si estamos en el apartado de setup (la partida no empezó se usa otra opcion)
-            analizarComandoSetup(comando);
-            return;
-        }
-        String comandoOriginal = comando.trim(); //quita espacio del principio y del final
-        String comandoLC = comandoOriginal.toLowerCase(Locale.ROOT);// pone todo en minusculas
-
-        // Manejo del comando: "comandos <ruta/al/archivo.txt>"
-        if (comandoLC.startsWith("comandos")) {
-            // Dividimos en máximo 2 partes: la palabra 'comandos' y el resto (la ruta)
-            String[] partesCmd = comandoOriginal.split("\\s+", 2);
-
-            // Si no hay segunda parte (ruta) o está vacía, mostramos el uso correcto
-            if (partesCmd.length < 2 || partesCmd[1].isBlank()) {
-                System.out.println("Uso: comandos <ruta/al/archivo.txt>");
-            } else {
-                // Usamos la ruta tal cual (sin pasarla a minúsculas)
-                String ruta = partesCmd[1].trim();
-                ejecutarComandosDesdeArchivo(ruta);
-            }
-            // Terminamos aquí para no seguir procesando este comando en otros casos
-            return;
-        }
-        // A partir de aquí, tu lógica actual (usando minúsculas para comparar)
-        String[] partes = comandoLC.split("\\s+");
-
-        //Implementaciones de los comandos que se pueden usar
-        if (comandoLC.equals("listar jugadores") || comandoLC.equals("jugadores")) {
-            listarJugadores();
-        } else if (comandoLC.equals("ver tablero")) {
-            System.out.println(tablero);
-        } else if (comandoLC.equals("salir")) {
-            System.out.println("Saliendo del juego...");
-            System.exit(0);
-        } else if (comandoLC.equals("jugador")) {
-            indicarTurno();
-        } else if (comandoLC.equals("tirar dados")) {
-            lanzarDados();
-        } else if (comandoLC.equals("forzar dados")) {
-            forzarDados();
-        } else if (partes.length == 2 && partes[0].equals("comprar")) {
-            comprar(partes[1]);
-        } else if (comandoLC.equals("salir carcel")) {
-            Jugador actual = jugadores.get(turno);
-            salirCarcel(actual);
-        } else if (comandoLC.equals("listar venta")) {
-            listarVenta();
-        }else if (partes.length == 3 && partes[0].equals("describir") && partes[1].equals("avatar")) {
-            String id = partes[2].trim();
-            descAvatar(id);
-        } else if (comandoLC.equals("listar avatares")) {
-            listarAvatares();
-        } else if (partes.length >= 3 && partes[0].equals("describir") && partes[1].equals("jugador")) {
-            descJugador(partes);
-        } else if (partes.length == 2 && partes[0].equals("describir")) {
-            String nombreCasilla = comandoOriginal.substring(comandoOriginal.indexOf(' ') + 1).trim(); //Coge todo lo que hay despies de la separacion como nombre de la casilla
-            if (nombreCasilla.isEmpty()) {
-                System.out.println("Uso: describir <casilla>");
-            } else {
-                descCasilla(nombreCasilla);
-            }
-        } else if (comandoLC.equals("acabar turno")) {
-            acabarTurno();
-        } else {
-            System.out.println("Comando no reconocido. Prueba con alguno de estos:");
-            System.out.println("  - 'listar jugadores' / 'jugadores'");
-            System.out.println("  - 'jugador' (ver turno actual)");
-            System.out.println("  - 'tirar dados'");
-            System.out.println("  - 'forzar dados'");
-            System.out.println("  - 'acabar turno'");
-            System.out.println("  - 'describir <casilla>'");
-            System.out.println("  - 'ver tablero'");
-            System.out.println("  - 'describir jugador <nombre>'");
-            System.out.println("  - 'describir avatar X'");
-            System.out.println("  - 'listar venta' (casillas disponibles)");
-            System.out.println("  - 'listar avatares'");
-            System.out.println("  - 'comprar <casilla>'");
-            System.out.println("  - 'salir carcel'");
-            System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
-            System.out.println("  - 'salir' (cerrar el juego)");
         }
     }
 
     //metodo para crear un jugador con su avatar asociado
     private void crearJugador(String nombre, String avatarElegido) {
+
         if (jugadores.size() >= 4) { //no crea mas si hay 4
             System.out.println("Ya hay 4 jugadores. No se pueden crear más.");
             return;
@@ -234,7 +122,7 @@ public class Menu { // la clase menu
         }
 
         //Poner en la salida
-        Casilla salida = tablero.encontrar_casilla("Salida"); //Poner en la salida
+        Casilla salida = tablero.encontrarCasilla("Salida"); //Poner en la salida
         Jugador j = new Jugador(nombre, avatarElegido.toLowerCase(Locale.ROOT), salida, avatares);
         Avatar av = j.getAvatar();
         salida.anhadirAvatar(av);
@@ -245,52 +133,212 @@ public class Menu { // la clase menu
         System.out.println("Jugadores totales: " + jugadores.size() + " (mínimo 2, máximo 4)");
     }
 
-    //Método para analizar comandos en la parte de setup (en la que se pueden crear personajes)
-    private void analizarComandoSetup(String comando) {
-        String comandoOriginal = comando.trim();
-        String comandoOriginalLc = comandoOriginal.toLowerCase(Locale.ROOT);
-        String[] partes = comandoOriginal.split("\\s+");
 
-        if (comandoOriginalLc.startsWith("comandos")) {
-            String[] partesCmd = comandoOriginal.split("\\s+", 2);
-            if (partesCmd.length < 2 || partesCmd[1].isBlank()) {
-                System.out.println("Uso: comandos <ruta/al/archivo.txt>");
-            } else {
-                String ruta = partesCmd[1].trim();
-                ejecutarComandosDesdeArchivo(ruta);
-            }
+    /*Método que interpreta el comando introducido y toma la accion correspondiente.
+     * Parámetro: cadena de caracteres (el comando).
+    < */
+    public void analizarComando(String comando) {
+
+        if (!juegoIniciado) { //Si estamos en el apartado de setup (la partida no empezó se usa otra opcion)
+            analizarComandoSetup(comando);
+            return;
+        }
+        String comandoLimpio = comando.trim(); //quita espacio del principio y del final
+        String comandoMinusculas = comandoLimpio.toLowerCase(Locale.ROOT);// pone todo en minusculas
+
+        if (procesarComandoDados(comandoLimpio)) { // para procesar el tirar dados con diferentes parametros
             return;
         }
 
-        if (comandoOriginalLc.startsWith("salir")) {
+        if (procesarComandoArchivo(comandoLimpio, comandoMinusculas)) { //para comandos desde archivos
+            return;
+        }
+
+        if (procesarComandoSimple(comandoMinusculas)) {
+            return;
+        }
+
+        if (procesarComandoConParametros(comandoMinusculas, comandoLimpio)) {
+            return;
+        }
+
+        System.out.println("Comando no reconocido. Prueba con alguno de estos:");
+        menuComandos();
+
+    }
+
+
+    //Método para analizar comandos en la parte de setup (en la que se pueden crear personajes)
+    private void analizarComandoSetup(String comando) {
+        String comandoLimpio = comando.trim();
+        String comandoMinusculas = comandoLimpio.toLowerCase(Locale.ROOT);
+        String[] partes = comandoLimpio.split("\\s+");
+
+        if (procesarComandoArchivo(comandoLimpio, comandoMinusculas)) {
+            return;
+        }
+
+        if (comandoMinusculas.equals("salir")) {
             IO.println("Saliendo...");
             System.exit(0);
-        }else if (comandoOriginalLc.equals("listar jugadores") || comandoOriginalLc.equals("jugadores")) {
-            listarJugadores();
-        } else if (comandoOriginalLc.equals("listar avatares")) {
-            listarAvatares();
-        } else if (partes.length >= 4 && partes[0].equalsIgnoreCase("crear") && partes[1].equalsIgnoreCase("jugador")) {
-            String nombre = partes[2];
-            String avatarElegido = partes[3].toLowerCase(Locale.ROOT);
-            crearJugador(nombre, avatarElegido);
-        } else if (comandoOriginalLc.equals("empezar")) {
-            if (jugadores.size() < 2) {
-                System.out.println("Debes crear al menos 2 jugadores para empezar.");
-            } else if (jugadores.size() > 4) {
-                System.out.println("No puedes tener más de 4 jugadores.");
-            } else {
-                System.out.println("Iniciando partida...");
-                juegoIniciado = true;
-            }
-        } else {
-            System.out.println("Estás en modo configuración. Comandos:");
-            System.out.println("- 'crear jugador <nombre> <avatar>'");
-            System.out.println("- 'listar jugadores' | 'jugadores'");
-            System.out.println("- 'listar avatares'");
-            System.out.println("- 'comandos <ruta/al/archivo.txt>'");
-            System.out.println("- 'empezar' (con 2-4 jugadores)");
-            System.out.println("- 'salir'");
+            return;
         }
+        if (comandoMinusculas.equals("listar jugadores") || comandoMinusculas.equals("jugadores")) {
+            listarJugadores();
+            return;
+        }
+
+        if (comandoMinusculas.equals("listar avatares")) {
+            listarAvatares();
+            return;
+        }
+
+        if (partes.length >= 4 && partes[0].equalsIgnoreCase("crear") && partes[1].equalsIgnoreCase("jugador")) {
+            String nombreJugador = partes[2];
+            String avatarElegido = partes[3].toLowerCase(Locale.ROOT);
+            crearJugador(nombreJugador, avatarElegido);
+        }
+
+        if (comandoMinusculas.equals("empezar")) {
+            validarPartida();
+            return;
+        }
+        System.out.println("Estás en modo configuración. Comandos:");
+        menuSetUp();
+    }
+
+    private boolean procesarComandoDados(String comandoOriginal) {
+        Pattern patronDados = Pattern.compile(
+                "^(tirar|lanzar)\\s+dados(?:\\s+(\\d)\\s*\\+\\s*(\\d))?$",
+                Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher coincidencia = patronDados.matcher(comandoOriginal);
+
+        if (!coincidencia.matches()) {
+            return false;
+        }
+
+        String valorDado1 = coincidencia.group(2);
+        String valorDado2 = coincidencia.group(3);
+
+        // Si se especificaron valores para los dados
+        if (valorDado1 != null && valorDado2 != null) {
+            int dado1 = Integer.parseInt(valorDado1);
+            int dado2 = Integer.parseInt(valorDado2);
+            lanzarDadosForzados(dado1, dado2);
+
+        } else {
+            // Tirada aleatoria normal
+            lanzarDados();
+
+        }
+
+        return true;
+    }
+
+    private boolean procesarComandoArchivo(String comandoOriginal, String comandoMinusculas) {
+        if (!comandoMinusculas.startsWith("comandos")) {
+            return false;
+        }
+
+        // Dividir en máximo 2 partes: "comandos" + ruta
+        String[] partes = comandoOriginal.split("\\s+", 2);
+
+        if (partes.length < 2 || partes[1].isBlank()) {
+            System.out.println("Uso: comandos <ruta/al/archivo.txt>");
+        } else {
+            String rutaArchivo = partes[1].trim();
+            ejecutarComandosDesdeArchivo(rutaArchivo);
+        }
+
+        return true;
+    }
+
+    private boolean procesarComandoSimple(String comandoMinusculas) {
+        switch (comandoMinusculas) {
+            case "listar jugadores":
+            case "jugadores":
+                listarJugadores();
+                return true;
+
+            case "ver tablero":
+                System.out.println(tablero);
+                return true;
+
+            case "salir":
+                System.out.println("Saliendo del juego...");
+                System.exit(0);
+                return true;
+
+            case "jugador":
+                indicarTurno();
+                return true;
+
+            case "forzar dados":
+                // Comando legacy - se mantiene por compatibilidad
+                forzarDados();
+                System.out.println(tablero);
+                return true;
+
+            case "salir carcel":
+                Jugador jugadorActual = jugadores.get(turno);
+                salirCarcel(jugadorActual);
+                return true;
+
+            case "listar enventa":
+                listarVenta();
+                return true;
+
+            case "listar avatares":
+                listarAvatares();
+                return true;
+
+            case "acabar turno":
+                acabarTurno();
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    private boolean procesarComandoConParametros(String comandoMinusculas, String comandoOriginal) {
+        String[] palabras = comandoMinusculas.split("\\s+");
+
+        // "comprar <propiedad>"
+        if (palabras.length == 2 && palabras[0].equals("comprar")) {
+            comprar(palabras[1]);
+            return true;
+        }
+
+        // "describir avatar <id>"
+        if (palabras.length == 3 && palabras[0].equals("describir") && palabras[1].equals("avatar")) {
+            String idAvatar = palabras[2];
+            descAvatar(idAvatar);
+            return true;
+        }
+
+        // "describir jugador <nombre>"
+        if (palabras.length >= 3 && palabras[0].equals("describir") && palabras[1].equals("jugador")) {
+            descJugador(palabras);
+            return true;
+        }
+
+        // "describir <casilla>" (puede tener espacios en el nombre)
+        if (palabras.length == 2 && palabras[0].equals("describir")) {
+            // Extraer el nombre completo de la casilla (después de "describir ")
+            String nombreCasilla = comandoOriginal.substring(comandoOriginal.indexOf(' ') + 1).trim();
+
+            if (nombreCasilla.isEmpty()) {
+                System.out.println("Uso: describir <casilla>");
+            } else {
+                descCasilla(nombreCasilla);
+            }
+            return true;
+        }
+
+        return false;
     }
 
     // Metodo helper para ejecutar comandos desde un archivo
@@ -345,8 +393,6 @@ public class Menu { // la clase menu
                 System.out.println("fortuna: " + (long) j.getFortuna() + ",");
                 System.out.println("Cartas para salir de la cárcel: " + j.getCartasSalirCarcel());
 
-
-
                 if (j.getPropiedades().isEmpty()) {
                     System.out.println("propiedades: -,");
                 } else {
@@ -381,8 +427,6 @@ public class Menu { // la clase menu
             }
         }
         System.out.println("No se encontró ningún avatar con ID '" + ID + "'.");
-
-
     }
 
 
@@ -391,7 +435,7 @@ public class Menu { // la clase menu
      */
     private void descCasilla(String nombre) {
         //Busca la casilla en el tablero
-        Casilla casilla = tablero.encontrar_casilla(nombre);
+        Casilla casilla = tablero.encontrarCasilla(nombre);
         if (casilla != null) {
             System.out.println(casilla.describir());
         } else {
@@ -435,7 +479,7 @@ public class Menu { // la clase menu
                 actual.irACarcel(tablero);
                 contadorDobles = 0;
                 tirado = true;
-                // NO llamar a salirCarcel aquí - esperamos al siguiente turno
+                // no llamar a salirCarcel aquí - esperamos al siguiente turno
                 return total;
             }
         } else {
@@ -446,7 +490,7 @@ public class Menu { // la clase menu
 
         // Si al movernos acabamos en "IrCarcel", NO intentar salir en este turno
         if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
-            System.out.println("Estás en la cárcel. Intenta salir con el comando 'salir carcel.");
+            System.out.println("Estás en la cárcel. Intenta salir con el comando 'salir carcel'.");
             tirado = true;
             contadorDobles = 0; // Reset dobles al ir a cárcel
             return total;
@@ -457,11 +501,14 @@ public class Menu { // la clase menu
         if (d1 == d2 && contadorDobles < 3) {
             tirado = false; // puede repetir
         }
-
+        System.out.println(tablero);
         return total;
+
     }
 
-    private int forzarDados() {
+    // NUEVO: tirada forzada desde el comando "tirar/lanzar dados X+Y"
+    private int lanzarDadosForzados(int d1, int d2) {
+
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
             return 0;
@@ -472,6 +519,11 @@ public class Menu { // la clase menu
             return 0;
         }
 
+        if (d1 < 1 || d1 > 6 || d2 < 1 || d2 > 6) {
+            System.out.println("Valores inválidos. Usa números entre 1 y 6. Ej: 'tirar dados 5+1'");
+            return 0;
+        }
+
         Jugador actual = jugadores.get(turno);
         Avatar av = actual.getAvatar();
 
@@ -479,25 +531,6 @@ public class Menu { // la clase menu
         if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
             salirCarcel(actual);
             return 0;
-        }
-
-        Scanner sc = new Scanner(System.in);
-        int d1, d2;
-
-        // Pedir valor del dado 1
-        while (true) {
-            System.out.print("Forzar valor dado1 (1-6): ");
-            d1 = sc.nextInt();
-            if (d1 >= 1 && d1 <= 6) break;
-            System.out.println("Valor inválido, debe estar entre 1 y 6.");
-        }
-
-        // Pedir valor del dado 2
-        while (true) {
-            System.out.print("Forzar valor dado2 (1-6): ");
-            d2 = sc.nextInt();
-            if (d2 >= 1 && d2 <= 6) break;
-            System.out.println("Valor inválido, debe estar entre 1 y 6.");
         }
 
         // Guardar valores en los dados
@@ -541,7 +574,52 @@ public class Menu { // la clase menu
             tirado = false; // puede repetir
         }
 
+        System.out.println(tablero);
         return total;
+    }
+
+    private int forzarDados() {
+        if (jugadores == null || jugadores.isEmpty()) {
+            System.out.println("No hay jugadores en la partida.");
+            return 0;
+        }
+
+        if (tirado) {
+            System.out.println("Ya has tirado los dados este turno.");
+            return 0;
+        }
+
+        Jugador actual = jugadores.get(turno);
+        Avatar av = actual.getAvatar();
+
+        // Si está en la cárcel, abrir menú de opciones
+        if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
+            salirCarcel(actual);
+            return 0;
+        }
+
+        Scanner sc = new Scanner(System.in);
+        int d1, d2;
+
+        // Pedir valor del dado 1
+        while (true) {
+            System.out.print("Forzar valor dado1 (1-6): ");
+            d1 = sc.nextInt();
+            if (d1 >= 1 && d1 <= 6) break;
+            System.out.println("Valor inválido, debe estar entre 1 y 6.");
+        }
+
+        // Pedir valor del dado 2
+        while (true) {
+            System.out.print("Forzar valor dado2 (1-6): ");
+            d2 = sc.nextInt();
+            if (d2 >= 1 && d2 <= 6) break;
+            System.out.println("Valor inválido, debe estar entre 1 y 6.");
+        }
+
+        System.out.println(tablero);
+        // Redirigir a la nueva lógica unificada
+        return lanzarDadosForzados(d1, d2);
     }
 
     /*Método que ejecuta todas las acciones realizadas con el comando 'comprar nombre_casilla'.
@@ -550,7 +628,7 @@ public class Menu { // la clase menu
     public void comprar(String nombreCasilla) {
         //Jugador y casilla actuales
         Jugador jugador = jugadores.get(turno);
-        Casilla casilla = tablero.encontrar_casilla(nombreCasilla);
+        Casilla casilla = tablero.encontrarCasilla(nombreCasilla);
 
         if (casilla == null) {
             System.out.println("No se encontró la casilla '" + nombreCasilla + "'.");
@@ -728,16 +806,17 @@ public class Menu { // la clase menu
         }
 
         System.out.println("$> listar enventa");
-        for (Casilla c : enVenta) { //for each para encontrar las casillas en venta e imprimirlas
-            System.out.println("{");
-            System.out.println("nombre: " + c.getNombre() + ",");
-            System.out.println("tipo: " + c.getTipo() + ",");
-            if ("solar".equalsIgnoreCase(c.getTipo())) {
-                System.out.println("grupo: " + c.getGrupo() + ",");
+        for (Casilla c : enVenta) {
+            //for each para encontrar las casillas en venta e imprimirlas
+                System.out.println("{");
+                System.out.println("nombre: " + c.getNombre() + ",");
+                System.out.println("tipo: " + c.getTipo() + ",");
+                if ("solar".equalsIgnoreCase(c.getTipo())) {
+                    System.out.println("grupo: " + c.getGrupo() + ",");
+                }
+                System.out.println("valor: " + (long) c.getValor());
+                System.out.println("},");
             }
-            System.out.println("valor: " + (long)c.getValor());
-            System.out.println("},");
-        }
     }
 
 
@@ -837,6 +916,7 @@ public class Menu { // la clase menu
         System.out.println("nombre: " + actual.getNombre() + ",");
         System.out.println("avatar: " + actual.getAvatar().getId());
         System.out.println("}");
+        System.out.println(tablero);
     }
 
     // Determina si hay un único jugador activo (no en bancarrota) y lo retorna como ganador.
@@ -861,4 +941,44 @@ public class Menu { // la clase menu
             // Aquí puedes terminar el juego o bloquear más comandos
         }
     }
+
+    public void menuComandos(){
+        System.out.println("  - 'listar jugadores' / 'jugadores'");
+        System.out.println("  - 'jugador' (ver turno actual)");
+        System.out.println("  - 'tirar dados' (tirada aleatoria)");
+        System.out.println("  - 'tirar dados X+Y' o 'lanzar dados X+Y' (forzar valores 1-6)");
+        System.out.println("  - 'acabar turno'");
+        System.out.println("  - 'describir <casilla>'");
+        System.out.println("  - 'ver tablero'");
+        System.out.println("  - 'describir jugador <nombre>'");
+        System.out.println("  - 'describir avatar X'");
+        System.out.println("  - 'listar enventa' (casillas disponibles)");
+        System.out.println("  - 'listar avatares'");
+        System.out.println("  - 'comprar <casilla>'");
+        System.out.println("  - 'salir carcel'");
+        System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
+        System.out.println("  - 'salir' (cerrar el juego)");
+    }
+
+    private void menuSetUp(){
+        System.out.println("Modo configuración de partida:"); //comandos que se pueden usar si la partida no está empezada
+        System.out.println("- 'crear jugador <nombre> <avatar>' (avatares: sombrero, coche, esfinge, pelota)");
+        System.out.println("- 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
+        System.out.println("- 'listar jugadores'");
+        System.out.println("- 'empezar' (requiere entre 2 y 4 jugadores)");
+        System.out.println("- 'salir'");
+
+    }
+
+    private void validarPartida() {
+        if (jugadores.size() < 2) {
+            System.out.println("Debes crear al menos 2 jugadores para empezar.");
+        } else if (jugadores.size() > 4) {
+            System.out.println("No puedes tener más de 4 jugadores.");
+        } else {
+            System.out.println("Iniciando partida...");
+            juegoIniciado = true;
+        }
+    }
+
 }

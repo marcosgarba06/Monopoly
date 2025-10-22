@@ -440,7 +440,7 @@ public class Tablero {
             String nombreGrupo = norm(fila[0]);
             Grupo g = new Grupo(nombreGrupo);
             for (int i = 1; i < fila.length; i++) {
-                Casilla c = encontrar_casilla(fila[i]);
+                Casilla c = encontrarCasilla(fila[i]);
                 if (c == null) {
                     System.out.println("Aviso: no existe la casilla " + fila[i] + " para el grupo " + nombreGrupo);
                     continue;
@@ -601,7 +601,7 @@ public class Tablero {
     }
 
 
-    public Casilla encontrar_casilla(String nombre) {
+    public Casilla encontrarCasilla(String nombre) {
         for (ArrayList<Casilla> lado : posiciones) {
             for (Casilla c : lado) {
                 if (c.getNombre().equalsIgnoreCase(nombre)) {
@@ -639,7 +639,6 @@ public class Tablero {
     public void setUltimaTirada(int tirada) {
         this.ultimaTirada = tirada;
     }
-
 
     public void setMenu(Menu menu) {
         this.menu = menu;

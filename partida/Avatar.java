@@ -98,6 +98,7 @@ public class Avatar {
             }
         }
     }
+
     public String toString() {
         String pos = (casilla != null) ? casilla.getNombre() : "sin posición";
         return tipo + " (ID: " + id + ", en " + pos + ")";
@@ -141,7 +142,6 @@ public class Avatar {
         this.casilla = c;
         if (c != null) c.anhadirAvatar(this);
     }
-
 
     public String getTipo() {
         return tipo;
