@@ -43,7 +43,7 @@ public class Jugador {
      */
     public Jugador(String nombre, String tipoAvatar, Casilla inicio, ArrayList<Avatar> avCreados) {
         this.nombre = nombre;
-        this.avatar = new Avatar(tipoAvatar, this, inicio, avCreados); //this → la instancia actual
+        this.avatar = new Avatar(tipoAvatar, this, inicio, avCreados);
         this.fortuna = Valor.FORTUNA_INICIAL;
         this.gastos = 0;
         this.enCarcel = false;
@@ -69,9 +69,9 @@ public class Jugador {
 
     public void añadirCartaSalirCarcel() {
         cartasSalirCarcel++;
-    } //no esta implementado aun
+    }
 
-    public boolean usarCartaSalirCarcel() { //no esta implementado
+    public boolean usarCartaSalirCarcel() {
         if (cartasSalirCarcel > 0) {
             cartasSalirCarcel--;
             return true;
@@ -110,7 +110,6 @@ public class Jugador {
 
     // Método para enviar al jugador a la cárcel
     public void irACarcel(Tablero tablero) {
-
         this.enCarcel = true;
         this.tiradasCarcel = 0;
 
@@ -120,7 +119,7 @@ public class Jugador {
             return;
         }
 
-        // Eliminar el avatar de su casilla actual, en ir a carcel o en suerte o caja para siguentes entregas
+        // Eliminar el avatar de su casilla actual
         if (avatar.getCasilla() != null) {
             avatar.getCasilla().eliminarAvatar(avatar);
         }
@@ -170,7 +169,9 @@ public class Jugador {
 
         propiedades.clear();
         fortuna = 0;
-        activo = false;// si usas un flag para saber si sigue en juego
+        activo = false;
+
+        // si usas un flag para saber si sigue en juego
     }
 
     public boolean estaActivo() {
@@ -212,7 +213,6 @@ public class Jugador {
     public boolean getTieneCartaSalirCarcel() {
         return tieneCartaSalirCarcel;
     }
-
     // Setters
 
     public void setTieneCartaSalirCarcel(boolean valor) {

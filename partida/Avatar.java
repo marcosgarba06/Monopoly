@@ -47,7 +47,7 @@ public class Avatar {
 
     public void moverAvatar(int pasos, Tablero tablero) {
         int posicionActual = this.posicion;
-        int nuevaPos = (posicionActual + pasos) % 40;//calcular la nueva posición del avatar en el tablero, asegurándose de que no se salga del rango de casillas.
+        int nuevaPos = (posicionActual + pasos) % 40; //calcular la nueva posición del avatar en el tablero, asegurándose de que no se salga del rango de casillas.
 
         // Si la nueva posición es menor que la actual, significa que pasó por la salida
         if (nuevaPos < posicionActual) {
