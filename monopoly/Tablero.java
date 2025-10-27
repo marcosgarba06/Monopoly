@@ -468,6 +468,10 @@ public class Tablero {
         }
         return null;
     }
+
+    public int getNumeroCasillas() {
+        return casillas.size();
+    }
     private Menu menu; // asegúrate de tener una referencia al menú
 
     public void notificarBancarrota(Jugador jugador) {
@@ -577,7 +581,7 @@ public class Tablero {
     public int getCantidadCasillasGrupo(String nombreGrupo) {
         int total = 0;
         for (Casilla c : casillas) {
-            // ✅ Verificar que la casilla tenga grupo antes de acceder a él
+            //  Verificar que la casilla tenga grupo antes de acceder a él
             if (c.getGrupo() != null && c.getGrupo().getNombre().equalsIgnoreCase(nombreGrupo)) {
                 total++;
             }
@@ -643,4 +647,5 @@ public class Tablero {
     public void setMenu(Menu menu) {
         this.menu = menu;
     }
+
 }

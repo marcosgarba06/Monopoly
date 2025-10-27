@@ -67,6 +67,10 @@ public class Menu { // la clase menu
         }
         // Cuando hay 2-4 jugadores y se ejecuta 'empezar', arranca la fase de juego
         iniciarJuego();
+        // Inicializar los mazos de cartas una sola vez
+        Carta.inicializarMazos();
+        Carta.setJugadores(jugadores);
+
     }
 
     public void iniciarJuego() {
@@ -622,6 +626,7 @@ public class Menu { // la clase menu
         return lanzarDadosForzados(d1, d2);
     }
 
+
     /*Método que ejecuta todas las acciones realizadas con el comando 'comprar nombre_casilla'.
      * Parámetro: cadena de caracteres con el nombre de la casilla.
      */
@@ -940,6 +945,10 @@ public class Menu { // la clase menu
             System.out.println("Gastos totales: " + (long)ganador.getGastos() + "€");
             // Aquí puedes terminar el juego o bloquear más comandos
         }
+    }
+
+    public List<Jugador> getJugadores() {
+        return this.jugadores;
     }
 
     public void menuComandos(){

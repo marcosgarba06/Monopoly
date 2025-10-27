@@ -3,6 +3,9 @@ package monopoly;
 import partida.*;
 import java.util.ArrayList;
 
+
+import static java.awt.SystemColor.menu;
+
 public class Casilla {
 
     // Atributos
@@ -42,7 +45,6 @@ public class Casilla {
     private float costeHotel;
     private float costePiscina;
     private float costePista;
-
 
 
 
@@ -236,10 +238,16 @@ public class Casilla {
 
             case "suerte":
                 System.out.println("Has caído en Suerte. Robas una carta...");
+                Carta carta = Carta.seleccionarCarta("suerte");
+                carta.aplicarAccion(jugador, tablero);
+
                 break;
 
             case "caja":
-                System.out.println("Has caído en Caja de Comunidad. Robas una carta...");
+                System.out.println("Has caído en Suerte. Robas una carta...");
+                carta = Carta.seleccionarCarta("caja");
+                carta.aplicarAccion(jugador, tablero);
+
                 break;
 
 
