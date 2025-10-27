@@ -244,7 +244,7 @@ public class Casilla {
                 break;
 
             case "caja":
-                System.out.println("Has caído en Suerte. Robas una carta...");
+                System.out.println("Has caído en Caja. Robas una carta...");
                 carta = Carta.seleccionarCarta("caja");
                 carta.aplicarAccion(jugador, tablero);
 

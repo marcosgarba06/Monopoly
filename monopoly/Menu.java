@@ -68,6 +68,7 @@ public class Menu { // la clase menu
         // Cuando hay 2-4 jugadores y se ejecuta 'empezar', arranca la fase de juego
         iniciarJuego();
         // Inicializar los mazos de cartas una sola vez
+        Carta.resetearContadores();
         Carta.inicializarMazos();
         Carta.setJugadores(jugadores);
 
