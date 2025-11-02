@@ -499,7 +499,7 @@ public class Menu { // la clase menu
 
         // Si caemos en IrCarcel al movernos
         if (actual.isEnCarcel() || av.estaEnCarcel()) {
-            System.out.println("Has caído en 'Ir a Cárcel'. Usa 'salir carcel' en tu próximo turno.");
+            System.out.println("Has caído en 'Ir a Cárcel'. Usa 'salir carcel'.");
             tirado = true;
             contadorDobles = 0;
             return total;
@@ -537,7 +537,7 @@ public class Menu { // la clase menu
 
         // *** CAMBIO: No mostrar menú automáticamente ***
         if (actual.isEnCarcel() || av.estaEnCarcel()) {
-            System.out.println("Estás en la cárcel. Usa el comando 'salir carcel' para intentar salir.");
+            System.out.println("Estás en la cárcel. Usa el comando 'salir carcel'.");
             return 0;
         }
 
@@ -567,7 +567,7 @@ public class Menu { // la clase menu
         av.moverAvatar(total, tablero);
 
         if (actual.isEnCarcel() || av.estaEnCarcel()) {
-            System.out.println("Has caído en 'Ir a Cárcel'. Usa 'salir carcel' en tu próximo turno.");
+            System.out.println("Has caído en 'Ir a Cárcel'. Usa 'salir carcel'.");
             tirado = true;
             contadorDobles = 0;
             return total;
