@@ -275,8 +275,7 @@ public class Menu { // la clase menu
     private boolean procesarComandoSimple(String comandoMinusculas) {
 
         switch (comandoMinusculas) {
-            case "listar jugadores":
-            case "jugadores":
+            case "listar jugadores": case "jugadores":
                 listarJugadores();
                 return true;
 
@@ -367,6 +366,10 @@ public class Menu { // la clase menu
 
             edificarPropiedad(tipo);
             return true;
+        }
+
+        if(palabras.length == 2 && palabras[0].equals("estadisticas")) {
+            mostrarEstadisticasUnJugador(palabras[1]);
         }
         return false;
     }
@@ -689,6 +692,7 @@ public class Menu { // la clase menu
 
         // Realiza la compra
         jugador.restarFortuna(casilla.getValor());
+        jugador.sumarDineroInvertido(casilla.getValor());
         casilla.setDuenho(jugador);
         jugador.anhadirPropiedad(casilla);
         System.out.println("Has comprado " + casilla.getNombre() + " por " + (long) casilla.getValor() + "€.");
@@ -731,6 +735,7 @@ public class Menu { // la clase menu
             // Pagar y salir
             jugador.restarFortuna(500000);
             jugador.sumarGastos(500000);
+            jugador.sumarPagoTasasEImpuestos(500000);
             av.setEnCarcel(false);
             jugador.setEnCarcel(false);
             av.setTurnosEnCarcel(0);
@@ -770,6 +775,7 @@ public class Menu { // la clase menu
 
                 jugador.restarFortuna(500000);
                 jugador.sumarGastos(500000);
+                jugador.sumarPagoTasasEImpuestos(500000);
                 av.setEnCarcel(false);
                 jugador.setEnCarcel(false);
                 av.setTurnosEnCarcel(0);
@@ -1043,6 +1049,7 @@ public class Menu { // la clase menu
         System.out.println("  - 'listar enventa' (casillas disponibles)");
         System.out.println("  - 'listar avatares'");
         System.out.println("  - 'comprar <casilla>'");
+        System.out.println("  - 'estadisticas <jugador>'");
         System.out.println("  - 'salir carcel'");
         System.out.println("  - 'edificar <tipo>'");
         System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
@@ -1249,5 +1256,26 @@ public class Menu { // la clase menu
                 ". La fortuna de " + jugador.getNombre() +
                 " se reduce en " + (long)coste + "€.");
     }
+
+    private void mostrarEstadisticasUnJugador(String nombreJugador) {
+        for (Jugador j : jugadores) {
+            if (j.getNombre().equalsIgnoreCase(nombreJugador)) {
+                System.out.println("$> estadisticas " + j.getNombre());
+                System.out.println("{");
+                System.out.println("dineroInvertido: " + (long) j.getDineroInvertido() + ",");
+                System.out.println("pagoTasasEImpuestos: " + (long) j.getPagoTasasEImpuestos() + ",");
+                System.out.println("pagoDeAlquileres: " + (long) j.getPagoDeAlquileres() + ",");
+                System.out.println("cobroDeAlquileres: " + (long) j.getCobroDeAlquileres() + ",");
+                System.out.println("pasarPorCasillaDeSalida: " + (long) j.getPasarPorCasillaDeSalida() + ",");
+                System.out.println("premiosInversionesOBote: " + (long) j.getPremiosInversionesOBote() + ",");
+                System.out.println("vecesEnLaCarcel: " + j.getVecesEnLaCarcel());
+                System.out.println("}");
+                return;
+            }
+        }
+        System.out.println("No se encontró ningún jugador con el nombre '" + nombreJugador + "'.");
+    }
+
+
 
 }
