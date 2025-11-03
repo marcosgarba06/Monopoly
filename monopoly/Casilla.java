@@ -568,6 +568,19 @@ public class Casilla {
     }
 
     // ====== Venta de edificaciones ======
+    // ====== VENTA de edificaciones ======
+    /*
+     * Vende edificaciones en un solar.
+     * - tipoEdificacion: "casas", "hotel", "piscina" o "pista" (acepta singular/plural y variantes).
+     * - jugador: debe ser el dueño.
+     * - cantidadSolicitada: entero (>0). Para hotel/piscina/pista solo aplica 0/1; casas 0..N.
+     *
+     * Reglas clave:
+     * - Solo en solares.
+     * - Se paga el 100% del precio de compra (getPrecioXxx()).
+     * - Piscina/pista requieren hotel; por tanto, para vender el hotel deben venderse antes piscina y pista.
+     * - Al vender el hotel, la casilla recupera 4 casas (regla solicitada).
+     */
     public void venderEdificacion(String tipoEdificacion, Jugador jugador, int cantidadSolicitada) {
         if (tipoEdificacion == null) {
             System.out.println("Tipo de edificación no válido.");
@@ -575,30 +588,29 @@ public class Casilla {
         }
         String te = tipoEdificacion.trim().toLowerCase();
 
-        // Las variables booleanas toman valores t/f dependiendo de las condiciones
-        boolean esCasas = te.equals("casa") || te.equals("casas");
+        boolean esCasas   = te.equals("casa") || te.equals("casas");
         boolean esPiscina = te.equals("piscina") || te.equals("piscinas");
-        boolean esPista = te.equals("pista") || te.equals("pistas") || te.equals("pista deporte") || te.equals("pista_deporte") || te.equals("pista-deporte");
-        boolean esHotel = te.equals("hotel") || te.equals("hoteles");
+        boolean esPista   = te.equals("pista") || te.equals("pistas") || te.equals("pista deporte") || te.equals("pista_deporte") || te.equals("pista-deporte");
+        boolean esHotel   = te.equals("hotel") || te.equals("hoteles");
 
-        // Solo en solares se pueden vender edificaciones
+        // Solo solares admiten edificaciones
         if (this.tipo == null || !this.tipo.equalsIgnoreCase("solar")) {
             System.out.println("No se pueden vender edificaciones en una casilla de tipo " + this.tipo + ".");
             return;
         }
 
-        // Comprobar cantidad pedida
         if (cantidadSolicitada <= 0) {
             System.out.println("La cantidad a vender debe ser mayor que 0.");
             return;
         }
 
-        // Comprobar pertenencia
+        // Debe pertenecer al jugador
         if (this.getDuenho() == null || this.getDuenho() != jugador) {
             System.out.println("Esta propiedad no pertenece a " + jugador.getNombre() + ".");
             return;
         }
 
+        // --- Casas ---
         if (esCasas) {
             int disponibles = this.numCasas;
             if (disponibles <= 0) {
@@ -625,16 +637,17 @@ public class Casilla {
             return;
         }
 
+        // --- Piscina (0/1) ---
         if (esPiscina) {
-            int disponibles = this.piscina; // 0 o 1
+            int disponibles = this.piscina;
             if (disponibles <= 0) {
                 System.out.println("No hay piscina que vender en " + this.nombre + ".");
                 return;
             }
-            int aVender = Math.min(disponibles, cantidadSolicitada);
+            int aVender = Math.min(disponibles, cantidadSolicitada); // 1 máx
             long total = (long)(aVender * this.getPrecioPiscina());
 
-            this.piscina -= aVender;
+            this.piscina -= aVender; // → 0
             jugador.sumarFortuna(total);
 
             if (cantidadSolicitada > aVender) {
@@ -645,16 +658,17 @@ public class Casilla {
             return;
         }
 
+        // --- Pista (0/1) ---
         if (esPista) {
-            int disponibles = this.pista; // 0 o 1
+            int disponibles = this.pista;
             if (disponibles <= 0) {
                 System.out.println("No hay pista que vender en " + this.nombre + ".");
                 return;
             }
-            int aVender = Math.min(disponibles, cantidadSolicitada);
+            int aVender = Math.min(disponibles, cantidadSolicitada); // 1 máx
             long total = (long)(aVender * this.getPrecioPista());
 
-            this.pista -= aVender;
+            this.pista -= aVender; // → 0
             jugador.sumarFortuna(total);
 
             if (cantidadSolicitada > aVender) {
@@ -665,13 +679,14 @@ public class Casilla {
             return;
         }
 
+        // --- Hotel (0/1) ---
         if (esHotel) {
-            int disponibles = this.hotel; // 0 o 1
+            int disponibles = this.hotel;
             if (disponibles <= 0) {
                 System.out.println("No hay hotel que vender en " + this.nombre + ".");
                 return;
             }
-            // No permitir vender hotel si hay piscina o pista (dependen del hotel)
+            // Para poder vender el hotel, primero deben venderse piscina y pista
             if (this.piscina > 0 || this.pista > 0) {
                 System.out.println("No puedes vender el hotel mientras existan piscina o pista en la propiedad.");
                 return;
@@ -680,13 +695,16 @@ public class Casilla {
             int aVender = Math.min(disponibles, cantidadSolicitada); // será 1 como máximo
             long total = (long)(aVender * this.getPrecioHotel());
 
-            this.hotel -= aVender; // pasa a 0
+            // Quitar el hotel y restaurar 4 casas (regla solicitada)
+            this.hotel -= aVender;       // → 0
+            this.numCasas = 4;           // Al vender el hotel, vuelven 4 casas a la casilla
             jugador.sumarFortuna(total);
 
             if (cantidadSolicitada > aVender) {
                 System.out.println("Solo se puede vender 1 hotel aquí. Ingresas " + total + "€.");
             } else {
-                System.out.println(jugador.getNombre() + " ha vendido 1 hotel en " + this.nombre + ", recibiendo " + total + "€.");
+                System.out.println(jugador.getNombre() + " ha vendido 1 hotel en " + this.nombre + ", recibiendo " + total + "€."
+                        + " Tras la venta, la propiedad pasa a tener 4 casas.");
             }
             return;
         }
@@ -695,6 +713,6 @@ public class Casilla {
         System.out.println("Tipo de edificación no reconocido: " + tipoEdificacion + ".");
     }
 
-    
+
 }
 
