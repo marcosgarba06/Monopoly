@@ -11,8 +11,9 @@ public class Jugador {
     private String nombre;
     private int cartasSalirCarcel = 0;
     private Avatar avatar;
-    private float fortuna;
-    private float gastos;
+    private boolean enCarcel;
+    private int tiradasCarcel;
+    private int vecesEnLaCarcel;
     private int vueltas;
     private ArrayList<Casilla> propiedades;
     private boolean bancarrota;
@@ -20,12 +21,26 @@ public class Jugador {
     private boolean activo = true;
     private Tablero tablero;
 
+    // Respecto a la economía de la partida
+    private float fortuna;
+    private float gastos;
+    private float dineroInvertido = 0;
+    private float pagoTasasEImpuestos = 0;
+    private float pagoDeAlquileres = 0;
+    private float cobroDeAlquileres = 0;
+    private float pasarPorCasillaDeSalida = 0;
+    private float premiosInversionesOBote = 0;
+
+
+
     //Constructor vacío. Se usará para crear la banca.
     public Jugador() {
         this.nombre = "BANCA";
         this.avatar = null;
         this.fortuna = Valor.FORTUNA_BANCA;
         this.gastos = 0;
+        this.enCarcel = false;
+        this.tiradasCarcel = 0;
         this.vueltas = 0;
         this.propiedades = new ArrayList<>();
         this.bancarrota = false;
@@ -39,10 +54,12 @@ public class Jugador {
      */
     public Jugador(String nombre, String tipoAvatar, Casilla inicio, ArrayList<Avatar> avCreados) {
         this.nombre = nombre;
-        this.avatar = new Avatar(tipoAvatar, this, inicio, avCreados); //this → la instancia actual
+        this.avatar = new Avatar(tipoAvatar, this, inicio, avCreados);
         this.fortuna = Valor.FORTUNA_INICIAL;
         this.gastos = 0;
+        this.enCarcel = false;
         this.vueltas = 0;
+        this.tiradasCarcel = 0;
         this.propiedades = new ArrayList<>();
         this.bancarrota = false;
         this.tieneCartaSalirCarcel = false;
@@ -63,9 +80,9 @@ public class Jugador {
 
     public void añadirCartaSalirCarcel() {
         cartasSalirCarcel++;
-    } //no esta implementado aun
+    }
 
-    public boolean usarCartaSalirCarcel() { //no esta implementado
+    public boolean usarCartaSalirCarcel() {
         if (cartasSalirCarcel > 0) {
             cartasSalirCarcel--;
             return true;
@@ -104,6 +121,8 @@ public class Jugador {
 
     // Método para enviar al jugador a la cárcel
     public void irACarcel(Tablero tablero) {
+        this.enCarcel = true;
+        this.tiradasCarcel = 0;
 
         Casilla carcel = tablero.encontrarCasilla("Carcel");
         if (carcel == null) {
@@ -111,7 +130,7 @@ public class Jugador {
             return;
         }
 
-        // Eliminar el avatar de su casilla actual, en ir a carcel o en suerte o caja para siguentes entregas
+        // Eliminar el avatar de su casilla actual
         if (avatar.getCasilla() != null) {
             avatar.getCasilla().eliminarAvatar(avatar);
         }
@@ -122,6 +141,7 @@ public class Jugador {
         carcel.anhadirAvatar(avatar);
         avatar.setEnCarcel(true);
         avatar.setTurnosEnCarcel(0);
+        avatar.getJugador().incrementarVecesEnCarcel();
 
         System.out.println(nombre + " ha sido enviado a la cárcel.");
     }
@@ -161,12 +181,32 @@ public class Jugador {
 
         propiedades.clear();
         fortuna = 0;
-        activo = false;// si usas un flag para saber si sigue en juego
+        activo = false;
+
+        // si usas un flag para saber si sigue en juego
     }
 
     public boolean estaActivo() {
         return activo;
     }
+
+    // Métodos para gestionar el dinero más detallado (para estadísticas)
+    public void sumarDineroInvertido(float cantidad) {
+        dineroInvertido += cantidad;}
+    public void sumarPagoTasasEImpuestos(float cantidad) {
+        pagoTasasEImpuestos += cantidad;}
+    public void sumarPagoAlquiler(float cantidad) {
+        pagoDeAlquileres += cantidad;}
+    public void sumarCobroAlquiler(float cantidad) {
+        cobroDeAlquileres += cantidad;}
+    public void sumarSalida(float cantidad) {
+        pasarPorCasillaDeSalida += cantidad;}
+    public void sumarPremios(float cantidad) {
+        premiosInversionesOBote += cantidad;}
+    public void incrementarVecesEnCarcel() {
+        vecesEnLaCarcel++; }
+
+
 
     // Getters
 
@@ -183,10 +223,10 @@ public class Jugador {
         return gastos;
     }
     public boolean isEnCarcel() {
-        return avatar != null && avatar.estaEnCarcel();
+        return enCarcel;
     }
     public int getTiradasCarcel() {
-        return avatar != null ? avatar.getTurnosEnCarcel() : 0;
+        return tiradasCarcel;
     }
     public int getVueltas() {
         return vueltas;
@@ -203,6 +243,14 @@ public class Jugador {
     public boolean getTieneCartaSalirCarcel() {
         return tieneCartaSalirCarcel;
     }
+    public float getPremiosInversionesOBote() {return premiosInversionesOBote;}
+    public float getPasarPorCasillaDeSalida() {return pasarPorCasillaDeSalida;}
+    public float getCobroDeAlquileres() {return cobroDeAlquileres;}
+    public float getPagoDeAlquileres() {return pagoDeAlquileres;}
+    public float getPagoTasasEImpuestos() {return pagoTasasEImpuestos;}
+    public float getDineroInvertido() {return dineroInvertido;}
+    public int getVecesEnLaCarcel() {return vecesEnLaCarcel;}
+
 
     // Setters
 
@@ -210,9 +258,7 @@ public class Jugador {
         tieneCartaSalirCarcel = valor;
     }
     public void setEnCarcel(boolean enCarcel) {
-        if (avatar != null) {
-            avatar.setEnCarcel(enCarcel);
-        }
+        this.enCarcel = enCarcel;
     }
     public void setBancarrota(boolean bancarrota) {
         this.bancarrota = bancarrota;
@@ -228,22 +274,4 @@ public class Jugador {
     }
 
 
-    public boolean poseeGrupoCompleto(Casilla casilla, Tablero tablero) {
-        //  Verificar que la casilla tenga grupo
-        if (casilla.getGrupo() == null) {
-            return false;
-        }
-
-        String nombreGrupo = casilla.getGrupo().getNombre();
-        int total = tablero.getCantidadCasillasGrupo(nombreGrupo);
-
-        int propias = 0;
-        for (Casilla c : propiedades) {
-            // Verificar que cada propiedad tenga grupo antes de comparar
-            if (c.getGrupo() != null && c.getGrupo().getNombre().equalsIgnoreCase(nombreGrupo)) {
-                propias++;
-            }
-        }
-        return propias == total;
-    }
 }

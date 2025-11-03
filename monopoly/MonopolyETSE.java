@@ -21,7 +21,22 @@ public class MonopolyETSE {
         boolean continuar = true;
         //el bucle se repetira hasta que se introduzca el comando salir
         while (continuar) {
-            menu.menuComandos();
+            System.out.println("Comandos disponibles:");
+            System.out.println("  - 'listar jugadores' / 'jugadores'");
+            System.out.println("  - 'jugador' (ver turno actual)");
+            System.out.println("  - 'tirar dados'");
+            System.out.println("  - 'forzar dados'");
+            System.out.println("  - 'ver tablero'");
+            System.out.println("  - 'acabar turno'");
+            System.out.println("  - 'describir <casilla>'");
+            System.out.println("  - 'describir jugador <nombre>'");
+            System.out.println("  - 'describir avatar X'");
+            System.out.println("  - 'listar venta' (casillas disponibles)");
+            System.out.println("  - 'listar avatares'");
+            System.out.println("  - 'comprar <casilla>'");
+            System.out.println("  - 'salir carcel'");
+            System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
+            System.out.println("  - 'salir' (cerrar el juego)");
             String comando = sc.nextLine().trim(); // se lee lo que escribe el usuario y se limbia espacion innecesarios
 
             if (comando.equalsIgnoreCase("salir")) {

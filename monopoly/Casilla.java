@@ -173,6 +173,8 @@ public class Casilla {
                     } else {
                         jugador.pagar(alquiler, this.getDuenho());
                         System.out.println("Has pagado " + (long)alquiler + "€ a " + this.getDuenho().getNombre());
+                        jugador.sumarPagoAlquiler(alquiler);
+                        this.getDuenho().sumarCobroAlquiler(alquiler);
                     }
                 } else {
                     System.out.println("Has caído en tu propia propiedad.");
@@ -193,6 +195,8 @@ public class Casilla {
                     }
                     System.out.println("Debes pagar " + (long)alquilerTotal + "€ por el uso del transporte.");
                     jugador.pagar(alquilerTotal, this.getDuenho());
+                    jugador.sumarPagoAlquiler(alquilerTotal);
+                    this.getDuenho().sumarCobroAlquiler(alquilerTotal);
                 } else {
                     System.out.println("Has caído en tu propio transporte.");
                 }
@@ -208,6 +212,8 @@ public class Casilla {
                     float alquiler = this.evaluarAlquiler(tirada);
                     System.out.println("Debes pagar " + (long)alquiler + "€ por el servicio.");
                     jugador.pagar(alquiler, this.getDuenho());
+                    jugador.sumarPagoAlquiler(alquiler);
+                    this.getDuenho().sumarCobroAlquiler(alquiler);
                 } else {
                     System.out.println("Has caído en tu propio servicio.");
                 }
@@ -216,6 +222,7 @@ public class Casilla {
 
             case "impuesto":
                 System.out.println("Debes pagar un impuesto de " + (long)this.impuesto + "€.");
+                jugador.sumarPagoTasasEImpuestos(impuesto);
 
                 if (jugador.getFortuna() < impuesto) {
                     System.out.println("No puedes pagar el alquiler. Te declaras en bancarrota.");
@@ -232,6 +239,7 @@ public class Casilla {
 
                 jugador.restarFortuna(this.impuesto);
                 jugador.sumarGastos(this.impuesto);
+                jugador.sumarPagoTasasEImpuestos(impuesto);
                 tablero.añadirAlParking(this.impuesto);
                 System.out.println("El dinero se ha depositado en el parking. Total acumulado: " + (long)tablero.getFondoParking() + "€.");
                 break;
@@ -264,6 +272,7 @@ public class Casilla {
                         float premio = this.tablero.recogerParking();
                         if (premio > 0) {
                             jugador.sumarFortuna(premio);
+                            jugador.sumarPremios(premio);
                             System.out.println("¡Has recogido " + (long)premio + "€ del parking gratuito!");
                         } else {
                             System.out.println("El parking está vacío. No hay premio.");
@@ -327,6 +336,7 @@ public class Casilla {
 
         if (solicitante.getFortuna() >= valor) {
             solicitante.pagar(valor, banca);
+            solicitante.sumarDineroInvertido(valor);
             setDuenho(solicitante);
             solicitante.anadirPropiedad(this);
             System.out.println(solicitante.getNombre() + " ha comprado " + nombre + " por " + (long)valor);
@@ -369,6 +379,7 @@ public class Casilla {
 
             case "impuesto":
                 sb.append("  a_pagar: ").append((long) impuesto).append("\n");
+
                 break;
 
             case "especial":
