@@ -134,16 +134,25 @@ public class Carta {
                             totalAPagar += 250000;
                         }
                     }
+                    if (jugador.getFortuna() < totalAPagar) {
+                        System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
+                        jugador.declararBancarrota(null);
+                        tablero.notificarBancarrota(jugador);
+                        return;
+                    }
+
                     jugador.restarFortuna(totalAPagar);
                     jugador.sumarGastos(totalAPagar);
-                    System.out.println("Pagas " + totalAPagar + "€ como presidente de la junta.");
 
-                    // Verificar si queda en bancarrota
-                    if (jugador.getFortuna() < 0) {
-                        System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
-                        jugador.setBancarrota(true);
+                    for (Jugador c : jugadores) {
+                        if (!c.equals(jugador) && !c.isBancarrota()) {
+                            c.sumarFortuna(250000);
+                        }
                     }
+
+                    System.out.println("Pagas " + totalAPagar + "€ como presidente de la junta.");
                     break;
+
 
                 case 5: // Retroceder tres casillas
                     int nuevaPosicion = casillaActual.getPosicion() - 3;
@@ -162,28 +171,32 @@ public class Carta {
                     break;
 
                 case 6: // Multa por móvil
+                    if (jugador.getFortuna() < 150000) {
+                        System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
+                        jugador.declararBancarrota(null);
+                        tablero.notificarBancarrota(jugador);
+                        return;
+                    }
+
                     jugador.restarFortuna(150000);
                     jugador.sumarGastos(150000);
                     System.out.println("Pagas 150.000€ por conducir indebidamente.");
-
-                    if (jugador.getFortuna() < 0) {
-                        System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
-                        jugador.setBancarrota(true);
-                    }
                     break;
             }
 
         } else if (tipo.equals("caja")) {
             switch (id) {
                 case 1: // Balneario
+                    if (jugador.getFortuna() < 500000) {
+                        System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
+                        jugador.declararBancarrota(null);
+                        tablero.notificarBancarrota(jugador);
+                        return;
+                    }
+
                     jugador.restarFortuna(500000);
                     jugador.sumarGastos(500000);
                     System.out.println("Pagas 500.000€ por un fin de semana en un balneario de 5 estrellas.");
-
-                    if (jugador.getFortuna() < 0) {
-                        System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
-                        jugador.setBancarrota(true);
-                    }
                     break;
 
                 case 2: // Cárcel
@@ -207,14 +220,16 @@ public class Carta {
                     break;
 
                 case 5: // Viaje a Solar12
+                    if (jugador.getFortuna() < 1000000) {
+                        System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
+                        jugador.declararBancarrota(null);
+                        tablero.notificarBancarrota(jugador);
+                        return;
+                    }
+
                     jugador.restarFortuna(1000000);
                     jugador.sumarGastos(1000000);
                     System.out.println("Pagas 1.000.000€ por invitar a tus amigos a Solar12.");
-
-                    if (jugador.getFortuna() < 0) {
-                        System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
-                        jugador.setBancarrota(true);
-                    }
                     break;
 
                 case 6: // Alquiler villa (CORREGIDO)
@@ -225,14 +240,23 @@ public class Carta {
                             totalAlquiler += 200000;
                         }
                     }
+                    if (jugador.getFortuna() < totalAlquiler) {
+                        System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
+                        jugador.declararBancarrota(null);
+                        tablero.notificarBancarrota(jugador);
+                        return;
+                    }
+
                     jugador.restarFortuna(totalAlquiler);
                     jugador.sumarGastos(totalAlquiler);
-                    System.out.println("Pagas " + totalAlquiler + "€ por alquilar la villa a tus compañeros.");
 
-                    if (jugador.getFortuna() < 0) {
-                        System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
-                        jugador.setBancarrota(true);
+                    for (Jugador c : jugadores) {
+                        if (!c.equals(jugador) && !c.isBancarrota()) {
+                            c.sumarFortuna(200000);
+                        }
                     }
+
+                    System.out.println("Pagas " + totalAlquiler + "€ por alquilar la villa a tus compañeros.");
                     break;
             }
         }

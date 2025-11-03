@@ -32,7 +32,7 @@ public class Avatar {
         this.tipo = tipo;
         this.jugador = jugador;
         this.casilla = lugar;
-
+        this.turnosEnCarcel = 0;
         generarId(avCreados); //generamos un id
         avCreados.add(this); //añadimos el id nuevo para el cual lo creamos
 
@@ -56,7 +56,6 @@ public class Avatar {
         }
 
         this.posicion = nuevaPos;
-
         Casilla nuevaCasilla = tablero.getCasilla(nuevaPos);
         setCasilla(nuevaCasilla); // ← unifica y mantiene listas de avatares
 
@@ -107,12 +106,10 @@ public class Avatar {
     /// SETERS Y GETTERS, acceden y modifican atributos provados
 
     public void setPosicion(int i) {//actualiza la posicion del avatar en el tablero
-
         this.posicion = i;
     }
 
     public void setEnCarcel(boolean b) {
-
         this.enCarcel = b;
     }
 
@@ -129,12 +126,6 @@ public class Avatar {
     public Jugador getJugador() {
 
         return jugador;
-    }
-
-    public boolean isEnCarcel() {
-
-        return enCarcel;
-
     }
 
     public void setCasilla(Casilla c) {

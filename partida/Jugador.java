@@ -13,8 +13,6 @@ public class Jugador {
     private Avatar avatar;
     private float fortuna;
     private float gastos;
-    private boolean enCarcel;
-    private int tiradasCarcel;
     private int vueltas;
     private ArrayList<Casilla> propiedades;
     private boolean bancarrota;
@@ -28,8 +26,6 @@ public class Jugador {
         this.avatar = null;
         this.fortuna = Valor.FORTUNA_BANCA;
         this.gastos = 0;
-        this.enCarcel = false;
-        this.tiradasCarcel = 0;
         this.vueltas = 0;
         this.propiedades = new ArrayList<>();
         this.bancarrota = false;
@@ -46,9 +42,7 @@ public class Jugador {
         this.avatar = new Avatar(tipoAvatar, this, inicio, avCreados); //this → la instancia actual
         this.fortuna = Valor.FORTUNA_INICIAL;
         this.gastos = 0;
-        this.enCarcel = false;
         this.vueltas = 0;
-        this.tiradasCarcel = 0;
         this.propiedades = new ArrayList<>();
         this.bancarrota = false;
         this.tieneCartaSalirCarcel = false;
@@ -110,9 +104,6 @@ public class Jugador {
 
     // Método para enviar al jugador a la cárcel
     public void irACarcel(Tablero tablero) {
-
-        this.enCarcel = true;
-        this.tiradasCarcel = 0;
 
         Casilla carcel = tablero.encontrarCasilla("Carcel");
         if (carcel == null) {
@@ -192,10 +183,10 @@ public class Jugador {
         return gastos;
     }
     public boolean isEnCarcel() {
-        return enCarcel;
+        return avatar != null && avatar.estaEnCarcel();
     }
     public int getTiradasCarcel() {
-        return tiradasCarcel;
+        return avatar != null ? avatar.getTurnosEnCarcel() : 0;
     }
     public int getVueltas() {
         return vueltas;
@@ -219,7 +210,9 @@ public class Jugador {
         tieneCartaSalirCarcel = valor;
     }
     public void setEnCarcel(boolean enCarcel) {
-        this.enCarcel = enCarcel;
+        if (avatar != null) {
+            avatar.setEnCarcel(enCarcel);
+        }
     }
     public void setBancarrota(boolean bancarrota) {
         this.bancarrota = bancarrota;

@@ -935,30 +935,53 @@ public class Menu { // la clase menu
             return;
         }
 
+        // Contar jugadores activos
+        int jugadoresActivos = 0;
+        for (Jugador j : jugadores) {
+            if (!j.isBancarrota()) {
+                jugadoresActivos++;
+            }
+        }
+
+        // Si solo queda un jugador activo, terminar el juego
+        if (jugadoresActivos <= 1) {
+            System.out.println("¡La partida ha terminado!");
+            return;
+        }
+
         // Avanzar al siguiente jugador activo
         if (!repetirTurno) {
+            int intentos = 0;
+            int maxIntentos = jugadores.size(); // Evitar bucle infinito
+
             do {
                 turno = (turno + 1) % jugadores.size();
+                intentos++;
+
+                if (intentos >= maxIntentos) {
+                    System.out.println("Error: No se encontró jugador activo.");
+                    return;
+                }
             } while (jugadores.get(turno).isBancarrota());
         }
 
-        // *** RESETEAR FLAGS ***
+        // Resetear flags
         tirado = false;
         repetirTurno = false;
         contadorDobles = 0;
-        intentoSalirCarcel = false; // ← CRÍTICO
+        intentoSalirCarcel = false;
 
         Jugador actual = jugadores.get(turno);
         System.out.println("Turno acabado. Ahora le toca a:");
-        System.out.println("$> jugador"); System.out.println("{");
+        System.out.println("$> jugador");
+        System.out.println("{");
         System.out.println("nombre: " + actual.getNombre() + ",");
         System.out.println("avatar: " + actual.getAvatar().getId());
         System.out.println("}");
 
         if (actual.isEnCarcel() || actual.getAvatar().estaEnCarcel()) {
-            System.out.println("⚠️  " + actual.getNombre() + " está en la cárcel.");
+            System.out.println("CUIDADO " + actual.getNombre() + " está en la cárcel.");
         }
-
     }
 
 
