@@ -124,6 +124,7 @@ public class Carta {
                 case 3: // Ganar lotería
                     jugador.sumarFortuna(1000000);
                     System.out.println("¡Has recibido 1.000.000€ por el bote de la lotería!");
+                    jugador.sumarPremios(1000000);
                     break;
 
                 case 4: // Pagar a cada jugador (CORREGIDO)
@@ -131,6 +132,7 @@ public class Carta {
                     for (Jugador c : jugadores) {
                         if (!c.equals(jugador) && !c.isBancarrota()) {
                             c.sumarFortuna(250000); // Los otros RECIBEN dinero
+                            c.sumarPremios(250000);
                             totalAPagar += 250000;
                         }
                     }
@@ -143,6 +145,7 @@ public class Carta {
 
                     jugador.restarFortuna(totalAPagar);
                     jugador.sumarGastos(totalAPagar);
+                    jugador.sumarPagoTasasEImpuestos(totalAPagar);
 
                     for (Jugador c : jugadores) {
                         if (!c.equals(jugador) && !c.isBancarrota()) {
@@ -180,6 +183,7 @@ public class Carta {
 
                     jugador.restarFortuna(150000);
                     jugador.sumarGastos(150000);
+                    jugador.sumarPagoTasasEImpuestos(150000);
                     System.out.println("Pagas 150.000€ por conducir indebidamente.");
                     break;
             }
@@ -196,6 +200,7 @@ public class Carta {
 
                     jugador.restarFortuna(500000);
                     jugador.sumarGastos(500000);
+                    jugador.sumarPagoTasasEImpuestos(500000);
                     System.out.println("Pagas 500.000€ por un fin de semana en un balneario de 5 estrellas.");
                     break;
 
@@ -210,12 +215,14 @@ public class Carta {
                     jugador.getAvatar().setPosicion(casillaDestino.getPosicion());
                     casillaDestino.anhadirAvatar(jugador.getAvatar());
                     jugador.sumarFortuna(2000000);
+                    jugador.sumarSalida(2000000);
                     System.out.println("Has cobrado 2.000.000€ al llegar a Salida.");
                     casillaDestino.evaluarCasilla(jugador);
                     break;
 
                 case 4: // Beneficio de empresa
                     jugador.sumarFortuna(2000000);
+                    jugador.sumarPremios(2000000);
                     System.out.println("Tu compañía de Internet obtiene beneficios. Recibes 2.000.000€.");
                     break;
 
@@ -237,6 +244,7 @@ public class Carta {
                     for (Jugador c : jugadores) {
                         if (!c.equals(jugador) && !c.isBancarrota()) {
                             c.sumarFortuna(200000); // Los otros RECIBEN dinero
+                            c.sumarPremios(200000);
                             totalAlquiler += 200000;
                         }
                     }
@@ -249,12 +257,13 @@ public class Carta {
 
                     jugador.restarFortuna(totalAlquiler);
                     jugador.sumarGastos(totalAlquiler);
+                    jugador.sumarPagoTasasEImpuestos(totalAlquiler);
 
-                    for (Jugador c : jugadores) {
-                        if (!c.equals(jugador) && !c.isBancarrota()) {
-                            c.sumarFortuna(200000);
-                        }
-                    }
+//                    for (Jugador c : jugadores) {
+//                        if (!c.equals(jugador) && !c.isBancarrota()) {
+//                            c.sumarFortuna(200000);
+//                        }
+//                    }
 
                     System.out.println("Pagas " + totalAlquiler + "€ por alquilar la villa a tus compañeros.");
                     break;
