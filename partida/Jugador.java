@@ -1,6 +1,7 @@
 package partida;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import monopoly.*;
@@ -294,5 +295,24 @@ public class Jugador {
         return propias == total;
 
     }
+
+    public void setFortuna(float nuevaFortuna) {
+        if (nuevaFortuna < 0) {
+            this.fortuna = 0;
+        } else {
+            this.fortuna = nuevaFortuna;
+        }
+    }
+
+    private List<Edificacion> edificaciones = new ArrayList<>();
+
+    public void agregarEdificacion(Edificacion e) {
+        edificaciones.add(e);
+    }
+
+    public List<Edificacion> getEdificaciones() {
+        return edificaciones;
+    }
+
 
 }
