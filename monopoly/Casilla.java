@@ -155,45 +155,61 @@ public class Casilla {
                     System.out.println("La casilla está en venta por " + (long)this.valor + "€.");
                     System.out.println("Puedes comprarla con el comando: comprar " + this.nombre);
                 } else if (!this.getDuenho().equals(jugador)) {
-                    System.out.println("La casilla pertenece a " + this.getDuenho().getNombre() + ". Debes pagar alquiler.");
-
-                    float alquiler = this.evaluarAlquiler(tablero.getUltimaTirada());
-                    System.out.println("El alquiler total es de " + (long)alquiler + "€.");
-
-                    if (jugador.getFortuna() < alquiler) {
-                        System.out.println("No puedes pagar el alquiler. Te declaras en bancarrota.");
-                        jugador.declararBancarrota(this.getDuenho());
-
-                        if (tablero != null) {
-                            tablero.notificarBancarrota(jugador);
-                        }
+                    // *** VERIFICAR SI ESTÁ HIPOTECADA ***
+                    if (this.estaHipotecada()) {
+                        System.out.println("La casilla pertenece a " + this.getDuenho().getNombre() +
+                                " pero está hipotecada. No pagas alquiler.");
                     } else {
-                        jugador.pagar(alquiler, this.getDuenho());
-                        System.out.println("Has pagado " + (long)alquiler + "€ a " + this.getDuenho().getNombre());
-                        jugador.sumarPagoAlquiler(alquiler);
-                        this.getDuenho().sumarCobroAlquiler(alquiler);
+                        System.out.println("La casilla pertenece a " + this.getDuenho().getNombre() +
+                                ". Debes pagar alquiler.");
+
+                        float alquiler = this.evaluarAlquiler(tablero.getUltimaTirada());
+                        System.out.println("El alquiler total es de " + (long)alquiler + "€.");
+
+                        if (jugador.getFortuna() < alquiler) {
+                            System.out.println("No puedes pagar el alquiler. Te declaras en bancarrota.");
+                            jugador.declararBancarrota(this.getDuenho());
+
+                            if (tablero != null) {
+                                tablero.notificarBancarrota(jugador);
+                            }
+                        } else {
+                            jugador.pagar(alquiler, this.getDuenho());
+                            System.out.println("Has pagado " + (long)alquiler + "€ a " +
+                                    this.getDuenho().getNombre());
+                            jugador.sumarPagoAlquiler(alquiler);
+                            this.getDuenho().sumarCobroAlquiler(alquiler);
+                        }
                     }
                 } else {
                     System.out.println("Has caído en tu propia propiedad.");
                 }
-
                 break;
 
             case "transporte":
                 if (this.getDuenho() == null) {
-                    System.out.println("La casilla de transporte está en venta por " + (long)this.valor + "€.");
+                    System.out.println("La casilla de transporte está en venta por " +
+                            (long)this.valor + "€.");
                     System.out.println("Puedes comprarla con el comando: comprar " + this.nombre);
                 } else if (!this.getDuenho().equals(jugador)) {
-                    float alquilerTotal = 0;
-                    for (Casilla propiedad : this.getDuenho().getPropiedades()) {
-                        if ("transporte".equalsIgnoreCase(propiedad.getTipo())) {
-                            alquilerTotal += propiedad.getAlquiler();
+                    // *** VERIFICAR SI ESTÁ HIPOTECADA ***
+                    if (this.estaHipotecada()) {
+                        System.out.println("El transporte pertenece a " + this.getDuenho().getNombre() +
+                                " pero está hipotecado. No pagas alquiler.");
+                    } else {
+                        float alquilerTotal = 0;
+                        for (Casilla propiedad : this.getDuenho().getPropiedades()) {
+                            if ("transporte".equalsIgnoreCase(propiedad.getTipo()) &&
+                                    !propiedad.estaHipotecada()) {
+                                alquilerTotal += propiedad.getAlquiler();
+                            }
                         }
+                        System.out.println("Debes pagar " + (long)alquilerTotal +
+                                "€ por el uso del transporte.");
+                        jugador.pagar(alquilerTotal, this.getDuenho());
+                        jugador.sumarPagoAlquiler(alquilerTotal);
+                        this.getDuenho().sumarCobroAlquiler(alquilerTotal);
                     }
-                    System.out.println("Debes pagar " + (long)alquilerTotal + "€ por el uso del transporte.");
-                    jugador.pagar(alquilerTotal, this.getDuenho());
-                    jugador.sumarPagoAlquiler(alquilerTotal);
-                    this.getDuenho().sumarCobroAlquiler(alquilerTotal);
                 } else {
                     System.out.println("Has caído en tu propio transporte.");
                 }
@@ -202,15 +218,22 @@ public class Casilla {
 
             case "servicio":
                 if (this.getDuenho() == null) {
-                    System.out.println("La casilla de servicio está en venta por " + (long)this.valor + "€.");
+                    System.out.println("La casilla de servicio está en venta por " +
+                            (long)this.valor + "€.");
                     System.out.println("Puedes comprarla con el comando: comprar " + this.nombre);
                 } else if (!this.getDuenho().equals(jugador)) {
-                    int tirada = tablero.getUltimaTirada();
-                    float alquiler = this.evaluarAlquiler(tirada);
-                    System.out.println("Debes pagar " + (long)alquiler + "€ por el servicio.");
-                    jugador.pagar(alquiler, this.getDuenho());
-                    jugador.sumarPagoAlquiler(alquiler);
-                    this.getDuenho().sumarCobroAlquiler(alquiler);
+                    // *** VERIFICAR SI ESTÁ HIPOTECADA ***
+                    if (this.estaHipotecada()) {
+                        System.out.println("El servicio pertenece a " + this.getDuenho().getNombre() +
+                                " pero está hipotecado. No pagas alquiler.");
+                    } else {
+                        int tirada = tablero.getUltimaTirada();
+                        float alquiler = this.evaluarAlquiler(tirada);
+                        System.out.println("Debes pagar " + (long)alquiler + "€ por el servicio.");
+                        jugador.pagar(alquiler, this.getDuenho());
+                        jugador.sumarPagoAlquiler(alquiler);
+                        this.getDuenho().sumarCobroAlquiler(alquiler);
+                    }
                 } else {
                     System.out.println("Has caído en tu propio servicio.");
                 }
@@ -442,25 +465,35 @@ public class Casilla {
         return hipotecada;
     }
 
-//    public void setHipotecable(boolean valor) {
-//        this.hipotecable = valor;
-//    }
+    public void setHipotecable(boolean valor) {
+        this.hipotecable = valor;
+    }
 
-//    public String resumenEdificaciones() {
-//        return "Casas: " + numCasas + ", Hotel: " + hotel + ", Piscina: " + piscina + ", Pista: " + pista;
-//    }
-//
-//
-//    public void hipotecar() {
-//        hipotecada = true;
-//    }
-//
-//    public void deshipotecar() {
-//        hipotecada = false;
-//    }
-//    public boolean esHipotecable() {
-//        return hipotecable;
-//    }
+    public String resumenEdificaciones() {
+        return "Casas: " + numCasas + ", Hotel: " + hotel + ", Piscina: " + piscina + ", Pista: " + pista;
+    }
+
+
+
+    public boolean tieneEdificios() {
+        if(numCasas > 0 || tieneHotel() || tienePiscina() || tienePista) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    public void hipotecar() {
+        hipotecada = true;
+    }
+
+    public void deshipotecar() {
+        hipotecada = false;
+    }
+    public boolean esHipotecable() {
+        return hipotecable;
+    }
     // En un solar se puede construir un único hotel si ya se han construido 4 casas
     // En ese caso, se substituyen todas las casas por el hotel
     public boolean puedeConstruirHotel() {
@@ -661,5 +694,7 @@ public class Casilla {
         // Tipo no reconocido
         System.out.println("Tipo de edificación no reconocido: " + tipoEdificacion + ".");
     }
+
+    
 }
 

@@ -365,23 +365,7 @@ public class Menu { // la clase menu
             edificarPropiedad(tipo);
             return true;
         }
-        if (palabras.length == 3 && palabras[0].equals("listar") && palabras[1].equals("edificios")) {
-            String nombreGrupo = palabras[2];
-            listarEdificiosGrupo(nombreGrupo);
-            return true;
-        }
-
-        // "listar edificios" (sin grupo, lista todos)
-        if (palabras.length == 2 && palabras[0].equals("listar") && palabras[1].equals("edificios")) {
-            listarEdificaciones();
-            return true;
-        }
-
-        if(palabras.length == 2 && palabras[0].equals("estadisticas")){
-            mostrarEstadisticasUnJugador(palabras[1]);
-            return true;
-        }
-        if (palabras.length == 4 && palabras [0].equals("vender")){
+        if (palabras.length == 4 && palabras[0].equals("vender")) {
             // tipo de edificación: casas | hotel | piscina | pista
             String tipo = palabras[1];
 
@@ -427,6 +411,32 @@ public class Menu { // la clase menu
             }
         }*/
 
+        if(palabras.length == 2 && palabras[0].equals("deshipotecar")){
+            String nombreCasilla = palabras[1];
+            deshipotecar(nombreCasilla);
+            return true;
+        }
+        if (palabras.length == 3 && palabras[0].equals("listar") && palabras[1].equals("edificios")) {
+            String nombreGrupo = palabras[2];
+            listarEdificiosGrupo(nombreGrupo);
+            return true;
+        }
+
+        // "listar edificios" (sin grupo, lista todos)
+        if (palabras.length == 2 && palabras[0].equals("listar") && palabras[1].equals("edificios")) {
+            listarEdificaciones();
+            return true;
+        }
+
+        if(palabras.length == 2 && palabras[0].equals("estadisticas")){
+            mostrarEstadisticasUnJugador(palabras[1]);
+            return true;
+        }
+        if(palabras.length == 2 && palabras[0].equals("hipotecar")){
+            String nombreCasilla = palabras[1];
+            hipotecar(nombreCasilla);
+            return true;
+        }
         return false;
     }
 
@@ -489,7 +499,19 @@ public class Menu { // la clase menu
                     System.out.println("propiedades: [" + props + "],");
                 }
 
-                System.out.println("hipotecas: -,");
+                if (j.getPropiedades().isEmpty()) {
+                    System.out.println("hipotecas: -,");
+                } else {
+                    List<String> hipotecas = j.getPropiedades().stream()
+                            .filter(Casilla::estaHipotecada)
+                            .map(Casilla::getNombre)
+                            .collect(Collectors.toList());
+                    if (hipotecas.isEmpty()) {
+                        System.out.println("hipotecas: -,");
+                    } else {
+                        System.out.println("hipotecas: " + hipotecas + ",");
+                    }
+                }
                 System.out.print("edificios: ");
                 if (j.getEdificaciones().isEmpty()) {
                     System.out.println("-");
@@ -1070,6 +1092,9 @@ public class Menu { // la clase menu
         System.out.println("  - 'listar enventa' (casillas disponibles)");
         System.out.println("  - 'listar avatares'");
         System.out.println("  - 'comprar <casilla>'");
+        System.out.println("  - 'hipotecar <casilla>'");
+        System.out.println("  - 'deshipotecar <casilla>'");
+        System.out.println("  - 'vender <tipo> <casilla> <cantidad>'");
         System.out.println("  - 'estadisticas <jugador>'");
         System.out.println("  - 'salir carcel'");
         System.out.println("  - 'listar edificios'");
@@ -1121,6 +1146,17 @@ public class Menu { // la clase menu
             System.out.println("No puedes construir aquí. No posees todo el grupo " +
                     casilla.getGrupo().getNombre() + ".");
             return;
+        }
+
+        if (casilla.getGrupo() != null) {
+            for (Casilla c : casilla.getGrupo().getMiembros()) {
+                if (c.estaHipotecada()) {
+                    System.out.println("No puedes edificar en el grupo " +
+                            casilla.getGrupo().getNombre() +
+                            ". La casilla " + c.getNombre() + " está hipotecada.");
+                    return;
+                }
+            }
         }
 
         // Verificar que no esté hipotecada
@@ -1277,6 +1313,7 @@ public class Menu { // la clase menu
                 " se reduce en " + (long)coste + "€.");
         return true;
     }
+
 
     private boolean edificarPista(Jugador jugador, Casilla casilla) {
         // Verificar que hay hotel y piscina
@@ -1518,6 +1555,97 @@ public class Menu { // la clase menu
         }
     }
 
+    public void hipotecar(String nombreCasilla) {
+        Jugador jugador = jugadores.get(turno);
+        Casilla casilla = tablero.encontrarCasilla(nombreCasilla);
+
+        if (casilla == null) {
+            System.out.println("La casilla " + nombreCasilla + " no existe.");
+            return;
+        }
+
+        if (!jugador.equals(casilla.getDuenho())) {
+            System.out.println(jugador.getNombre() + " no puede hipotecar " +
+                    nombreCasilla + ". No es una propiedad que le pertenece.");
+            return;
+        }
+
+        if (casilla.estaHipotecada()) {
+            System.out.println(jugador.getNombre() + " no puede hipotecar " +
+                    nombreCasilla + ". Ya está hipotecada.");
+            return;
+        }
+
+        if (!casilla.esHipotecable()) {
+            System.out.println("La casilla " + nombreCasilla + " no se puede hipotecar.");
+            return;
+        }
+
+        if ("solar".equalsIgnoreCase(casilla.getTipo())) {
+            if (casilla.tieneEdificios()) {
+                System.out.println(jugador.getNombre() + " no puede hipotecar " +
+                        nombreCasilla + ". Antes de hipotecar la propiedad se " +
+                        "deberán vender todos los edificios.");
+                return;
+            }
+        }
+
+        float valorHipoteca = casilla.getValor() / 2;
+        jugador.sumarFortuna(valorHipoteca);
+        casilla.hipotecar();
+
+        // 7. Mensaje con el nombre del GRUPO (no de la casilla)
+        String nombreGrupo = (casilla.getGrupo() != null) ?
+                casilla.getGrupo().getNombre() : "sin grupo";
+
+        System.out.println(jugador.getNombre() + " recibe " + (long)valorHipoteca +
+                "€ por la hipoteca de " + nombreCasilla +
+                ". No puede recibir alquileres ni edificar en el grupo " +
+                nombreGrupo + ".");
+    }
+
+    public void deshipotecar(String nombreCasilla) {
+        Jugador jugador = jugadores.get(turno);
+        Casilla casilla = tablero.encontrarCasilla(nombreCasilla);
+
+        if (casilla == null) {
+            System.out.println("La casilla " + nombreCasilla + " no existe.");
+            return;
+        }
+
+        if (!jugador.equals(casilla.getDuenho())) {
+            System.out.println(jugador.getNombre() + " no puede deshipotecar " +
+                    nombreCasilla + ". No es una propiedad que le pertenece.");
+            return;
+        }
+
+        if (!casilla.estaHipotecada()) {
+            System.out.println(jugador.getNombre() + " no puede deshipotecar " +
+                    nombreCasilla + ". No está hipotecada.");
+            return;
+        }
+
+        float costoDeshipoteca = casilla.getValor() / 2;
+
+        if (jugador.getFortuna() < costoDeshipoteca) {
+            System.out.println(jugador.getNombre() + " no tiene suficiente dinero para " +
+                    "deshipotecar " + nombreCasilla + ". Necesita " +
+                    (long)costoDeshipoteca + "€.");
+            return;
+        }
+
+        jugador.restarFortuna(costoDeshipoteca);
+        jugador.sumarGastos(costoDeshipoteca);
+        casilla.deshipotecar();
+
+        String nombreGrupo = (casilla.getGrupo() != null) ?
+                casilla.getGrupo().getNombre() : "sin grupo";
+
+        System.out.println(jugador.getNombre() + " paga " + (long)costoDeshipoteca +
+                "€ por deshipotecar " + nombreCasilla +
+                ". Ahora puede recibir alquileres y edificar en el grupo " +
+                nombreGrupo + ".");
+    }
 
     // Vender edificaciones desde el menú.
     // Sintaxis: vender <casas|hotel|piscina|pista> <casilla> <cantidad>
@@ -1544,5 +1672,6 @@ public class Menu { // la clase menu
         // para vender un edificio
         c.venderEdificacion(tipo, jugadorActual, cantidad);
     }
+
 
 }
