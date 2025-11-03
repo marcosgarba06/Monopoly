@@ -274,4 +274,25 @@ public class Jugador {
     }
 
 
+    public boolean poseeGrupoCompleto(Casilla casilla, Tablero tablero) {
+
+        //  Verificar que la casilla tenga grupo
+        if (casilla.getGrupo() == null) {
+            return false;
+        }
+        String nombreGrupo = casilla.getGrupo().getNombre();
+        int total = tablero.getCantidadCasillasGrupo(nombreGrupo);
+        int propias = 0;
+        for (Casilla c : propiedades) {
+            // Verificar que cada propiedad tenga grupo antes de comparar
+            if (c.getGrupo() != null && c.getGrupo().getNombre().equalsIgnoreCase(nombreGrupo)) {
+
+                propias++;
+
+            }
+        }
+        return propias == total;
+
+    }
+
 }
