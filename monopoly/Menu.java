@@ -311,6 +311,9 @@ public class Menu { // la clase menu
             case "listar avatares":
                 listarAvatares();
                 return true;
+            case "listar edificios":
+                listarEdificaciones();
+                return true;
 
             case "acabar turno":
                 acabarTurno();
@@ -366,6 +369,10 @@ public class Menu { // la clase menu
             }
 
             edificarPropiedad(tipo);
+            return true;
+        }
+        if (palabras.length == 2 && palabras[0].equals("listar") && palabras[1].equals("edificios")) {
+            listarEdificaciones();
             return true;
         }
         return false;
@@ -431,7 +438,16 @@ public class Menu { // la clase menu
                 }
 
                 System.out.println("hipotecas: -,");
-                System.out.print("edificios: -");
+                System.out.print("edificios: ");
+                if (j.getEdificaciones().isEmpty()) {
+                    System.out.println("-");
+                } else {
+                    List<String> ids = j.getEdificaciones().stream()
+                            .map(Edificacion::getId)
+                            .collect(Collectors.toList());
+                    System.out.println(ids);
+                }
+
                 System.out.println("}");
                 return;
             }
@@ -1044,6 +1060,7 @@ public class Menu { // la clase menu
         System.out.println("  - 'listar avatares'");
         System.out.println("  - 'comprar <casilla>'");
         System.out.println("  - 'salir carcel'");
+        System.out.println("  - 'listar edificios'");
         System.out.println("  - 'edificar <tipo>'");
         System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
         System.out.println("  - 'salir' (cerrar el juego)");
@@ -1103,40 +1120,63 @@ public class Menu { // la clase menu
 
         switch (tipoNormalizado) {
             case "casa":
-                edificarCasa(jugadorActual, casilla);
+                if (edificarCasa(jugadorActual, casilla)) {
+                    String id = generarId("casa");
+                    Edificacion nueva = new Edificacion(id, jugadorActual, casilla, "casa", casilla.getPrecioCasa());
+                    edificaciones.add(nueva);
+                    jugadorActual.agregarEdificacion(nueva);
+
+                }
                 break;
 
             case "hotel":
-                edificarHotel(jugadorActual, casilla);
+                if (edificarHotel(jugadorActual, casilla)) {
+                    String id = generarId("hotel");
+                    Edificacion nueva = new Edificacion(id, jugadorActual, casilla, "hotel", casilla.getPrecioCasa());
+                    edificaciones.add(nueva);
+                    jugadorActual.agregarEdificacion(nueva);
+
+                }
                 break;
 
             case "piscina":
-                edificarPiscina(jugadorActual, casilla);
+                if (edificarPiscina(jugadorActual, casilla)) {
+                    String id = generarId("piscina");
+                    Edificacion nueva = new Edificacion(id, jugadorActual, casilla, "piscina", casilla.getPrecioCasa());
+                    edificaciones.add(nueva);
+                    jugadorActual.agregarEdificacion(nueva);
+
+                }
                 break;
 
             case "pista":
             case "pista deporte":
             case "pista_deporte":
-                edificarPista(jugadorActual, casilla);
-                break;
+                if (edificarPista(jugadorActual, casilla)) {
+                    String id = generarId("pista");
+                    Edificacion nueva = new Edificacion(id, jugadorActual, casilla, "pista", casilla.getPrecioCasa());
+                    edificaciones.add(nueva);
+                    jugadorActual.agregarEdificacion(nueva);
 
+                }
+                break;
             default:
                 System.out.println("Tipo de edificación no válido. Usa: casa, hotel, piscina o pista deporte");
                 break;
         }
     }
 
-    private void edificarCasa(Jugador jugador, Casilla casilla) {
+    private boolean edificarCasa(Jugador jugador, Casilla casilla) {
         // Verificar que no hay hotel
         if (casilla.tieneHotel()) {
             System.out.println("No se puede edificar ningún edificio más en esta casilla ni en el grupo al que la casilla pertenece.");
-            return;
+            return false;
         }
 
         // Verificar que no hay 4 casas
         if (casilla.getNumCasas() >= 4) {
             System.out.println("No se puede edificar ningún edificio más en esta casilla ni en el grupo al que la casilla pertenece.");
-            return;
+            return false;
         }
 
         // Verificar dinero
@@ -1145,32 +1185,35 @@ public class Menu { // la clase menu
             System.out.println("La fortuna de " + jugador.getNombre() +
                     " no es suficiente para edificar una casa en la casilla " +
                     casilla.getNombre() + ".");
-            return;
+            return false;
         }
 
         // Construir
         casilla.construirCasas(jugador, 1);
+        jugador.setFortuna(jugador.getFortuna() - coste);
 
         // Generar ID automático (ejemplo: casa-1, casa-2, etc.)
         int numCasa = casilla.getNumCasas();
         String idEdificio = "casa-" + numCasa;
 
+        casilla.construirCasas(jugador, 1);
         System.out.println("Se ha edificado una casa en " + casilla.getNombre() +
                 ". La fortuna de " + jugador.getNombre() +
                 " se reduce en " + (long)coste + "€.");
+        return true;
     }
 
-    private void edificarHotel(Jugador jugador, Casilla casilla) {
+    private boolean edificarHotel(Jugador jugador, Casilla casilla) {
         // Verificar que hay exactamente 4 casas
         if (casilla.getNumCasas() != 4) {
             System.out.println("No se puede edificar un hotel. Necesitas exactamente 4 casas.");
-            return;
+            return false;
         }
 
         // Verificar que no hay hotel ya
         if (casilla.tieneHotel()) {
             System.out.println("No se puede edificar ningún edificio más en esta casilla ni en el grupo al que la casilla pertenece.");
-            return;
+            return false;
         }
 
         // Verificar dinero
@@ -1179,7 +1222,7 @@ public class Menu { // la clase menu
             System.out.println("La fortuna de " + jugador.getNombre() +
                     " no es suficiente para edificar un hotel en la casilla " +
                     casilla.getNombre() + ".");
-            return;
+            return false;
         }
 
         // Construir
@@ -1188,19 +1231,20 @@ public class Menu { // la clase menu
         System.out.println("Se ha edificado un hotel en " + casilla.getNombre() +
                 ". La fortuna de " + jugador.getNombre() +
                 " se reduce en " + (long)coste + "€.");
+        return true;
     }
 
-    private void edificarPiscina(Jugador jugador, Casilla casilla) {
+    private boolean edificarPiscina(Jugador jugador, Casilla casilla) {
         // Verificar que hay hotel
         if (!casilla.tieneHotel()) {
             System.out.println("No se puede edificar una piscina, ya que no se dispone de un hotel.");
-            return;
+            return false;
         }
 
         // Verificar que no hay piscina ya
         if (casilla.tienePiscina()) {
             System.out.println("No se puede edificar ningún edificio más en esta casilla ni en el grupo al que la casilla pertenece.");
-            return;
+            return false;
         }
 
         // Verificar dinero
@@ -1209,7 +1253,7 @@ public class Menu { // la clase menu
             System.out.println("La fortuna de " + jugador.getNombre() +
                     " no es suficiente para edificar una piscina en la casilla " +
                     casilla.getNombre() + ".");
-            return;
+            return false;
         }
 
         // Construir
@@ -1218,19 +1262,20 @@ public class Menu { // la clase menu
         System.out.println("Se ha edificado una piscina en " + casilla.getNombre() +
                 ". La fortuna de " + jugador.getNombre() +
                 " se reduce en " + (long)coste + "€.");
+        return true;
     }
 
-    private void edificarPista(Jugador jugador, Casilla casilla) {
+    private boolean edificarPista(Jugador jugador, Casilla casilla) {
         // Verificar que hay hotel y piscina
         if (!casilla.tieneHotel() || !casilla.tienePiscina()) {
             System.out.println("No se puede edificar una pista de deporte, ya que no se dispone de un hotel y una piscina.");
-            return;
+            return false;
         }
 
         // Verificar que no hay pista ya
         if (casilla.tienePista()) {
             System.out.println("No se puede edificar ningún edificio más en esta casilla ni en el grupo al que la casilla pertenece.");
-            return;
+            return false;
         }
 
         // Verificar dinero
@@ -1239,7 +1284,7 @@ public class Menu { // la clase menu
             System.out.println("La fortuna de " + jugador.getNombre() +
                     " no es suficiente para edificar una pista de deporte en la casilla " +
                     casilla.getNombre() + ".");
-            return;
+            return false;
         }
 
         // Construir
@@ -1248,6 +1293,34 @@ public class Menu { // la clase menu
         System.out.println("Se ha edificado una pista de deporte en " + casilla.getNombre() +
                 ". La fortuna de " + jugador.getNombre() +
                 " se reduce en " + (long)coste + "€.");
+        return true;
+    }
+
+    private String generarId(String tipo) {
+        switch (tipo.toLowerCase()) {
+            case "casa": return "casa-" + (++contadorCasas);
+            case "hotel": return "hotel-" + (++contadorHoteles);
+            case "piscina": return "piscina-" + (++contadorPiscinas);
+            case "pista_deporte": return "pista-" + (++contadorPistas);
+            default: return "edif-" + UUID.randomUUID();
+        }
+    }
+
+    public void listarEdificaciones() {
+        if (edificaciones.isEmpty()) {
+            System.out.println("No hay edificaciones construidas.");
+            return;
+        }
+
+        for (Edificacion e : edificaciones) {
+            System.out.println("{");
+            System.out.println("  id: " + e.getId() + ",");
+            System.out.println("  propietario: " + e.getPropietario().getNombre() + ",");
+            System.out.println("  casilla: " + e.getCasilla().getNombre() + ",");
+            System.out.println("  grupo: " + e.getCasilla().getGrupo().getNombre() + ",");
+            System.out.println("  coste: " + (long) e.getCoste() + "€");
+            System.out.println("}");
+        }
     }
 
 }

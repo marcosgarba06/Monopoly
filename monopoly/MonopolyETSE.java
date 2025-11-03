@@ -34,6 +34,8 @@ public class MonopolyETSE {
             System.out.println("  - 'listar venta' (casillas disponibles)");
             System.out.println("  - 'listar avatares'");
             System.out.println("  - 'comprar <casilla>'");
+            System.out.println("  - 'listar edificios'");
+            System.out.println("  - 'edificar <tipo>'");
             System.out.println("  - 'salir carcel'");
             System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
             System.out.println("  - 'salir' (cerrar el juego)");
