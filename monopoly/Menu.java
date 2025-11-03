@@ -265,6 +265,7 @@ public class Menu { // la clase menu
     }
 
     private boolean procesarComandoSimple(String comandoMinusculas) {
+
         switch (comandoMinusculas) {
             case "listar jugadores":
             case "jugadores":
@@ -283,21 +284,7 @@ public class Menu { // la clase menu
             case "jugador":
                 indicarTurno();
                 return true;
-            case "edificar":
-                if (partes.length >= 4 && partes[0].equals("edificar")) {
-                    String nombreCasilla = partes[1];
-                    String tipo = partes[2];
 
-                    try {
-                        int cantidad = Integer.parseInt(partes[3]);
-                        edificarPropiedad(nombreCasilla, tipo, cantidad);
-                    } catch (NumberFormatException e) {
-                        System.out.println("Error: La cantidad debe ser un número válido.");
-                        System.out.println("Uso: edificar <casilla> <tipo> <cantidad>");
-                        System.out.println("Ejemplo: edificar Sol1 casa 2");
-                    }
-                }
-                break;
             case "forzar dados":
                 // Comando legacy - se mantiene por compatibilidad
                 forzarDados();
@@ -361,6 +348,20 @@ public class Menu { // la clase menu
             return true;
         }
 
+        if (palabras.length >= 4 && palabras[0].equals("edificar")) {
+            String nombreCasilla = palabras[1];
+            String tipo = palabras[2];
+
+            try {
+                int cantidad = Integer.parseInt(palabras[3]);
+                edificarPropiedad(nombreCasilla, tipo, cantidad);
+            } catch (NumberFormatException e) {
+                System.out.println("Error: La cantidad debe ser un número válido.");
+                System.out.println("Uso: edificar <casilla> <tipo> <cantidad>");
+                System.out.println("Ejemplo: edificar Sol1 casa 2");
+            }
+            return true; // ¡No olvides devolver true si se procesó!
+        }
         return false;
     }
 
@@ -861,15 +862,15 @@ public class Menu { // la clase menu
         System.out.println("$> listar enventa");
         for (Casilla c : enVenta) {
             //for each para encontrar las casillas en venta e imprimirlas
-                System.out.println("{");
-                System.out.println("nombre: " + c.getNombre() + ",");
-                System.out.println("tipo: " + c.getTipo() + ",");
-                if ("solar".equalsIgnoreCase(c.getTipo())) {
-                    System.out.println("grupo: " + c.getGrupo() + ",");
-                }
-                System.out.println("valor: " + (long) c.getValor());
-                System.out.println("},");
+            System.out.println("{");
+            System.out.println("nombre: " + c.getNombre() + ",");
+            System.out.println("tipo: " + c.getTipo() + ",");
+            if ("solar".equalsIgnoreCase(c.getTipo())) {
+                System.out.println("grupo: " + c.getGrupo() + ",");
             }
+            System.out.println("valor: " + (long) c.getValor());
+            System.out.println("},");
+        }
     }
 
 

@@ -52,6 +52,7 @@ public class Avatar {
         // Si la nueva posición es menor que la actual, significa que pasó por la salida
         if (nuevaPos < posicionActual) {
             jugador.sumarFortuna(2000000);
+            jugador.sumarSalida(2000000);
             System.out.println("Has pasado por la casilla de salida. Recibes 2.000.000€.");
         }
 
