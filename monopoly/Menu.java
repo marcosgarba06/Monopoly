@@ -376,8 +376,9 @@ public class Menu { // la clase menu
             return true;
         }
 
-        if(palabras.length == 2 && palabras[0].equals("estadisticas"){
+        if(palabras.length == 2 && palabras[0].equals("estadisticas")){
             mostrarEstadisticasUnJugador(palabras[1]);
+            return true;
         }
         return false;
     }
