@@ -402,14 +402,17 @@ public class Casilla {
 
     }
 
-
-
-    public boolean estaHipotecada() {
-        return hipotecada;
-    }
+    public float getHipoteca() { return hipoteca; }
     public float getAlquilerBase() { return alquilerBase; }
+    public float getAlquilerCasa() { return alquilerCasa; }
+    public float getAlquilerHotel() { return alquilerHotel; }
+    public float getAlquilerPiscina() { return alquilerPiscina; }
+    public float getAlquilerPista() { return alquilerPista; }
 
-
+    public float getPrecioCasa() { return precioCasa; }
+    public float getPrecioHotel() { return precioHotel; }
+    public float getPrecioPiscina() { return precioPiscina; }
+    public float getPrecioPista() { return precioPista; }
 
     public void setHipoteca(float h) { hipoteca = h; }
     public void setAlquilerBase(float a) { alquilerBase = a; }
@@ -423,8 +426,107 @@ public class Casilla {
     public void setPrecioPiscina(float p) { precioPiscina = p; }
     public void setPrecioPista(float p) { precioPista = p; }
 
+    public boolean puedeConstruirCasa(Jugador jugador) {
+        return this.getDuenho() == jugador &&
+                this.getGrupo() != null &&
+                this.getGrupo().perteneceEnteramenteA(jugador) &&
+                hotel == 0 &&  // Una vez construido hotel, no más casas
+                numCasas < 4;
+    }
 
+    public String resumenEdificaciones() {
+        return "Casas: " + numCasas + ", Hotel: " + hotel + ", Piscina: " + piscina + ", Pista: " + pista;
+    }
 
+    public boolean estaHipotecada() {
+        return hipotecada;
+    }
 
+    public void hipotecar() {
+        hipotecada = true;
+    }
+
+    public void deshipotecar() {
+        hipotecada = false;
+    }
+
+    // En un solar se puede construir un único hotel si ya se han construido 4 casas
+    // En ese caso, se substituyen todas las casas por el hotel
+    public boolean puedeConstruirHotel() {
+        return numCasas == 4 && hotel == 0;
+    }
+
+    // ✅ En un solar se puede construir una única piscina si se ha construido un hotel
+    public boolean puedeConstruirPiscina() {
+        return hotel > 0 && piscina == 0;
+    }
+
+    public void construirPiscina(Jugador jugador) {
+        if (puedeConstruirPiscina()) {
+            piscina = 1;
+            jugador.restarFortuna(costePiscina);
+        }
+    }
+
+    // En un solar se puede construir una única pista de deporte si se ha construido un hotel y una piscina
+    public boolean puedeConstruirPista() {
+        return hotel > 0 && piscina > 0 && pista == 0;
+    }
+
+    public void construirPista(Jugador jugador) {
+        if (puedeConstruirPista()) {
+            pista = 1;
+            jugador.restarFortuna(costePista);
+        }
+    }
+
+    // Se pueden construir un máximo de 4 casas y todas al mismo tiempo
+    public void construirCasas(Jugador jugador, int cantidad) {
+        if (puedeConstruirCasa(jugador)) {
+            numCasas += cantidad;
+            jugador.restarFortuna(costeCasa * cantidad);
+        } else {
+            System.out.println("No se pueden construir más casas aquí.");
+        }
+    }
+
+    public void setHipotecable(boolean valor) {
+        this.hipotecable = valor;
+    }
+
+    // Al construir hotel, se substituyen las 4 casas por el hotel
+    public void construirHotel(Jugador jugador) {
+        if (numCasas == 4 && hotel == 0) {
+            numCasas = 0;  // Substituir las casas
+            hotel = 1;
+            jugador.restarFortuna(costeHotel);
+        } else {
+            System.out.println("No se puede construir hotel aquí.");
+        }
+    }
+
+    public boolean tieneHotel() {
+        return hotel > 0;
+    }
+
+    public boolean tienePiscina() {
+        return piscina > 0;
+    }
+
+    public boolean tienePista() {
+        return pista > 0;
+    }
+
+    public boolean esHipotecable() {
+        return hipotecable;
+    }
+
+    public int getNumCasas() {
+        return numCasas;
+    }
+
+    public void setNumCasas(int numCasas) {
+        this.numCasas = numCasas;
+    }
 }
 
