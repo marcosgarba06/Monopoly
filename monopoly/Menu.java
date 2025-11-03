@@ -381,6 +381,52 @@ public class Menu { // la clase menu
             mostrarEstadisticasUnJugador(palabras[1]);
             return true;
         }
+        if (palabras.length == 4 && palabras [0].equals("vender")){
+            // tipo de edificación: casas | hotel | piscina | pista
+            String tipo = palabras[1];
+
+            // nombre de la casilla: puede venir como "Sol5"
+            // Nota: procesarComandoConParametros usa comandoMinusculas
+            String nombreCasilla = palabras[2];
+
+            // cantidad a vender (entero)
+            int cantidad;
+            // Pasar a entero el numero a vender
+            try {
+                cantidad = Integer.parseInt(palabras[3]);
+            } catch (NumberFormatException e) {
+                System.out.println("Cantidad inválida. Debe ser un entero positivo.");
+                return true; // comando reconocido y gestionado con error
+            }
+
+            vender(tipo, nombreCasilla, cantidad);
+            return true;
+        }
+
+        /*// Comando: vender <tipo> <casilla> <cantidad>
+        // - Acepta tipo: casas | hotel | piscina | pista
+        // - La casilla puede venir como "SolX" o como "SolarX" (se normaliza dentro del método vender)
+        if (comandoMinusculas.startsWith("vender ")) {
+            String[] p = comandoOriginal.trim().split("\\s+");
+            if (p.length == 4) {
+                String tipo = p[1];     // casas | hotel | piscina | pista
+                String casilla = p[2];  // nombre de casilla (Sol5 / Solar5 / ...)
+                int cantidad;
+                try {
+                    cantidad = Integer.parseInt(p[3]); // validamos que la cantidad sea numérica
+                } catch (NumberFormatException e) {
+                    System.out.println("Cantidad inválida. Debe ser un entero positivo.");
+                    return true; // hemos manejado este comando
+                }
+                vender(tipo, casilla, cantidad); // ejecutamos la venta
+                return true; // comando reconocido
+            } else {
+                // Ayuda de uso si el número de parámetros no es el correcto
+                System.out.println("Uso: vender <casas|hotel|piscina|pista> <casilla> <cantidad>");
+                return true;
+            }
+        }*/
+
         return false;
     }
 
@@ -1471,4 +1517,32 @@ public class Menu { // la clase menu
             System.out.println("Ya no se pueden construir " + String.join(" ni ", noPuedeConstruir) + ".");
         }
     }
+
+
+    // Vender edificaciones desde el menú.
+    // Sintaxis: vender <casas|hotel|piscina|pista> <casilla> <cantidad>
+    private void vender(String tipo, String nombreCasilla, int cantidad) {
+        // Obtenemos el jugador en turno
+        Jugador jugadorActual = jugadores.get(turno);
+
+        // Buscamos la casilla por nombre exactamente como llega
+        Casilla c = tablero.encontrarCasilla(nombreCasilla);
+
+        /*// Soportar el alias "SolarX" -> "SolX"
+        // Si no se encontró la casilla y el nombre empieza por "Solar", generamos "Sol" + sufijo
+        if (c == null && nombreCasilla != null && nombreCasilla.toLowerCase(Locale.ROOT).startsWith("solar")) {
+            String alterno = "Sol" + nombreCasilla.substring("Solar".length());
+            c = tablero.encontrarCasilla(alterno);
+        }*/
+
+        // Si no existe la casilla se avisa al user y se termina
+        if (c == null) {
+            System.out.println("No existe la casilla " + nombreCasilla + ".");
+            return;
+        }
+        // LLamar al metodo de venderEdificacion definido en casilla que contiene toda la logica que se usa
+        // para vender un edificio
+        c.venderEdificacion(tipo, jugadorActual, cantidad);
+    }
+
 }

@@ -533,5 +533,133 @@ public class Casilla {
     public void setNumCasas(int numCasas) {
         this.numCasas = numCasas;
     }
+
+    // ====== Venta de edificaciones ======
+    public void venderEdificacion(String tipoEdificacion, Jugador jugador, int cantidadSolicitada) {
+        if (tipoEdificacion == null) {
+            System.out.println("Tipo de edificación no válido.");
+            return;
+        }
+        String te = tipoEdificacion.trim().toLowerCase();
+
+        // Las variables booleanas toman valores t/f dependiendo de las condiciones
+        boolean esCasas = te.equals("casa") || te.equals("casas");
+        boolean esPiscina = te.equals("piscina") || te.equals("piscinas");
+        boolean esPista = te.equals("pista") || te.equals("pistas") || te.equals("pista deporte") || te.equals("pista_deporte") || te.equals("pista-deporte");
+        boolean esHotel = te.equals("hotel") || te.equals("hoteles");
+
+        // Solo en solares se pueden vender edificaciones
+        if (this.tipo == null || !this.tipo.equalsIgnoreCase("solar")) {
+            System.out.println("No se pueden vender edificaciones en una casilla de tipo " + this.tipo + ".");
+            return;
+        }
+
+        // Comprobar cantidad pedida
+        if (cantidadSolicitada <= 0) {
+            System.out.println("La cantidad a vender debe ser mayor que 0.");
+            return;
+        }
+
+        // Comprobar pertenencia
+        if (this.getDuenho() == null || this.getDuenho() != jugador) {
+            System.out.println("Esta propiedad no pertenece a " + jugador.getNombre() + ".");
+            return;
+        }
+
+        if (esCasas) {
+            int disponibles = this.numCasas;
+            if (disponibles <= 0) {
+                System.out.println("No hay casas que vender en " + this.nombre + ".");
+                return;
+            }
+            int aVender = Math.min(disponibles, cantidadSolicitada);
+            long total = (long)(aVender * this.getPrecioCasa());
+
+            this.numCasas -= aVender;
+            jugador.sumarFortuna(total);
+
+            if (aVender < cantidadSolicitada) {
+                String plural = (aVender == 1) ? "casa" : "casas";
+                System.out.println("Se pueden vender como máximo " + aVender + " " + plural + " aquí. Ingresas " + total + "€.");
+            } else {
+                String pluralVendidas = (aVender == 1) ? "casa" : "casas";
+                System.out.print(jugador.getNombre() + " ha vendido " + aVender + " " + pluralVendidas + " en " + this.nombre + ", recibiendo " + total + "€.");
+                int quedan = this.numCasas;
+                String quedanTxt = (quedan == 1) ? " En la propiedad queda 1 casa." :
+                        " En la propiedad quedan " + quedan + " casas.";
+                System.out.println(quedanTxt);
+            }
+            return;
+        }
+
+        if (esPiscina) {
+            int disponibles = this.piscina; // 0 o 1
+            if (disponibles <= 0) {
+                System.out.println("No hay piscina que vender en " + this.nombre + ".");
+                return;
+            }
+            int aVender = Math.min(disponibles, cantidadSolicitada);
+            long total = (long)(aVender * this.getPrecioPiscina());
+
+            this.piscina -= aVender;
+            jugador.sumarFortuna(total);
+
+            if (cantidadSolicitada > aVender) {
+                System.out.println("Solo se puede vender 1 piscina aquí. Ingresas " + total + "€.");
+            } else {
+                System.out.println(jugador.getNombre() + " ha vendido 1 piscina en " + this.nombre + ", recibiendo " + total + "€.");
+            }
+            return;
+        }
+
+        if (esPista) {
+            int disponibles = this.pista; // 0 o 1
+            if (disponibles <= 0) {
+                System.out.println("No hay pista que vender en " + this.nombre + ".");
+                return;
+            }
+            int aVender = Math.min(disponibles, cantidadSolicitada);
+            long total = (long)(aVender * this.getPrecioPista());
+
+            this.pista -= aVender;
+            jugador.sumarFortuna(total);
+
+            if (cantidadSolicitada > aVender) {
+                System.out.println("Solo se puede vender 1 pista aquí. Ingresas " + total + "€.");
+            } else {
+                System.out.println(jugador.getNombre() + " ha vendido 1 pista en " + this.nombre + ", recibiendo " + total + "€.");
+            }
+            return;
+        }
+
+        if (esHotel) {
+            int disponibles = this.hotel; // 0 o 1
+            if (disponibles <= 0) {
+                System.out.println("No hay hotel que vender en " + this.nombre + ".");
+                return;
+            }
+            // No permitir vender hotel si hay piscina o pista (dependen del hotel)
+            if (this.piscina > 0 || this.pista > 0) {
+                System.out.println("No puedes vender el hotel mientras existan piscina o pista en la propiedad.");
+                return;
+            }
+
+            int aVender = Math.min(disponibles, cantidadSolicitada); // será 1 como máximo
+            long total = (long)(aVender * this.getPrecioHotel());
+
+            this.hotel -= aVender; // pasa a 0
+            jugador.sumarFortuna(total);
+
+            if (cantidadSolicitada > aVender) {
+                System.out.println("Solo se puede vender 1 hotel aquí. Ingresas " + total + "€.");
+            } else {
+                System.out.println(jugador.getNombre() + " ha vendido 1 hotel en " + this.nombre + ", recibiendo " + total + "€.");
+            }
+            return;
+        }
+
+        // Tipo no reconocido
+        System.out.println("Tipo de edificación no reconocido: " + tipoEdificacion + ".");
+    }
 }
 
