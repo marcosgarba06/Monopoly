@@ -108,34 +108,27 @@ public class Avatar {
     /// SETERS Y GETTERS, acceden y modifican atributos provados
 
     public void setPosicion(int i) {//actualiza la posicion del avatar en el tablero
-
         this.posicion = i;
     }
 
     public void setEnCarcel(boolean b) {
-
         this.enCarcel = b;
     }
 
     public int getPosicion() {
-
         return posicion;
     }
 
     public String getId() {
-
         return id;
     }
 
     public Jugador getJugador() {
-
         return jugador;
     }
 
     public boolean isEnCarcel() {
-
         return enCarcel;
-
     }
 
     public void setCasilla(Casilla c) {

@@ -1,4 +1,5 @@
-import monopoly.Casilla;
+package monopoly;
+
 import partida.Jugador;
 
 public class Edificacion {

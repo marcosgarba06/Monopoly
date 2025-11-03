@@ -395,8 +395,7 @@ public class Casilla {
                     sb.append("  salir: 500000,\n");
                     sb.append("  jugadores: ");
                     for (Avatar av : avatares) {
-                        sb.append("[").append(av.getJugador().getNombre())
-                                .append(",").append(av.getJugador().getTiradasCarcel()).append("] ");
+                        sb.append("[").append(av.getJugador().getNombre()).append(",").append(av.getJugador().getTiradasCarcel()).append("] ");
                     }
                     sb.append("\n");
                 } else {
