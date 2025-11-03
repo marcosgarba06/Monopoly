@@ -293,12 +293,6 @@ public class Menu { // la clase menu
                 indicarTurno();
                 return true;
 
-            case "forzar dados":
-                // Comando legacy - se mantiene por compatibilidad
-                forzarDados();
-                System.out.println(tablero);
-                return true;
-
             case "salir carcel":
                 Jugador jugadorActual = jugadores.get(turno);
                 salirCarcel(jugadorActual);
@@ -371,6 +365,13 @@ public class Menu { // la clase menu
             edificarPropiedad(tipo);
             return true;
         }
+        if (palabras.length == 3 && palabras[0].equals("listar") && palabras[1].equals("edificios")) {
+            String nombreGrupo = palabras[2];
+            listarEdificiosGrupo(nombreGrupo);
+            return true;
+        }
+
+        // "listar edificios" (sin grupo, lista todos)
         if (palabras.length == 2 && palabras[0].equals("listar") && palabras[1].equals("edificios")) {
             listarEdificaciones();
             return true;
@@ -622,50 +623,6 @@ public class Menu { // la clase menu
 
         System.out.println(tablero);
         return total;
-    }
-
-    private int forzarDados() {
-        if (jugadores == null || jugadores.isEmpty()) {
-            System.out.println("No hay jugadores en la partida.");
-            return 0;
-        }
-
-        if (tirado) {
-            System.out.println("Ya has tirado los dados este turno.");
-            return 0;
-        }
-
-        Jugador actual = jugadores.get(turno);
-        Avatar av = actual.getAvatar();
-
-        // Si está en la cárcel, abrir menú de opciones
-        if (actual.isEnCarcel() || (av != null && av.estaEnCarcel())) {
-            salirCarcel(actual);
-            return 0;
-        }
-
-        Scanner sc = new Scanner(System.in);
-        int d1, d2;
-
-        // Pedir valor del dado 1
-        while (true) {
-            System.out.print("Forzar valor dado1 (1-6): ");
-            d1 = sc.nextInt();
-            if (d1 >= 1 && d1 <= 6) break;
-            System.out.println("Valor inválido, debe estar entre 1 y 6.");
-        }
-
-        // Pedir valor del dado 2
-        while (true) {
-            System.out.print("Forzar valor dado2 (1-6): ");
-            d2 = sc.nextInt();
-            if (d2 >= 1 && d2 <= 6) break;
-            System.out.println("Valor inválido, debe estar entre 1 y 6.");
-        }
-
-        System.out.println(tablero);
-        // Redirigir a la nueva lógica unificada
-        return lanzarDadosForzados(d1, d2);
     }
 
 
@@ -1070,6 +1027,7 @@ public class Menu { // la clase menu
         System.out.println("  - 'estadisticas <jugador>'");
         System.out.println("  - 'salir carcel'");
         System.out.println("  - 'listar edificios'");
+        System.out.println("  - 'listar edificios <grupo>'");
         System.out.println("  - 'edificar <tipo>'");
         System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
         System.out.println("  - 'salir' (cerrar el juego)");
@@ -1199,13 +1157,13 @@ public class Menu { // la clase menu
 
         // Construir
         casilla.construirCasas(jugador, 1);
-        jugador.setFortuna(jugador.getFortuna() - coste);
-
-        // Generar ID automático (ejemplo: casa-1, casa-2, etc.)
-        int numCasa = casilla.getNumCasas();
-        String idEdificio = "casa-" + numCasa;
-
-        casilla.construirCasas(jugador, 1);
+//        jugador.setFortuna(jugador.getFortuna() - coste);
+//
+//        // Generar ID automático (ejemplo: casa-1, casa-2, etc.)
+//        int numCasa = casilla.getNumCasas();
+//        String idEdificio = "casa-" + numCasa;
+//
+//        casilla.construirCasas(jugador, 1);
         System.out.println("Se ha edificado una casa en " + casilla.getNombre() +
                 ". La fortuna de " + jugador.getNombre() +
                 " se reduce en " + (long)coste + "€.");
@@ -1351,4 +1309,166 @@ public class Menu { // la clase menu
         System.out.println("No se encontró ningún jugador con el nombre '" + nombreJugador + "'.");
     }
 
+    private void listarEdificiosGrupo(String nombreGrupo) {
+        // Buscar el grupo en el tablero
+        Grupo grupo = tablero.getGrupo(nombreGrupo);
+
+        if (grupo == null) {
+            System.out.println("No existe el grupo '" + nombreGrupo + "'.");
+            return;
+        }
+
+        ArrayList<Casilla> casillasGrupo = grupo.getMiembros();
+
+        if (casillasGrupo.isEmpty()) {
+            System.out.println("El grupo '" + nombreGrupo + "' no tiene casillas.");
+            return;
+        }
+
+        System.out.println("$> listar edificios " + nombreGrupo);
+
+        // Variables para contar qué se puede construir
+        boolean puedeCasas = false;
+        boolean puedeHoteles = false;
+        boolean puedePiscinas = false;
+        boolean puedePistas = false;
+        int totalCasas = 0;
+        int totalHoteles = 0;
+        int totalPiscinas = 0;
+        int totalPistas = 0;
+
+        // Recorrer las casillas del grupo
+        for (Casilla casilla : casillasGrupo) {
+            // Solo mostrar si tiene edificaciones o si pertenece a un jugador
+            if (casilla.getDuenho() != null && "solar".equalsIgnoreCase(casilla.getTipo())) {
+                System.out.println("{");
+                System.out.println("  propiedad: " + casilla.getNombre() + ",");
+
+                // Listar hoteles
+                if (casilla.tieneHotel()) {
+                    System.out.print("  hoteles: [");
+                    // Buscar el ID del hotel en las edificaciones
+                    List<String> hotelesIds = new ArrayList<>();
+                    for (Edificacion e : edificaciones) {
+                        if (e.getCasilla().equals(casilla) && e.getTipo().equals("hotel")) {
+                            hotelesIds.add(e.getId());
+                        }
+                    }
+                    System.out.print(String.join(", ", hotelesIds));
+                    System.out.println("],");
+                    totalHoteles++;
+                } else {
+                    System.out.println("  hoteles: -,");
+                }
+
+                // Listar casas
+                if (casilla.getNumCasas() > 0) {
+                    System.out.print("  casas: [");
+                    List<String> casasIds = new ArrayList<>();
+                    for (Edificacion e : edificaciones) {
+                        if (e.getCasilla().equals(casilla) && e.getTipo().equals("casa")) {
+                            casasIds.add(e.getId());
+                        }
+                    }
+                    System.out.print(String.join(", ", casasIds));
+                    System.out.println("],");
+                    totalCasas += casilla.getNumCasas();
+                } else {
+                    System.out.println("  casas: -,");
+                }
+
+                // Listar piscinas
+                if (casilla.tienePiscina()) {
+                    System.out.print("  piscinas: [");
+                    List<String> piscinasIds = new ArrayList<>();
+                    for (Edificacion e : edificaciones) {
+                        if (e.getCasilla().equals(casilla) && e.getTipo().equals("piscina")) {
+                            piscinasIds.add(e.getId());
+                        }
+                    }
+                    System.out.print(String.join(", ", piscinasIds));
+                    System.out.println("],");
+                    totalPiscinas++;
+                } else {
+                    System.out.println("  piscinas: -,");
+                }
+
+                // Listar pistas de deporte
+                if (casilla.tienePista()) {
+                    System.out.print("  pistasDeDeporte: [");
+                    List<String> pistasIds = new ArrayList<>();
+                    for (Edificacion e : edificaciones) {
+                        if (e.getCasilla().equals(casilla) && e.getTipo().equals("pista")) {
+                            pistasIds.add(e.getId());
+                        }
+                    }
+                    System.out.print(String.join(", ", pistasIds));
+                    System.out.println("],");
+                    totalPistas++;
+                } else {
+                    System.out.println("  pistasDeDeporte: -,");
+                }
+
+                // Mostrar alquiler
+                float alquiler = casilla.calcularAlquilerTotal();
+                System.out.println("  alquiler: " + (long)alquiler);
+                System.out.println("},");
+            }
+        }
+
+        // Determinar qué se puede construir
+        for (Casilla casilla : casillasGrupo) {
+            if (casilla.getDuenho() != null && grupo.perteneceEnteramenteA(casilla.getDuenho())) {
+                if (casilla.puedeConstruirCasa(casilla.getDuenho())) {
+                    puedeCasas = true;
+                }
+                if (casilla.puedeConstruirHotel()) {
+                    puedeHoteles = true;
+                }
+                if (casilla.puedeConstruirPiscina()) {
+                    puedePiscinas = true;
+                }
+                if (casilla.puedeConstruirPista()) {
+                    puedePistas = true;
+                }
+            }
+        }
+
+        // Mostrar resumen de lo que se puede construir
+        System.out.println();
+        List<String> puedeConstruir = new ArrayList<>();
+        List<String> noPuedeConstruir = new ArrayList<>();
+
+        if (puedePiscinas) {
+            puedeConstruir.add("piscinas");
+        } else {
+            noPuedeConstruir.add("piscinas");
+        }
+
+        if (puedePistas) {
+            puedeConstruir.add("pistas de deporte");
+        } else {
+            noPuedeConstruir.add("pistas de deporte");
+        }
+
+        if (puedeCasas) {
+            puedeConstruir.add("casas");
+        } else {
+            noPuedeConstruir.add("casas");
+        }
+
+        if (puedeHoteles) {
+            puedeConstruir.add("hoteles");
+        } else {
+            noPuedeConstruir.add("hoteles");
+        }
+
+        if (!puedeConstruir.isEmpty()) {
+            System.out.println("Aún se puede edificar " + String.join(", ", puedeConstruir) + ".");
+        }
+
+        if (!noPuedeConstruir.isEmpty()) {
+            System.out.println("Ya no se pueden construir " + String.join(" ni ", noPuedeConstruir) + ".");
+        }
+    }
 }

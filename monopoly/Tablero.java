@@ -617,9 +617,9 @@ public class Tablero {
 
     }
 
-    public Jugador getBanca() {
-        return banca;
-    }
+//    public Jugador getBanca() {
+//        return banca;
+//    }
 
 
     public void añadirAlParking(float cantidad) {
@@ -646,6 +646,11 @@ public class Tablero {
 
     public void setMenu(Menu menu) {
         this.menu = menu;
+    }
+
+    public Grupo getGrupo(String nombreGrupo) {
+        if (nombreGrupo == null) return null;
+        return grupos.get(nombreGrupo.toLowerCase().trim());
     }
 
 }

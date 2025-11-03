@@ -24,19 +24,21 @@ public class MonopolyETSE {
             System.out.println("Comandos disponibles:");
             System.out.println("  - 'listar jugadores' / 'jugadores'");
             System.out.println("  - 'jugador' (ver turno actual)");
-            System.out.println("  - 'tirar dados'");
-            System.out.println("  - 'forzar dados'");
-            System.out.println("  - 'ver tablero'");
+            System.out.println("  - 'tirar dados' (tirada aleatoria)");
+            System.out.println("  - 'tirar dados X+Y' o 'lanzar dados X+Y' (forzar valores 1-6)");
             System.out.println("  - 'acabar turno'");
             System.out.println("  - 'describir <casilla>'");
+            System.out.println("  - 'ver tablero'");
             System.out.println("  - 'describir jugador <nombre>'");
             System.out.println("  - 'describir avatar X'");
-            System.out.println("  - 'listar venta' (casillas disponibles)");
+            System.out.println("  - 'listar enventa' (casillas disponibles)");
             System.out.println("  - 'listar avatares'");
             System.out.println("  - 'comprar <casilla>'");
-            System.out.println("  - 'listar edificios'");
-            System.out.println("  - 'edificar <tipo>'");
+            System.out.println("  - 'estadisticas <jugador>'");
             System.out.println("  - 'salir carcel'");
+            System.out.println("  - 'listar edificios'");
+            System.out.println("  - 'listar edificios <grupo>'");
+            System.out.println("  - 'edificar <tipo>'");
             System.out.println("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
             System.out.println("  - 'salir' (cerrar el juego)");
             String comando = sc.nextLine().trim(); // se lee lo que escribe el usuario y se limbia espacion innecesarios

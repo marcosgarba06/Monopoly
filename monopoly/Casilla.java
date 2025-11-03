@@ -51,10 +51,10 @@ public class Casilla {
 
     // ====== Constructores ======
 
-    public Casilla() {
-        this.avatares = new ArrayList<>();
-
-    }
+//    public Casilla() {
+//        this.avatares = new ArrayList<>();
+//
+//    }
 
     // Solares
     public Casilla(String nombre, String tipo, int posicion, float valor, float costeCasa, float costeHotel, float costePiscina, float costePista,
@@ -113,7 +113,7 @@ public class Casilla {
 
     public void anhadirAvatar(Avatar av) { if (av != null && !avatares.contains(av)) avatares.add(av); }
     public void eliminarAvatar(Avatar av) { avatares.remove(av); }
-    public void sumarValor(float suma) { this.valor += suma; }
+//    public void sumarValor(float suma) { this.valor += suma; }
 
     // ====== Lógica de alquiler sencilla ======
 
@@ -121,9 +121,9 @@ public class Casilla {
         float total = this.getAlquilerBase();
         return total;
     }
-    public float getAlquilerTransporte() {
-        return alquilerBase; // o alquilerTransporte si lo has definido aparte
-    }
+//    public float getAlquilerTransporte() {
+//        return alquilerBase; // o alquilerTransporte si lo has definido aparte
+//    }
 
 
     public float evaluarAlquiler(int tirada) {
@@ -144,9 +144,6 @@ public class Casilla {
                 return 0f;
         }
     }
-
-
-    // ====== Evaluación de casilla al caer ======
 
     public void evaluarCasilla(Jugador jugador) {
         System.out.println("Evaluando la casilla: " + this.nombre);
@@ -222,7 +219,7 @@ public class Casilla {
 
             case "impuesto":
                 System.out.println("Debes pagar un impuesto de " + (long)this.impuesto + "€.");
-                jugador.sumarPagoTasasEImpuestos(impuesto);
+
 
                 if (jugador.getFortuna() < impuesto) {
                     System.out.println("No puedes pagar el alquiler. Te declaras en bancarrota.");
@@ -299,9 +296,9 @@ public class Casilla {
     // ====== Compra ======
 
 
-    public void setAlquiler(float valor) {
-        this.alquiler = valor;
-    }
+//    public void setAlquiler(float valor) {
+//        this.alquiler = valor;
+//    }
 
 
     public boolean estaEnVenta() {
@@ -324,36 +321,34 @@ public class Casilla {
         }
     }
 
+//
+//    public void comprarCasilla(Jugador solicitante, Jugador banca) {
+//        String t = (this.tipo == null) ? "" : this.tipo.toLowerCase();
+//        boolean comprable = t.equals("solar") || t.equals("servicio") || t.equals("transporte");
+//
+//        if (!comprable || this.duenho != null) {
+//            System.out.println("La casilla " + nombre + " no está disponible para compra.");
+//            return;
+//        }
+//
+//        if (solicitante.getFortuna() >= valor) {
+//            solicitante.pagar(valor, banca);
+//            solicitante.sumarDineroInvertido(valor);
+//            setDuenho(solicitante);
+//            solicitante.anadirPropiedad(this);
+//            System.out.println(solicitante.getNombre() + " ha comprado " + nombre + " por " + (long)valor);
+//        } else {
+//            System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + nombre);
+//        }
+//    }
 
-    public void comprarCasilla(Jugador solicitante, Jugador banca) {
-        String t = (this.tipo == null) ? "" : this.tipo.toLowerCase();
-        boolean comprable = t.equals("solar") || t.equals("servicio") || t.equals("transporte");
-
-        if (!comprable || this.duenho != null) {
-            System.out.println("La casilla " + nombre + " no está disponible para compra.");
-            return;
-        }
-
-        if (solicitante.getFortuna() >= valor) {
-            solicitante.pagar(valor, banca);
-            solicitante.sumarDineroInvertido(valor);
-            setDuenho(solicitante);
-            solicitante.anadirPropiedad(this);
-            System.out.println(solicitante.getNombre() + " ha comprado " + nombre + " por " + (long)valor);
-        } else {
-            System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + nombre);
-        }
-    }
-
-    // ====== Info / descripción ======
-
-    public String infoCasilla() {
-        return "Casilla: " + nombre + " (" + tipo + "), valor=" + (long)valor;
-    }
-
-    public String casEnVenta() {
-        return nombre + " en venta por " + (long)valor;
-    }
+//    public String infoCasilla() {
+//        return "Casilla: " + nombre + " (" + tipo + "), valor=" + (long)valor;
+//    }
+//
+//    public String casEnVenta() {
+//        return nombre + " en venta por " + (long)valor;
+//    }
 
     @Override
     public String toString() {
@@ -413,11 +408,11 @@ public class Casilla {
     }
 
     public float getHipoteca() { return hipoteca; }
-    public float getAlquilerBase() { return alquilerBase; }
     public float getAlquilerCasa() { return alquilerCasa; }
     public float getAlquilerHotel() { return alquilerHotel; }
     public float getAlquilerPiscina() { return alquilerPiscina; }
     public float getAlquilerPista() { return alquilerPista; }
+    public float getAlquilerBase() { return alquilerBase; }
 
     public float getPrecioCasa() { return precioCasa; }
     public float getPrecioHotel() { return precioHotel; }
@@ -443,23 +438,29 @@ public class Casilla {
                 hotel == 0 &&  // Una vez construido hotel, no más casas
                 numCasas < 4;
     }
-
-    public String resumenEdificaciones() {
-        return "Casas: " + numCasas + ", Hotel: " + hotel + ", Piscina: " + piscina + ", Pista: " + pista;
-    }
-
     public boolean estaHipotecada() {
         return hipotecada;
     }
 
-    public void hipotecar() {
-        hipotecada = true;
-    }
+//    public void setHipotecable(boolean valor) {
+//        this.hipotecable = valor;
+//    }
 
-    public void deshipotecar() {
-        hipotecada = false;
-    }
-
+//    public String resumenEdificaciones() {
+//        return "Casas: " + numCasas + ", Hotel: " + hotel + ", Piscina: " + piscina + ", Pista: " + pista;
+//    }
+//
+//
+//    public void hipotecar() {
+//        hipotecada = true;
+//    }
+//
+//    public void deshipotecar() {
+//        hipotecada = false;
+//    }
+//    public boolean esHipotecable() {
+//        return hipotecable;
+//    }
     // En un solar se puede construir un único hotel si ya se han construido 4 casas
     // En ese caso, se substituyen todas las casas por el hotel
     public boolean puedeConstruirHotel() {
@@ -474,7 +475,7 @@ public class Casilla {
     public void construirPiscina(Jugador jugador) {
         if (puedeConstruirPiscina()) {
             piscina = 1;
-            jugador.restarFortuna(costePiscina);
+            jugador.restarFortuna(precioPiscina);
         }
     }
 
@@ -486,7 +487,7 @@ public class Casilla {
     public void construirPista(Jugador jugador) {
         if (puedeConstruirPista()) {
             pista = 1;
-            jugador.restarFortuna(costePista);
+            jugador.restarFortuna(precioPista);
         }
     }
 
@@ -494,22 +495,19 @@ public class Casilla {
     public void construirCasas(Jugador jugador, int cantidad) {
         if (puedeConstruirCasa(jugador)) {
             numCasas += cantidad;
-            jugador.restarFortuna(costeCasa * cantidad);
+            jugador.restarFortuna(precioCasa * cantidad);
         } else {
             System.out.println("No se pueden construir más casas aquí.");
         }
     }
 
-    public void setHipotecable(boolean valor) {
-        this.hipotecable = valor;
-    }
 
     // Al construir hotel, se substituyen las 4 casas por el hotel
     public void construirHotel(Jugador jugador) {
         if (numCasas == 4 && hotel == 0) {
             numCasas = 0;  // Substituir las casas
             hotel = 1;
-            jugador.restarFortuna(costeHotel);
+            jugador.restarFortuna(precioHotel);
         } else {
             System.out.println("No se puede construir hotel aquí.");
         }
@@ -527,9 +525,6 @@ public class Casilla {
         return pista > 0;
     }
 
-    public boolean esHipotecable() {
-        return hipotecable;
-    }
 
     public int getNumCasas() {
         return numCasas;

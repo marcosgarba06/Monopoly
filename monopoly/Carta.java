@@ -24,17 +24,17 @@ public class Carta {
         this.id = id;
     }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public int getId() {
-        return id;
-    }
+//    public String getDescripcion() {
+//        return descripcion;
+//    }
+//
+//    public String getTipo() {
+//        return tipo;
+//    }
+//
+//    public int getId() {
+//        return id;
+//    }
 
     public static void setJugadores(ArrayList<Jugador> listaJugadores) {
         jugadores = listaJugadores;
@@ -258,12 +258,6 @@ public class Carta {
                     jugador.restarFortuna(totalAlquiler);
                     jugador.sumarGastos(totalAlquiler);
                     jugador.sumarPagoTasasEImpuestos(totalAlquiler);
-
-//                    for (Jugador c : jugadores) {
-//                        if (!c.equals(jugador) && !c.isBancarrota()) {
-//                            c.sumarFortuna(200000);
-//                        }
-//                    }
 
                     System.out.println("Pagas " + totalAlquiler + "€ por alquilar la villa a tus compañeros.");
                     break;
