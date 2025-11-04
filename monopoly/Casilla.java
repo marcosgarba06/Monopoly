@@ -46,6 +46,8 @@ public class Casilla {
     private float costePiscina;
     private float costePista;
 
+    private int vecesVisitada = 0;
+    private float ingresosGenerados = 0;
 
 
 
@@ -103,6 +105,8 @@ public class Casilla {
     public float getImpuesto() { return impuesto; }
     public ArrayList<Avatar> getAvatares() { return avatares; }
 
+    public float getIngresosGenerados() { return ingresosGenerados;}
+    public int getVecesVisitada() { return vecesVisitada;}
     // ====== Setters ======
 
     public void setDuenho(Jugador d) { this.duenho = d; }
@@ -148,6 +152,7 @@ public class Casilla {
     public void evaluarCasilla(Jugador jugador) {
         System.out.println("Evaluando la casilla: " + this.nombre);
         String t = (this.tipo == null) ? "" : this.tipo.toLowerCase();
+        this.incrementarVisita();
 
         switch (t) {
             case "solar":
@@ -175,6 +180,7 @@ public class Casilla {
                             }
                         } else {
                             jugador.pagar(alquiler, this.getDuenho());
+                            this.sumarIngresos(alquiler);
                             System.out.println("Has pagado " + (long)alquiler + "€ a " +
                                     this.getDuenho().getNombre());
                             jugador.sumarPagoAlquiler(alquiler);
@@ -567,6 +573,8 @@ public class Casilla {
         this.numCasas = numCasas;
     }
 
+
+
     // ====== Venta de edificaciones ======
     // ====== VENTA de edificaciones ======
     /*
@@ -712,6 +720,10 @@ public class Casilla {
         // Tipo no reconocido
         System.out.println("Tipo de edificación no reconocido: " + tipoEdificacion + ".");
     }
+
+    // funciones estadísticas juego
+    public void incrementarVisita(){vecesVisitada++; }
+    public void sumarIngresos(float cantidad){ingresosGenerados += cantidad; }
 
 
 }

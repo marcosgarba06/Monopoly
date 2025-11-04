@@ -653,4 +653,7 @@ public class Tablero {
         return grupos.get(nombreGrupo.toLowerCase().trim());
     }
 
+    public ArrayList<Casilla> getCasillas() { return casillas;}
+    public ArrayList<Grupo> getGrupos() { return new ArrayList<>(grupos.values());}
+
 }

@@ -313,6 +313,10 @@ public class Menu { // la clase menu
                 acabarTurno();
                 return true;
 
+            case "estadisticas juego":
+                mostrarEstadisticasJuego();
+                return true;
+
             default:
                 return false;
         }
@@ -1096,6 +1100,7 @@ public class Menu { // la clase menu
         System.out.println("  - 'deshipotecar <casilla>'");
         System.out.println("  - 'vender <tipo> <casilla> <cantidad>'");
         System.out.println("  - 'estadisticas <jugador>'");
+        System.out.println("  - 'estadisticas juego'");
         System.out.println("  - 'salir carcel'");
         System.out.println("  - 'listar edificios'");
         System.out.println("  - 'listar edificios <grupo>'");
@@ -1672,6 +1677,87 @@ public class Menu { // la clase menu
         // para vender un edificio
         c.venderEdificacion(tipo, jugadorActual, cantidad);
     }
+
+
+
+    private void mostrarEstadisticasJuego() {
+        // Casilla más rentable (la que más alquiler ha generado)
+        Casilla casillaMasRentable = null;
+        float maxRenta = -1;
+        for (Jugador j : jugadores) {
+            for (Casilla c : j.getPropiedades()) {
+                float renta = c.getIngresosGenerados(); // acumulador en Casilla
+                if (renta > maxRenta) {
+                    maxRenta = renta;
+                    casillaMasRentable = c;
+                }
+            }
+        }
+
+        // Grupo más rentable (suma de ingresos de todas las casillas del grupo)
+        Grupo grupoMasRentable = null;
+        float maxGrupo = -1;
+        for (Grupo g : tablero.getGrupos()) { // ahora Tablero tiene getGrupos()
+            float total = 0;
+            for (Casilla c : g.getMiembros()) { // en Grupo usas getMiembros()
+                total += c.getIngresosGenerados();
+            }
+            if (total > maxGrupo) {
+                maxGrupo = total;
+                grupoMasRentable = g;
+            }
+        }
+
+        // Casilla más frecuentada (la que más veces han caído avatares)
+        Casilla casillaMasFrecuentada = null;
+        int maxVisitas = -1;
+        for (Casilla c : tablero.getCasillas()) { // ahora Tablero tiene getCasillas()
+            if (c.getVecesVisitada() > maxVisitas) {
+                maxVisitas = c.getVecesVisitada();
+                casillaMasFrecuentada = c;
+            }
+        }
+
+        // Jugador con más vueltas
+        Jugador jugadorMasVueltas = null;
+        int maxVueltas = -1;
+        for (Jugador j : jugadores) {
+            if (j.getVueltas() > maxVueltas) {
+                maxVueltas = j.getVueltas();
+                jugadorMasVueltas = j;
+            }
+        }
+
+        // Jugador en cabeza (fortuna + valor propiedades + edificios)
+        Jugador jugadorEnCabeza = null;
+        float maxValorTotal = -1;
+        for (Jugador j : jugadores) {
+            float valorPropiedades = 0;
+            for (Casilla c : j.getPropiedades()) {
+                valorPropiedades += c.getValor();
+                // si quieres, aquí puedes añadir valor de casas/hoteles/piscinas/pistas
+            }
+            float valorTotal = j.getFortuna() + valorPropiedades;
+            if (valorTotal > maxValorTotal) {
+                maxValorTotal = valorTotal;
+                jugadorEnCabeza = j;
+            }
+        }
+
+        // Imprimir resultado
+        System.out.println("$> estadisticas");
+        System.out.println("{");
+        System.out.println("casillaMasRentable: " + (casillaMasRentable != null ? casillaMasRentable.getNombre() : "-") + ",");
+        System.out.println("grupoMasRentable: " + (grupoMasRentable != null ? grupoMasRentable.getNombre() : "-") + ",");
+        System.out.println("casillaMasFrecuentada: " + (casillaMasFrecuentada != null ? casillaMasFrecuentada.getNombre() : "-") + ",");
+        System.out.println("jugadorMasVueltas: " + (jugadorMasVueltas != null ? jugadorMasVueltas.getNombre() : "-") + ",");
+        System.out.println("jugadorEnCabeza: " + (jugadorEnCabeza != null ? jugadorEnCabeza.getNombre() : "-"));
+        System.out.println("}");
+    }
+
+
+
+
 
 
 }
