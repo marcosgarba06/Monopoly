@@ -37,6 +37,8 @@ public class MonopolyETSE {
             System.out.println("  - 'deshipotecar <casilla>'");
             System.out.println("  - 'vender <tipo> <casilla> <cantidad>'");
             System.out.println("  - 'estadisticas <jugador>'");
+            System.out.println("  - 'estadisticas juego'");
+            System.out.println("  - 'comprar jugador <nombre>'");
             System.out.println("  - 'salir carcel'");
             System.out.println("  - 'listar edificios'");
             System.out.println("  - 'listar edificios <grupo>'");
