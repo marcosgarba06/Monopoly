@@ -1720,7 +1720,7 @@ public class Menu { // la clase menu
 
         // Jugador con más vueltas
         Jugador jugadorMasVueltas = null;
-        int maxVueltas = -1;
+        int maxVueltas = 0;
         for (Jugador j : jugadores) {
             if (j.getVueltas() > maxVueltas) {
                 maxVueltas = j.getVueltas();
@@ -1735,8 +1735,13 @@ public class Menu { // la clase menu
             float valorPropiedades = 0;
             for (Casilla c : j.getPropiedades()) {
                 valorPropiedades += c.getValor();
-                // si quieres, aquí puedes añadir valor de casas/hoteles/piscinas/pistas
+                valorPropiedades += c.getNumCasas() * c.getPrecioCasa();
+                valorPropiedades += c.getPrecioHotel();
+                valorPropiedades += c.getPrecioPista();
+                valorPropiedades += c.getPrecioPiscina();
+
             }
+            
             float valorTotal = j.getFortuna() + valorPropiedades;
             if (valorTotal > maxValorTotal) {
                 maxValorTotal = valorTotal;

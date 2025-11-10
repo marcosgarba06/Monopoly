@@ -35,6 +35,8 @@ public class MonopolyETSE {
             System.out.println("  - 'listar avatares'");
             System.out.println("  - 'comprar <casilla>'");
             System.out.println("  - 'estadisticas <jugador>'");
+            System.out.println("  - 'estadisticas juego'");
+            System.out.println("  - 'comprar jugador <nombre>'");
             System.out.println("  - 'salir carcel'");
             System.out.println("  - 'listar edificios'");
             System.out.println("  - 'listar edificios <grupo>'");
