@@ -1102,6 +1102,7 @@ public class Menu { // la clase menu
         System.out.println("  - 'estadisticas <jugador>'");
         System.out.println("  - 'estadisticas juego'");
         System.out.println("  - 'salir carcel'");
+        System.out.println("  - 'estadistas juego'");
         System.out.println("  - 'listar edificios'");
         System.out.println("  - 'listar edificios <grupo>'");
         System.out.println("  - 'edificar <tipo>'");
@@ -1281,6 +1282,16 @@ public class Menu { // la clase menu
 
         // Construir
         casilla.construirHotel(jugador);
+        // Eliminar las 4 casas
+        List<Edificacion> casasAEliminar = new ArrayList<>();
+        for (Edificacion e : edificaciones) {
+            if (e.getCasilla().equals(casilla) && e.getTipo().equals("casa")) {
+                casasAEliminar.add(e);
+            }
+        }
+        edificaciones.removeAll(casasAEliminar);
+        jugador.getEdificaciones().removeAll(casasAEliminar);
+
 
         System.out.println("Se ha edificado un hotel en " + casilla.getNombre() +
                 ". La fortuna de " + jugador.getNombre() +
@@ -1720,7 +1731,7 @@ public class Menu { // la clase menu
 
         // Jugador con más vueltas
         Jugador jugadorMasVueltas = null;
-        int maxVueltas = -1;
+        int maxVueltas = 0;
         for (Jugador j : jugadores) {
             if (j.getVueltas() > maxVueltas) {
                 maxVueltas = j.getVueltas();
@@ -1735,7 +1746,6 @@ public class Menu { // la clase menu
             float valorPropiedades = 0;
             for (Casilla c : j.getPropiedades()) {
                 valorPropiedades += c.getValor();
-                // si quieres, aquí puedes añadir valor de casas/hoteles/piscinas/pistas
             }
             float valorTotal = j.getFortuna() + valorPropiedades;
             if (valorTotal > maxValorTotal) {

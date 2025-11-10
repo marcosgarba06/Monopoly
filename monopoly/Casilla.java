@@ -408,7 +408,7 @@ public class Casilla {
 
             case "especial":
                 if ("parking".equalsIgnoreCase(nombre)) {
-                    sb.append("  bote: ").append((long) valor).append(",\n");
+                    sb.append("  bote: ").append((long) tablero.getFondoParking()).append(",\n");
                     sb.append("  jugadores: [");
                     for (int i = 0; i < avatares.size(); i++) {
                         sb.append(avatares.get(i).getJugador().getNombre());
@@ -705,7 +705,6 @@ public class Casilla {
 
             // Quitar el hotel y restaurar 4 casas (regla solicitada)
             this.hotel -= aVender;       // → 0
-            this.numCasas = 4;           // Al vender el hotel, vuelven 4 casas a la casilla
             jugador.sumarFortuna(total);
 
             if (cantidadSolicitada > aVender) {
