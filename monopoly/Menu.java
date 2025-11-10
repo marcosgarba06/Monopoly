@@ -230,6 +230,18 @@ public class Menu { // la clase menu
                 Pattern.CASE_INSENSITIVE
         );
 
+//        ^(tirar|lanzar)         // El comando debe empezar por "tirar" o "lanzar"
+//        \\s+                    // Uno o más espacios
+//        dados                   // Literal "dados"
+//        (?:                     // Inicio de grupo opcional (no captura)
+//        \\s+                 // Uno o más espacios
+//        (\\d)                // Primer número (dado1), un solo dígito
+//        \\s*\\+\\s*          // El signo + con espacios opcionales
+//        (\\d)                // Segundo número (dado2), un solo dígito
+//        )?                      // Fin del grupo opcional
+//        $                       // Fin de la línea
+//
+
         Matcher coincidencia = patronDados.matcher(comandoOriginal);
 
         if (!coincidencia.matches()) {
@@ -1665,31 +1677,91 @@ public class Menu { // la clase menu
 
     // Vender edificaciones desde el menú.
     // Sintaxis: vender <casas|hotel|piscina|pista> <casilla> <cantidad>
-    private void vender(String tipo, String nombreCasilla, int cantidad) {
-        // Obtenemos el jugador en turno
-        Jugador jugadorActual = jugadores.get(turno);
+//    private void vender(String tipo, String nombreCasilla, int cantidad) {
+//        // Obtenemos el jugador en turno
+//        Jugador jugadorActual = jugadores.get(turno);
+//
+//        // Buscamos la casilla por nombre exactamente como llega
+//        Casilla c = tablero.encontrarCasilla(nombreCasilla);
+//
+//        /*// Soportar el alias "SolarX" -> "SolX"
+//        // Si no se encontró la casilla y el nombre empieza por "Solar", generamos "Sol" + sufijo
+//        if (c == null && nombreCasilla != null && nombreCasilla.toLowerCase(Locale.ROOT).startsWith("solar")) {
+//            String alterno = "Sol" + nombreCasilla.substring("Solar".length());
+//            c = tablero.encontrarCasilla(alterno);
+//        }*/
+//
+//        // Si no existe la casilla se avisa al user y se termina
+//        if (c == null) {
+//            System.out.println("No existe la casilla " + nombreCasilla + ".");
+//            return;
+//        }
+//        // LLamar al metodo de venderEdificacion definido en casilla que contiene toda la logica que se usa
+//        // para vender un edificio
+//        c.venderEdificacion(tipo, jugadorActual, cantidad);
+//    }
 
-        // Buscamos la casilla por nombre exactamente como llega
+    // En Menu.java, método vender()
+    private void vender(String tipo, String nombreCasilla, int cantidad) {
+        Jugador jugadorActual = jugadores.get(turno);
         Casilla c = tablero.encontrarCasilla(nombreCasilla);
 
-        /*// Soportar el alias "SolarX" -> "SolX"
-        // Si no se encontró la casilla y el nombre empieza por "Solar", generamos "Sol" + sufijo
-        if (c == null && nombreCasilla != null && nombreCasilla.toLowerCase(Locale.ROOT).startsWith("solar")) {
-            String alterno = "Sol" + nombreCasilla.substring("Solar".length());
-            c = tablero.encontrarCasilla(alterno);
-        }*/
-
-        // Si no existe la casilla se avisa al user y se termina
         if (c == null) {
             System.out.println("No existe la casilla " + nombreCasilla + ".");
             return;
         }
-        // LLamar al metodo de venderEdificacion definido en casilla que contiene toda la logica que se usa
-        // para vender un edificio
+
+        // Guardar el número de edificaciones ANTES de vender
+        int casasAntes = c.getNumCasas();
+        boolean hotelAntes = c.tieneHotel();
+        boolean piscinaAntes = c.tienePiscina();
+        boolean pistaAntes = c.tienePista();
+
+        // Llamar al método de venta en Casilla
         c.venderEdificacion(tipo, jugadorActual, cantidad);
+
+        // DESPUÉS de vender, eliminar de las listas globales según lo que cambió
+        String tipoNorm = tipo.toLowerCase().trim();
+
+        if (tipoNorm.equals("casa") || tipoNorm.equals("casas")) {
+            int casasVendidas = casasAntes - c.getNumCasas();
+            eliminarEdificaciones(c, "casa", casasVendidas, jugadorActual);
+        }
+        else if (tipoNorm.equals("hotel") || tipoNorm.equals("hoteles")) {
+            if (hotelAntes && !c.tieneHotel()) {
+                eliminarEdificaciones(c, "hotel", 1, jugadorActual);
+            }
+        }
+        else if (tipoNorm.equals("piscina") || tipoNorm.equals("piscinas")) {
+            if (piscinaAntes && !c.tienePiscina()) {
+                eliminarEdificaciones(c, "piscina", 1, jugadorActual);
+            }
+        }
+        else if (tipoNorm.equals("pista") || tipoNorm.contains("pista")) {
+            if (pistaAntes && !c.tienePista()) {
+                eliminarEdificaciones(c, "pista", 1, jugadorActual);
+            }
+        }
     }
 
+    // Método auxiliar para eliminar edificaciones
+    private void eliminarEdificaciones(Casilla casilla, String tipo, int cantidad, Jugador jugador) {
+        List<Edificacion> aEliminar = new ArrayList<>();
+        int eliminadas = 0;
 
+        for (Edificacion e : edificaciones) {
+            if (e.getCasilla().equals(casilla) &&
+                    e.getTipo().equals(tipo) &&
+                    eliminadas < cantidad) {
+                aEliminar.add(e);
+                eliminadas++;
+            }
+        }
+
+        // Eliminar de ambas listas
+        edificaciones.removeAll(aEliminar);
+        jugador.getEdificaciones().removeAll(aEliminar);
+    }
 
     private void mostrarEstadisticasJuego() {
         // Casilla más rentable (la que más alquiler ha generado)
