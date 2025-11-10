@@ -1376,11 +1376,18 @@ public class Menu { // la clase menu
 
     private String generarId(String tipo) {
         switch (tipo.toLowerCase()) {
-            case "casa": return "casa-" + (++contadorCasas);
-            case "hotel": return "hotel-" + (++contadorHoteles);
-            case "piscina": return "piscina-" + (++contadorPiscinas);
-            case "pista_deporte": return "pista-" + (++contadorPistas);
-            default: return "edif-" + UUID.randomUUID();
+            case "casa":
+                return "casa-" + (++contadorCasas);
+            case "hotel":
+                return "hotel-" + (++contadorHoteles);
+            case "piscina":
+                return "piscina-" + (++contadorPiscinas);
+            case "pista":           // ✅ Añadir este case
+            case "pista_deporte":   // ✅ Y mantener este por compatibilidad
+            case "pista deporte":   // ✅ Por si llega con espacio
+                return "pista-" + (++contadorPistas);
+            default:
+                return "edif-" + UUID.randomUUID();
         }
     }
 
