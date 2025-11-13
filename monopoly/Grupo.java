@@ -72,7 +72,7 @@ public class Grupo {
        return true;
     }
 
-    //getters
+
     public ArrayList<Casilla> getMiembros() {
         return miembros;
     }

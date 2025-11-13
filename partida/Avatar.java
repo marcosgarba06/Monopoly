@@ -111,9 +111,9 @@ public class Avatar {
         this.enCarcel = b;
     }
 
-//    public int getPosicion() {
-//        return posicion;
-//    }
+    public int getPosicion() {
+        return posicion;
+    }
 
     public String getId() {
         return id;
@@ -123,9 +123,9 @@ public class Avatar {
         return jugador;
     }
 
-//    public boolean isEnCarcel() {
-//        return enCarcel;
-//    }
+    public boolean isEnCarcel() {
+        return enCarcel;
+    }
 
     public void setCasilla(Casilla c) {
         if (this.casilla != null) this.casilla.eliminarAvatar(this);

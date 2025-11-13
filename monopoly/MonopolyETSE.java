@@ -11,9 +11,6 @@ public class MonopolyETSE {
         Menu menu = new Menu(); //creamos el objeto menu que gestiona los comandos
         menu.iniciarPartida();// inicamos la partida
 
-        Jugador banca = new Jugador(); //se crea el jugado de la banca
-        Tablero tablero = new Tablero(banca); // se inicializa el tablero
-
         Scanner sc = new Scanner(System.in);
 
         System.out.println("Bienvenido a Monopoly ETSE.");

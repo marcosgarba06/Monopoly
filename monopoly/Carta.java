@@ -7,16 +7,16 @@ import java.util.ArrayList;
 public class Carta {
 
     private String descripcion;
-    private String tipo;
-    private int id;// "suerte" o "caja"
+    private String tipo;// "suerte" o "caja"
+    private int id; //indica el numero que identifica a la carta dentro del mazo
 
-    private static int contadorSuerte = 0;
-    private static int contadorCaja = 0;
+    private static int contadorSuerte = 0; //carta actual de suerte
+    private static int contadorCaja = 0; //carta actual de caja
 
-    private static ArrayList<Carta> mazoSuerte = null;
-    private static ArrayList<Carta> mazoCaja = null;
+    private static ArrayList<Carta> mazoSuerte = null; //listas que contienen las cartas de tipo suerte
+    private static ArrayList<Carta> mazoCaja = null; //lista que contiene las cartas de tipo caja
 
-    private static ArrayList<Jugador> jugadores;
+    private static ArrayList<Jugador> jugadores; //lista de jugadores
 
     public Carta(String descripcion, String tipo, int id) {
         this.descripcion = descripcion;
@@ -24,20 +24,8 @@ public class Carta {
         this.id = id;
     }
 
-//    public String getDescripcion() {
-//        return descripcion;
-//    }
-//
-//    public String getTipo() {
-//        return tipo;
-//    }
-//
-//    public int getId() {
-//        return id;
-//    }
-
     public static void setJugadores(ArrayList<Jugador> listaJugadores) {
-        jugadores = listaJugadores;
+        jugadores = listaJugadores; // asigna la lista de jugadores al sistema de cartas, hace que haya una sola lista para todas las cartas
     }
 
 
@@ -63,11 +51,13 @@ public class Carta {
     }
 
     public static Carta seleccionarCarta(String tipo) {
+
         if (mazoSuerte == null || mazoCaja == null) {
             inicializarMazos();
         }
-
-        Carta cartaSeleccionada;
+        //cartaSeleccionada es un objeto que tiene valor tipo null hasta que se le asigne un vaalor
+        //cuando hagamos mazoSuerte.get(), ahi ya apunta a un objeto real de tipo carta
+        Carta cartaSeleccionada; //aqui se va a aguardar la carta seleccionada
 
         if (tipo.equalsIgnoreCase("suerte")) {
             if (mazoSuerte.isEmpty()) {
@@ -75,21 +65,21 @@ public class Carta {
                 return null;
             }
             cartaSeleccionada = mazoSuerte.get(contadorSuerte % mazoSuerte.size()); //El uso de % mazo.size() hace que el orden sea circular: después de la última carta, vuelve a la primera.
-            contadorSuerte++;
+            contadorSuerte++; //para que la próxima vez se avance a la siguiente carta.
         } else {
             if (mazoCaja.isEmpty()) {
                 System.out.println("Error: No hay cartas de Caja disponibles.");
                 return null;
             }
             cartaSeleccionada = mazoCaja.get(contadorCaja % mazoCaja.size());
-            contadorCaja++;
+            contadorCaja++; //para que la próxima vez se avance a la siguiente carta.
         }
-
         return cartaSeleccionada;
     }
 
-
+    //cartaSeleccionada.aplicarAccion(jugadorActual, tablero); estoy dentro de la carta
     public void aplicarAccion(Jugador jugador, Tablero tablero) {
+
         System.out.println("Carta seleccionada: " + descripcion);
 
         // Verificación de seguridad
@@ -98,9 +88,10 @@ public class Carta {
             return;
         }
 
-        Casilla casillaActual = jugador.getAvatar().getCasilla();
-        Casilla casillaDestino;
+        Casilla casillaActual = jugador.getAvatar().getCasilla(); //cogemos la caslla del avatar
+        Casilla casillaDestino; //cojemos la casilla destino
 
+        /// ///////SUERTE
         if (tipo.equals("suerte")) {
             switch (id) {
                 case 1: // Avanza a Solar19
@@ -188,7 +179,8 @@ public class Carta {
                     break;
             }
 
-        } else if (tipo.equals("caja")) {
+            /// ///////CAJA
+        } else if (tipo.equals("caja")) { //
             switch (id) {
                 case 1: // Balneario
                     if (jugador.getFortuna() < 500000) {

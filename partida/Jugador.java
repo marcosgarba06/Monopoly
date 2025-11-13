@@ -48,11 +48,6 @@ public class Jugador {
         this.tieneCartaSalirCarcel = false;
     }
 
-    /*Constructor principal. Requiere parámetros:
-     * Nombre del jugador, tipo del avatar que tendrá, casilla en la que empezará y ArrayList de
-     * avatares creados (usado para dos propósitos: evitar que dos jugadores tengan el mismo nombre y
-     * que dos avatares tengan mismo ID). Desde este constructor también se crea el avatar.
-     */
     public Jugador(String nombre, String tipoAvatar, Casilla inicio, ArrayList<Avatar> avCreados) {
         this.nombre = nombre;
         this.avatar = new Avatar(tipoAvatar, this, inicio, avCreados);
@@ -66,7 +61,7 @@ public class Jugador {
         this.tieneCartaSalirCarcel = false;
     }
 
-    // Métodos de fortuna
+
     public void sumarFortuna(float valor) {
         this.fortuna += valor;
     }
@@ -79,8 +74,8 @@ public class Jugador {
         }
     }
 
-    public void añadirCartaSalirCarcel() {
-        cartasSalirCarcel++;
+    public void sumarGastos(float valor) {
+        this.gastos += valor;
     }
 
     public boolean usarCartaSalirCarcel() {
@@ -95,30 +90,26 @@ public class Jugador {
         return cartasSalirCarcel;
     }
 
-    public void sumarGastos(float valor) {
-        this.gastos += valor;
-    }
-
     // Métodos de propiedades
-    public void anadirPropiedad(Casilla casilla) {
-        if (!propiedades.contains(casilla)) {
-            this.propiedades.add(casilla);
-        }
-    }
-
-    public void eliminarPropiedad(Casilla casilla) {
-        this.propiedades.remove(casilla);
-    }
-
-
-    public void darCartaSalirCarcel() {
-        this.tieneCartaSalirCarcel = true;
-    }
-
-    public boolean tienePropiedades() {
-        return !propiedades.isEmpty();
-    }
-
+//    public void anadirPropiedad(Casilla casilla) {
+//        if (!propiedades.contains(casilla)) {
+//            this.propiedades.add(casilla);
+//        }
+//    }
+//
+//    public void eliminarPropiedad(Casilla casilla) {
+//        this.propiedades.remove(casilla);
+//    }
+//
+//
+//    public void darCartaSalirCarcel() {
+//        this.tieneCartaSalirCarcel = true;
+//    }
+//
+//    public boolean tienePropiedades() {
+//        return !propiedades.isEmpty();
+//    }
+//
 
     // Método para enviar al jugador a la cárcel
     public void irACarcel(Tablero tablero) {
@@ -159,12 +150,12 @@ public class Jugador {
             // Aquí se podría implementar lógica de bancarrota, hipoteca, etc.
         }
     }
-
-    public void cobrar(float cantidad, Jugador pagador) {
-        this.fortuna += cantidad;
-        pagador.restarFortuna(cantidad);
-        pagador.sumarGastos(cantidad);
-    }
+//
+//    public void cobrar(float cantidad, Jugador pagador) {
+//        this.fortuna += cantidad;
+//        pagador.restarFortuna(cantidad);
+//        pagador.sumarGastos(cantidad);
+//    }
 
 
     public void anhadirPropiedad(Casilla c) {
@@ -255,24 +246,24 @@ public class Jugador {
 
     // Setters
 
-    public void setTieneCartaSalirCarcel(boolean valor) {
-        tieneCartaSalirCarcel = valor;
-    }
+//    public void setTieneCartaSalirCarcel(boolean valor) {
+//        tieneCartaSalirCarcel = valor;
+//    }
     public void setEnCarcel(boolean enCarcel) {
         this.enCarcel = enCarcel;
     }
     public void setBancarrota(boolean bancarrota) {
         this.bancarrota = bancarrota;
     }
-    public void incrementarVueltas() {
-        this.vueltas++;
-    }
-    public void setActivo(boolean estado) {
-        this.activo = estado;
-    }
-    public void setTablero(Tablero t) {
-        this.tablero = t;
-    }
+//    public void incrementarVueltas() {
+//        this.vueltas++;
+//    }
+//    public void setActivo(boolean estado) {
+//        this.activo = estado;
+//    }
+//    public void setTablero(Tablero t) {
+//        this.tablero = t;
+//    }
 
 
     public boolean poseeGrupoCompleto(Casilla casilla, Tablero tablero) {
@@ -296,14 +287,15 @@ public class Jugador {
 
     }
 
-    public void setFortuna(float nuevaFortuna) {
-        if (nuevaFortuna < 0) {
-            this.fortuna = 0;
-        } else {
-            this.fortuna = nuevaFortuna;
-        }
-    }
+//    public void setFortuna(float nuevaFortuna) {
+//        if (nuevaFortuna < 0) {
+//            this.fortuna = 0;
+//        } else {
+//            this.fortuna = nuevaFortuna;
+//        }
+//    }
 
+    ///  /////////// EDIFICACIONES DE JUGADOR
     private List<Edificacion> edificaciones = new ArrayList<>();
 
     public void agregarEdificacion(Edificacion e) {

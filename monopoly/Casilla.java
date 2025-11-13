@@ -50,15 +50,12 @@ public class Casilla {
     private float ingresosGenerados = 0;
 
 
+    public Casilla() {
+        this.avatares = new ArrayList<>();
 
-    // ====== Constructores ======
+    }
 
-//    public Casilla() {
-//        this.avatares = new ArrayList<>();
-//
-//    }
 
-    // Solares
     public Casilla(String nombre, String tipo, int posicion, float valor, float costeCasa, float costeHotel, float costePiscina, float costePista,
                    Jugador banca) {
         this.nombre = nombre;
@@ -93,9 +90,6 @@ public class Casilla {
         this(nombre, tipo, posicion, valor, 50f, 100f, 75f, 120f, banca); // valores por defecto
     }
 
-
-    // ====== Getters ======
-
     public String getNombre() { return nombre; }
     public String getTipo() { return tipo; }
     public float getValor() { return valor; }
@@ -107,27 +101,14 @@ public class Casilla {
 
     public float getIngresosGenerados() { return ingresosGenerados;}
     public int getVecesVisitada() { return vecesVisitada;}
-    // ====== Setters ======
 
     public void setDuenho(Jugador d) { this.duenho = d; }
     public void setGrupo(Grupo g) { this.grupo = g; }
     public void setTablero(Tablero t) { this.tablero = t; }
 
-    // ====== Auxiliares ======
-
     public void anhadirAvatar(Avatar av) { if (av != null && !avatares.contains(av)) avatares.add(av); }
     public void eliminarAvatar(Avatar av) { avatares.remove(av); }
-//    public void sumarValor(float suma) { this.valor += suma; }
 
-    // ====== Lógica de alquiler sencilla ======
-
-    public float calcularAlquilerTotal() {
-        float total = this.getAlquilerBase();
-        return total;
-    }
-//    public float getAlquilerTransporte() {
-//        return alquilerBase; // o alquilerTransporte si lo has definido aparte
-//    }
 
 
     public float evaluarAlquiler(int tirada) {
@@ -135,7 +116,7 @@ public class Casilla {
 
         switch (t) {
             case "solar":
-                return calcularAlquilerTotal(); // ← usa el método que suma alquiler base + edificaciones
+                return getAlquiler(); // ← usa el método que suma alquiler base + edificaciones
 
             case "transporte":
                 return 250000f;
@@ -180,7 +161,7 @@ public class Casilla {
                             }
                         } else {
                             jugador.pagar(alquiler, this.getDuenho());
-                            this.sumarIngresos(alquiler);
+                            this.sumarIngresos(alquiler);/////////estadisticas juego
                             System.out.println("Has pagado " + (long)alquiler + "€ a " +
                                     this.getDuenho().getNombre());
                             jugador.sumarPagoAlquiler(alquiler);
@@ -213,6 +194,7 @@ public class Casilla {
                         System.out.println("Debes pagar " + (long)alquilerTotal +
                                 "€ por el uso del transporte.");
                         jugador.pagar(alquilerTotal, this.getDuenho());
+                        this.sumarIngresos(alquilerTotal); /////////estadisticas juego
                         jugador.sumarPagoAlquiler(alquilerTotal);
                         this.getDuenho().sumarCobroAlquiler(alquilerTotal);
                     }
@@ -239,6 +221,7 @@ public class Casilla {
                         jugador.pagar(alquiler, this.getDuenho());
                         jugador.sumarPagoAlquiler(alquiler);
                         this.getDuenho().sumarCobroAlquiler(alquiler);
+                        this.sumarIngresos(alquiler);/////////estadisticas juego
                     }
                 } else {
                     System.out.println("Has caído en tu propio servicio.");
@@ -322,18 +305,12 @@ public class Casilla {
         }
     }
 
-    // ====== Compra ======
-
-
-//    public void setAlquiler(float valor) {
-//        this.alquiler = valor;
-//    }
-
 
     public boolean estaEnVenta() {
         String t = (this.tipo == null) ? "" : this.tipo.toLowerCase();
         return (t.equals("solar") || t.equals("servicio") || t.equals("transporte")) && duenho == null;
     }
+
     public float getAlquiler() {
         switch (tipo.toLowerCase()) {
             case "transporte":
@@ -350,34 +327,6 @@ public class Casilla {
         }
     }
 
-//
-//    public void comprarCasilla(Jugador solicitante, Jugador banca) {
-//        String t = (this.tipo == null) ? "" : this.tipo.toLowerCase();
-//        boolean comprable = t.equals("solar") || t.equals("servicio") || t.equals("transporte");
-//
-//        if (!comprable || this.duenho != null) {
-//            System.out.println("La casilla " + nombre + " no está disponible para compra.");
-//            return;
-//        }
-//
-//        if (solicitante.getFortuna() >= valor) {
-//            solicitante.pagar(valor, banca);
-//            solicitante.sumarDineroInvertido(valor);
-//            setDuenho(solicitante);
-//            solicitante.anadirPropiedad(this);
-//            System.out.println(solicitante.getNombre() + " ha comprado " + nombre + " por " + (long)valor);
-//        } else {
-//            System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + nombre);
-//        }
-//    }
-
-//    public String infoCasilla() {
-//        return "Casilla: " + nombre + " (" + tipo + "), valor=" + (long)valor;
-//    }
-//
-//    public String casEnVenta() {
-//        return nombre + " en venta por " + (long)valor;
-//    }
 
     @Override
     public String toString() {
@@ -436,6 +385,34 @@ public class Casilla {
 
     }
 
+    public boolean tieneEdificios() {
+        if(numCasas > 0 || tieneHotel() || tienePiscina() || tienePista) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public boolean tieneHotel() {
+        return hotel > 0;
+    }
+    public boolean tienePiscina() {
+        return piscina > 0;
+    }
+    public boolean tienePista() {
+        return pista > 0;
+    }
+    public int getNumCasas() {
+        return numCasas;
+    }
+    public void hipotecar() {
+        hipotecada = true;
+    }
+    public void deshipotecar() {
+        hipotecada = false;
+    }
+    public boolean esHipotecable() {
+        return hipotecable;
+    }
     public float getHipoteca() { return hipoteca; }
     public float getAlquilerCasa() { return alquilerCasa; }
     public float getAlquilerHotel() { return alquilerHotel; }
@@ -459,6 +436,12 @@ public class Casilla {
     public void setPrecioHotel(float p) { precioHotel = p; }
     public void setPrecioPiscina(float p) { precioPiscina = p; }
     public void setPrecioPista(float p) { precioPista = p; }
+    public boolean estaHipotecada() {
+        return hipotecada;
+    }
+
+
+    //////////////////VERIFICACION DE CONSTRUCCION DE EDIFICACIONES
 
     public boolean puedeConstruirCasa(Jugador jugador) {
         return this.getDuenho() == jugador &&
@@ -467,69 +450,6 @@ public class Casilla {
                 hotel == 0 &&  // Una vez construido hotel, no más casas
                 numCasas < 4;
     }
-    public boolean estaHipotecada() {
-        return hipotecada;
-    }
-
-    public void setHipotecable(boolean valor) {
-        this.hipotecable = valor;
-    }
-
-    public String resumenEdificaciones() {
-        return "Casas: " + numCasas + ", Hotel: " + hotel + ", Piscina: " + piscina + ", Pista: " + pista;
-    }
-
-
-
-    public boolean tieneEdificios() {
-        if(numCasas > 0 || tieneHotel() || tienePiscina() || tienePista) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
-    public void hipotecar() {
-        hipotecada = true;
-    }
-
-    public void deshipotecar() {
-        hipotecada = false;
-    }
-    public boolean esHipotecable() {
-        return hipotecable;
-    }
-    // En un solar se puede construir un único hotel si ya se han construido 4 casas
-    // En ese caso, se substituyen todas las casas por el hotel
-    public boolean puedeConstruirHotel() {
-        return numCasas == 4 && hotel == 0;
-    }
-
-    // ✅ En un solar se puede construir una única piscina si se ha construido un hotel
-    public boolean puedeConstruirPiscina() {
-        return hotel > 0 && piscina == 0;
-    }
-
-    public void construirPiscina(Jugador jugador) {
-        if (puedeConstruirPiscina()) {
-            piscina = 1;
-            jugador.restarFortuna(precioPiscina);
-        }
-    }
-
-    // En un solar se puede construir una única pista de deporte si se ha construido un hotel y una piscina
-    public boolean puedeConstruirPista() {
-        return hotel > 0 && piscina > 0 && pista == 0;
-    }
-
-    public void construirPista(Jugador jugador) {
-        if (puedeConstruirPista()) {
-            pista = 1;
-            jugador.restarFortuna(precioPista);
-        }
-    }
-
     // Se pueden construir un máximo de 4 casas y todas al mismo tiempo
     public void construirCasas(Jugador jugador, int cantidad) {
         if (puedeConstruirCasa(jugador)) {
@@ -539,8 +459,10 @@ public class Casilla {
             System.out.println("No se pueden construir más casas aquí.");
         }
     }
-
-
+    // En un solar se puede construir un único hotel si ya se han construido 4 casas
+    public boolean puedeConstruirHotel() {
+        return numCasas == 4 && hotel == 0;
+    }
     // Al construir hotel, se substituyen las 4 casas por el hotel
     public void construirHotel(Jugador jugador) {
         if (numCasas == 4 && hotel == 0) {
@@ -551,32 +473,30 @@ public class Casilla {
             System.out.println("No se puede construir hotel aquí.");
         }
     }
-
-    public boolean tieneHotel() {
-        return hotel > 0;
+    // En un solar se puede construir una única piscina si se ha construido un hotel
+    public boolean puedeConstruirPiscina() {
+        return hotel > 0 && piscina == 0;
     }
 
-    public boolean tienePiscina() {
-        return piscina > 0;
+    public void construirPiscina(Jugador jugador) {
+        if (puedeConstruirPiscina()) {
+            piscina = 1;
+            jugador.restarFortuna(precioPiscina);
+        }
+    }
+    // En un solar se puede construir una única pista de deporte si se ha construido un hotel y una piscina
+    public boolean puedeConstruirPista() {
+        return hotel == 1 && piscina == 0 && pista == 0; //devueleve true si hay hotel, piscina y no pista
     }
 
-    public boolean tienePista() {
-        return pista > 0;
+    public void construirPista(Jugador jugador) {
+        if (puedeConstruirPista()) {
+            pista = 1;
+            jugador.restarFortuna(precioPista);
+        }
     }
 
-
-    public int getNumCasas() {
-        return numCasas;
-    }
-
-    public void setNumCasas(int numCasas) {
-        this.numCasas = numCasas;
-    }
-
-
-
-    // ====== Venta de edificaciones ======
-    // ====== VENTA de edificaciones ======
+    ///  ////////////////VENDER EDIFICACIONES
     /*
      * Vende edificaciones en un solar.
      * - tipoEdificacion: "casas", "hotel", "piscina" o "pista" (acepta singular/plural y variantes).
@@ -590,18 +510,33 @@ public class Casilla {
      * - Al vender el hotel, la casilla recupera 4 casas (regla solicitada).
      */
     public void venderEdificacion(String tipoEdificacion, Jugador jugador, int cantidadSolicitada) {
+
         if (tipoEdificacion == null) {
             System.out.println("Tipo de edificación no válido.");
             return;
         }
-        String te = tipoEdificacion.trim().toLowerCase();
 
-        boolean esCasas   = te.equals("casa") || te.equals("casas");
-        boolean esPiscina = te.equals("piscina") || te.equals("piscinas");
-        boolean esPista   = te.equals("pista") || te.equals("pistas") || te.equals("pista deporte") || te.equals("pista_deporte") || te.equals("pista-deporte");
-        boolean esHotel   = te.equals("hotel") || te.equals("hoteles");
+        String textoEdificacion = tipoEdificacion.trim().toLowerCase();
 
-        // Solo solares admiten edificaciones
+        //si el texto introdicido por el usuario coincide con alguno de estos, devuelve true
+        boolean esCasas = false;
+        if(textoEdificacion.equals("casa") || textoEdificacion.equals("casas")){
+            esCasas = true;
+        }
+        boolean esPiscina = false;
+        if(textoEdificacion.equals("piscina") || textoEdificacion.equals("piscinas")){
+            esPiscina = true;
+        }
+        boolean esPista = false;
+        if(textoEdificacion.equals("pista") || textoEdificacion.equals("pistas") || textoEdificacion.equals("pista deporte") || textoEdificacion.equals("pista_deporte") || textoEdificacion.equals("pista-deporte")) {
+            esPista = true;
+        }
+        boolean esHotel  =  false;
+        if(textoEdificacion.equals("hotel") || textoEdificacion.equals("hoteles")){
+            esHotel = true;
+        }
+
+        // Solo solares admiten edificaciones, si es de tipo transporte o servicio no se puede vernder SOLO HIPOTECAR
         if (this.tipo == null || !this.tipo.equalsIgnoreCase("solar")) {
             System.out.println("No se pueden vender edificaciones en una casilla de tipo " + this.tipo + ".");
             return;
@@ -620,18 +555,19 @@ public class Casilla {
 
         // --- Casas ---
         if (esCasas) {
-            int disponibles = this.numCasas;
+
+            int disponibles = this.numCasas; //numero de casas que tiene el solar
             if (disponibles <= 0) {
                 System.out.println("No hay casas que vender en " + this.nombre + ".");
                 return;
             }
-            int aVender = Math.min(disponibles, cantidadSolicitada);
-            long total = (long)(aVender * this.getPrecioCasa());
+            int aVender = Math.min(disponibles, cantidadSolicitada); // el minimo entre las disponibles y la cantidad que quieres vender, para no vender mas casas de las que tienes
+            long total = (long)(aVender * this.getPrecioCasa()); // el precio que vas a ganar
 
-            this.numCasas -= aVender;
-            jugador.sumarFortuna(total);
+            this.numCasas -= aVender; //resta las casas vendidas al numero de casas de que hay en el solar
+            jugador.sumarFortuna(total); //suma el dinero ganado al jugador
 
-            if (aVender < cantidadSolicitada) {
+            if (aVender < cantidadSolicitada) { // si las que puedes vender es menor que las solicitadas manda un mensaje de aviso, solo vamos a vender las que haiga en la casilla
                 String plural = (aVender == 1) ? "casa" : "casas";
                 System.out.println("Se pueden vender como máximo " + aVender + " " + plural + " aquí. Ingresas " + total + "€.");
             } else {
@@ -655,7 +591,7 @@ public class Casilla {
             int aVender = Math.min(disponibles, cantidadSolicitada); // 1 máx
             long total = (long)(aVender * this.getPrecioPiscina());
 
-            this.piscina -= aVender; // → 0
+            this.piscina -= aVender; // tienen que ser cero por que solo se puede construir una piscina
             jugador.sumarFortuna(total);
 
             if (cantidadSolicitada > aVender) {
@@ -703,7 +639,7 @@ public class Casilla {
             int aVender = Math.min(disponibles, cantidadSolicitada); // será 1 como máximo
             long total = (long)(aVender * this.getPrecioHotel());
 
-            // Quitar el hotel y restaurar 4 casas (regla solicitada)
+            //cuando se vende el hotel no se restauran las casas, solo ganas lo del hotel(lo dijo el profe)
             this.hotel -= aVender;       // → 0
             jugador.sumarFortuna(total);
 
@@ -720,10 +656,9 @@ public class Casilla {
         System.out.println("Tipo de edificación no reconocido: " + tipoEdificacion + ".");
     }
 
-    // funciones estadísticas juego
+    /// ///////////////ESTADISTICAS
     public void incrementarVisita(){vecesVisitada++; }
-    public void sumarIngresos(float cantidad){ingresosGenerados += cantidad; }
-
+    public void sumarIngresos(float cantidad){ingresosGenerados += cantidad; } //para calcular la casilla mas rentable, sumamos cada vcez que pagan un alquiler
 
 }
 
