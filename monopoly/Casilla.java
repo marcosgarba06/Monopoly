@@ -725,11 +725,12 @@ public class Casilla {
             return !c.tieneEdificios();
         }
 
-        // Transportes y servicios NO se hipotecan según PDF Parte 1
+        // Transportes y servicios NO se hipotecar
         return false;
     }
 
     public void procesarPagoDeuda(Jugador jugador, Tablero tablero) {
+
         float deuda = jugador.getDeudaPendiente();
 
         if (jugador.getFortuna() >= deuda) {
@@ -737,7 +738,6 @@ public class Casilla {
             System.out.println("Deuda pendiente: " + (long)deuda + "€");
             System.out.println("Tu fortuna: " + (long)jugador.getFortuna() + "€");
 
-            // Pagar automáticamente
             Jugador acreedor = jugador.getAcreedorDeuda();
 
             if (acreedor != null) {
@@ -792,7 +792,7 @@ public class Casilla {
                     }
                 }
             } else {
-                System.out.println("\n⚠ No puedes reunir el dinero suficiente.");
+                System.out.println("\nNo puedes reunir el dinero suficiente.");
                 System.out.println("Valor hipotecable total restante: " + (long)valorHipotecableRestante + "€");
                 System.out.println("Debes declararte en BANCARROTA.");
                 System.out.println("Usa el comando: declarar bancarrota");

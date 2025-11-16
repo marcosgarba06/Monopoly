@@ -156,7 +156,7 @@ public class Menu { // la clase menu
 
             // Solo permitir hipotecar y declarar bancarrota
             if (!cmd.startsWith("hipotecar") && !cmd.equals("declarar bancarrota")) {
-                System.out.println("\n❌ TURNO BLOQUEADO - DEUDA PENDIENTE");
+                System.out.println("\nTienen una deuda pendiente:");
                 System.out.println("Debes pagar: " + (long)actual.getDeudaPendiente() + "€");
                 System.out.println("Tu fortuna: " + (long)actual.getFortuna() + "€");
                 System.out.println("Faltante: " + (long)(actual.getDeudaPendiente() - actual.getFortuna()) + "€");
@@ -988,8 +988,9 @@ public class Menu { // la clase menu
         }
 
         Jugador actual = jugadores.get(turno);
+
         if (actual.getDeudaPendiente() > 0) {
-            System.out.println("❌ No puedes acabar el turno con una deuda pendiente.");
+            System.out.println("No puedes acabar el turno con una deuda pendiente.");
             System.out.println("Deuda: " + (long)actual.getDeudaPendiente() + "€");
             System.out.println("Tu fortuna: " + (long)actual.getFortuna() + "€");
             System.out.println("\nOPCIONES:");
@@ -1594,11 +1595,7 @@ public class Menu { // la clase menu
                 nombreGrupo + ".");
 
         if (jugador.getDeudaPendiente() > 0) {
-            // Obtener la casilla actual del jugador para llamar a su método
-            Casilla casillaActual = jugador.getAvatar().getCasilla();
-            if (casillaActual != null) {
-                casillaActual.procesarPagoDeuda(jugador, tablero);
-            }
+            casilla.procesarPagoDeuda(jugador, tablero);
         }
 }
 
