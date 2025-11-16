@@ -1,6 +1,5 @@
 package monopoly;
 
-
 import java.awt.*;
 import java.util.Scanner;
 import partida.Jugador;

@@ -38,6 +38,7 @@ public class Carta {
         mazoSuerte.add(new Carta("Has sido elegido presidente de la junta directiva. Paga a cada jugador 250.000€", "suerte", 4));
         mazoSuerte.add(new Carta("¡Hora punta de tráfico! Retrocede tres casillas.", "suerte", 5));
         mazoSuerte.add(new Carta("Te multan por usar el móvil mientras conduces. Paga 150.000€.", "suerte", 6));
+        mazoSuerte.add(new Carta("Avanza hasta la casilla de transporte más cercana. Si no tiene dueño, puedes comprarla. Si tiene dueño, paga al dueño el doble de la operación indicada.", "suerte" , 7));
 
         // Inicializar mazo de caja
         mazoCaja = new ArrayList<>();
@@ -177,7 +178,60 @@ public class Carta {
                     jugador.sumarPagoTasasEImpuestos(150000);
                     System.out.println("Pagas 150.000€ por conducir indebidamente.");
                     break;
+                case 7:
+                    int posActual = casillaActual.getPosicion();
+                    int[] posicionesTransporte = {5, 15, 25, 35}; // Tran1, Tran2, Tran3, Tran4
+
+                    int posCercana = -1;
+                    int distanciaMin = 40;
+
+                    for (int posT : posicionesTransporte) {
+                        int distancia = (posT - posActual + 40) % 40;
+                        if (distancia == 0) distancia = 40;
+                        if (distancia < distanciaMin) {
+                            distanciaMin = distancia;
+                            posCercana = posT;
+                        }
+                    }
+
+                    casillaDestino = tablero.getCasilla(posCercana);
+                    if (casillaDestino != null) {
+                        System.out.println("Avanzas al transporte más cercano: " + casillaDestino.getNombre());
+
+                        // Verificar si pasa por la salida
+                        if (posCercana < posActual) {
+                            jugador.sumarFortuna(2000000);
+                            jugador.sumarSalida(2000000);
+                            System.out.println("Has pasado por la casilla de salida. Recibes 2.000.000€.");
+                        }
+
+                        casillaActual.eliminarAvatar(jugador.getAvatar());
+                        jugador.getAvatar().setCasilla(casillaDestino);
+                        jugador.getAvatar().setPosicion(casillaDestino.getPosicion());
+                        casillaDestino.anhadirAvatar(jugador.getAvatar());
+
+                        // Evaluar la casilla (compra o pago doble)
+                        if (casillaDestino.getDuenho() == null) {
+                            System.out.println("La casilla está en venta. Puedes comprarla con: comprar " + casillaDestino.getNombre());
+                        } else if (!casillaDestino.getDuenho().equals(jugador)) {
+                            float alquilerDoble = casillaDestino.getAlquiler() * 2;
+                            System.out.println("Debes pagar el doble del alquiler: " + (long)alquilerDoble + "€");
+
+                            if (jugador.getFortuna() < alquilerDoble) {
+                                System.out.println("No puedes pagar. Te declaras en bancarrota.");
+                                jugador.declararBancarrota(casillaDestino.getDuenho());
+                                tablero.notificarBancarrota(jugador);
+                            } else {
+                                jugador.pagar(alquilerDoble, casillaDestino.getDuenho());
+                                jugador.sumarPagoAlquiler(alquilerDoble);
+                                casillaDestino.getDuenho().sumarCobroAlquiler(alquilerDoble);
+                                casillaDestino.sumarIngresos(alquilerDoble);
+                            }
+                        }
+                    }
+                    break;
             }
+
 
             /// ///////CAJA
         } else if (tipo.equals("caja")) { //
@@ -212,46 +266,42 @@ public class Carta {
                     casillaDestino.evaluarCasilla(jugador);
                     break;
 
-                case 4: // Beneficio de empresa
-                    jugador.sumarFortuna(2000000);
-                    jugador.sumarPremios(2000000);
-                    System.out.println("Tu compañía de Internet obtiene beneficios. Recibes 2.000.000€.");
+                case 4: // Devolución Hacienda
+                    jugador.sumarFortuna(500000);
+                    jugador.sumarPremios(500000);
+                    System.out.println("Devolución de Hacienda. Recibes 500.000€.");
                     break;
 
-                case 5: // Viaje a Solar12
-                    if (jugador.getFortuna() < 1000000) {
-                        System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
-                        jugador.declararBancarrota(null);
-                        tablero.notificarBancarrota(jugador);
-                        return;
+                case 5: // Retroceder a Solar1
+                    casillaDestino = tablero.encontrarCasilla("Sol1");
+                    if (casillaDestino != null) {
+                        System.out.println("Retrocedes hasta Solar1 para comprar antigüedades exóticas.");
+                        casillaActual.eliminarAvatar(jugador.getAvatar());
+                        jugador.getAvatar().setCasilla(casillaDestino);
+                        jugador.getAvatar().setPosicion(casillaDestino.getPosicion());
+                        casillaDestino.anhadirAvatar(jugador.getAvatar());
+                        casillaDestino.evaluarCasilla(jugador);
                     }
-
-                    jugador.restarFortuna(1000000);
-                    jugador.sumarGastos(1000000);
-                    System.out.println("Pagas 1.000.000€ por invitar a tus amigos a Solar12.");
                     break;
 
-                case 6: // Alquiler villa (CORREGIDO)
-                    int totalAlquiler = 0;
-                    for (Jugador c : jugadores) {
-                        if (!c.equals(jugador) && !c.isBancarrota()) {
-                            c.sumarFortuna(200000); // Los otros RECIBEN dinero
-                            c.sumarPremios(200000);
-                            totalAlquiler += 200000;
+                case 6: // Ir a Solar20
+                    casillaDestino = tablero.encontrarCasilla("Sol20");
+                    if (casillaDestino != null) {
+                        System.out.println("Vas a Solar20 para disfrutar del San Fermín.");
+
+                        // Verificar si pasa por la salida
+                        if (casillaDestino.getPosicion() < casillaActual.getPosicion()) {
+                            jugador.sumarFortuna(2000000);
+                            jugador.sumarSalida(2000000);
+                            System.out.println("Has pasado por la casilla de salida. Recibes 2.000.000€.");
                         }
-                    }
-                    if (jugador.getFortuna() < totalAlquiler) {
-                        System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
-                        jugador.declararBancarrota(null);
-                        tablero.notificarBancarrota(jugador);
-                        return;
-                    }
 
-                    jugador.restarFortuna(totalAlquiler);
-                    jugador.sumarGastos(totalAlquiler);
-                    jugador.sumarPagoTasasEImpuestos(totalAlquiler);
-
-                    System.out.println("Pagas " + totalAlquiler + "€ por alquilar la villa a tus compañeros.");
+                        casillaActual.eliminarAvatar(jugador.getAvatar());
+                        jugador.getAvatar().setCasilla(casillaDestino);
+                        jugador.getAvatar().setPosicion(casillaDestino.getPosicion());
+                        casillaDestino.anhadirAvatar(jugador.getAvatar());
+                        casillaDestino.evaluarCasilla(jugador);
+                    }
                     break;
             }
         }

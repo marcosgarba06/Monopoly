@@ -486,7 +486,7 @@ public class Casilla {
     }
     // En un solar se puede construir una única pista de deporte si se ha construido un hotel y una piscina
     public boolean puedeConstruirPista() {
-        return hotel == 1 && piscina == 0 && pista == 0; //devueleve true si hay hotel, piscina y no pista
+        return hotel == 1 && piscina == 1 && pista == 0; //devueleve true si hay hotel, piscina y no pista
     }
 
     public void construirPista(Jugador jugador) {
@@ -646,8 +646,7 @@ public class Casilla {
             if (cantidadSolicitada > aVender) {
                 System.out.println("Solo se puede vender 1 hotel aquí. Ingresas " + total + "€.");
             } else {
-                System.out.println(jugador.getNombre() + " ha vendido 1 hotel en " + this.nombre + ", recibiendo " + total + "€."
-                        + " Tras la venta, la propiedad pasa a tener 4 casas.");
+                System.out.println(jugador.getNombre() + " ha vendido 1 hotel en " + this.nombre + ", recibiendo " + total + "€.");
             }
             return;
         }

@@ -54,6 +54,7 @@ public class Avatar {
             jugador.sumarFortuna(2000000);
             jugador.sumarSalida(2000000);
             System.out.println("Has pasado por la casilla de salida. Recibes 2.000.000€.");
+            jugador.incrementarVueltas();
         }
 
         this.posicion = nuevaPos;

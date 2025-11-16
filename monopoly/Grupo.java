@@ -73,9 +73,11 @@ public class Grupo {
     }
 
 
+
     public ArrayList<Casilla> getMiembros() {
         return miembros;
     }
+
 
 
     public String getNombre() {

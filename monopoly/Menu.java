@@ -1503,7 +1503,7 @@ public class Menu { // la clase menu
         }
 
         if (!noPuedeConstruir.isEmpty()) {
-            System.out.println("Ya no se pueden construir " + String.join(" ni ", noPuedeConstruir) + ".");
+            System.out.println("No se pueden construir " + String.join(" ni ", noPuedeConstruir) + ".");
         }
     }
 
