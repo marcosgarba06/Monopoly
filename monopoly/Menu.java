@@ -150,6 +150,22 @@ public class Menu { // la clase menu
             return;
         }
 
+        Jugador actual = jugadores.get(turno);
+        if (actual.getDeudaPendiente() > 0) {
+            String cmd = comando.trim().toLowerCase();
+
+            // Solo permitir hipotecar y declarar bancarrota
+            if (!cmd.startsWith("hipotecar") && !cmd.equals("declarar bancarrota")) {
+                System.out.println("\n❌ TURNO BLOQUEADO - DEUDA PENDIENTE");
+                System.out.println("Debes pagar: " + (long)actual.getDeudaPendiente() + "€");
+                System.out.println("Tu fortuna: " + (long)actual.getFortuna() + "€");
+                System.out.println("Faltante: " + (long)(actual.getDeudaPendiente() - actual.getFortuna()) + "€");
+                System.out.println("\nComandos permitidos:");
+                System.out.println("  - hipotecar <casilla>");
+                System.out.println("  - declarar bancarrota");
+                return;
+            }
+        }
         String comandoLimpio = comando.trim(); //quita espacio del principio y del final
         String comandoMinusculas = comandoLimpio.toLowerCase(Locale.ROOT);// pone todo en minusculas
 
@@ -306,6 +322,18 @@ public class Menu { // la clase menu
                 return true;
             case "listar edificios":
                 listarEdificaciones();
+                return true;
+
+            case "declarar bancarrota":
+
+                Jugador jugadorActuaal = jugadores.get(turno);
+                if (jugadorActuaal.getDeudaPendiente() > 0) {
+                    jugadorActuaal.declararBancarrota(jugadorActuaal.getAcreedorDeuda());
+                    tablero.notificarBancarrota(jugadorActuaal);
+                } else {
+                    System.out.println("No tienes deudas pendientes.");
+                    System.out.println("No puedes declararte en bancarrota voluntariamente.");
+                }
                 return true;
 
             case "acabar turno":
@@ -959,6 +987,17 @@ public class Menu { // la clase menu
             return;
         }
 
+        Jugador actual = jugadores.get(turno);
+        if (actual.getDeudaPendiente() > 0) {
+            System.out.println("❌ No puedes acabar el turno con una deuda pendiente.");
+            System.out.println("Deuda: " + (long)actual.getDeudaPendiente() + "€");
+            System.out.println("Tu fortuna: " + (long)actual.getFortuna() + "€");
+            System.out.println("\nOPCIONES:");
+            System.out.println("1. Hipotecar más propiedades");
+            System.out.println("2. Declarar bancarrota");
+            return;
+        }
+
         if (!tirado) {
             System.out.println("No puedes acabar el turno sin haber tirado los dados o intentado salir de la cárcel.");
             return;
@@ -1005,12 +1044,12 @@ public class Menu { // la clase menu
         contadorDobles = 0;
         intentoSalirCarcel = false;
 
-        Jugador actual = jugadores.get(turno);
+        Jugador actualTurno = jugadores.get(turno);
         System.out.println("Turno acabado. Ahora le toca a:");
         System.out.println("$> jugador");
         System.out.println("{");
-        System.out.println("nombre: " + actual.getNombre() + ",");
-        System.out.println("avatar: " + actual.getAvatar().getId());
+        System.out.println("nombre: " + actualTurno.getNombre() + ",");
+        System.out.println("avatar: " + actualTurno.getAvatar().getId());
         System.out.println("}");
 
         if (actual.isEnCarcel() || actual.getAvatar().estaEnCarcel()) {
@@ -1553,7 +1592,15 @@ public class Menu { // la clase menu
                 "€ por la hipoteca de " + nombreCasilla +
                 ". No puede recibir alquileres ni edificar en el grupo " +
                 nombreGrupo + ".");
-    }
+
+        if (jugador.getDeudaPendiente() > 0) {
+            // Obtener la casilla actual del jugador para llamar a su método
+            Casilla casillaActual = jugador.getAvatar().getCasilla();
+            if (casillaActual != null) {
+                casillaActual.procesarPagoDeuda(jugador, tablero);
+            }
+        }
+}
 
     public void deshipotecarPropiedad(String nombreCasilla) {
 
@@ -1786,4 +1833,6 @@ public class Menu { // la clase menu
 
         System.out.println("}");
     }
+
+
 }

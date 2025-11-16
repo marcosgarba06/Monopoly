@@ -153,15 +153,53 @@ public class Casilla {
                         System.out.println("El alquiler total es de " + (long)alquiler + "€.");
 
                         if (jugador.getFortuna() < alquiler) {
-                            System.out.println("No puedes pagar el alquiler. Te declaras en bancarrota.");
-                            jugador.declararBancarrota(this.getDuenho());
+                            float faltante = alquiler - jugador.getFortuna();
 
-                            if (tablero != null) {
-                                tablero.notificarBancarrota(jugador);
+                            System.out.println("\n⚠️  ¡No tienes suficiente dinero para pagar!");
+                            System.out.println("Alquiler a pagar: " + (long)alquiler + "€");
+                            System.out.println("Tu fortuna: " + (long)jugador.getFortuna() + "€");
+                            System.out.println("Te faltan: " + (long)faltante + "€");
+
+                            // Calcular si puede reunir el dinero hipotecando
+                            float valorHipotecable = calcularValorHipotecable(jugador);
+
+                            if (valorHipotecable >= faltante) {
+                                System.out.println("\n💡 OPCIONES:");
+                                System.out.println("1. Hipoteca propiedades para reunir el dinero");
+                                System.out.println("   Valor hipotecable disponible: " + (long)valorHipotecable + "€");
+                                System.out.println("   Usa el comando: hipotecar <casilla>");
+                                System.out.println("2. Declara bancarrota");
+                                System.out.println("   Usa el comando: declarar bancarrota");
+
+                                // Listar propiedades hipotecables
+                                System.out.println("\nPropiedades que puedes hipotecar:");
+                                for (Casilla c : jugador.getPropiedades()) {
+                                    if (puedeHipotecar(c)) {
+                                        System.out.println("  - " + c.getNombre() +
+                                                " (recibes " + (long)c.getHipoteca() + "€)");
+                                    }
+                                }
+
+                                // NO declarar bancarrota todavía, esperar comando del jugador
+                                // Marcar que tiene una deuda pendiente
+                                jugador.setDeudaPendiente(alquiler);
+                                jugador.setAcreedorDeuda(this.getDuenho());
+
+                            } else {
+                                // No puede reunir el dinero ni hipotecando todo
+                                System.out.println("\n❌ No puedes reunir el dinero necesario.");
+                                System.out.println("Valor total hipotecable: " + (long)valorHipotecable + "€");
+                                System.out.println("Debes declararte en BANCARROTA.");
+
+                                jugador.declararBancarrota(this.getDuenho());
+                                if (tablero != null) {
+                                    tablero.notificarBancarrota(jugador);
+                                }
                             }
                         } else {
+                            // Tiene dinero suficiente, pagar automáticamente
                             jugador.pagar(alquiler, this.getDuenho());
-                            this.sumarIngresos(alquiler);/////////estadisticas juego
+                            this.sumarIngresos(alquiler);
                             System.out.println("Has pagado " + (long)alquiler + "€ a " +
                                     this.getDuenho().getNombre());
                             jugador.sumarPagoAlquiler(alquiler);
@@ -193,10 +231,15 @@ public class Casilla {
                         }
                         System.out.println("Debes pagar " + (long)alquilerTotal +
                                 "€ por el uso del transporte.");
-                        jugador.pagar(alquilerTotal, this.getDuenho());
-                        this.sumarIngresos(alquilerTotal); /////////estadisticas juego
-                        jugador.sumarPagoAlquiler(alquilerTotal);
-                        this.getDuenho().sumarCobroAlquiler(alquilerTotal);
+                        if (jugador.getFortuna() < alquilerTotal) {
+                            manejarDeuda(jugador, alquilerTotal, this.getDuenho(),
+                                    "Alquiler de transporte " + this.nombre);
+                        } else {
+                            jugador.pagar(alquilerTotal, this.getDuenho());
+                            this.sumarIngresos(alquilerTotal);
+                            jugador.sumarPagoAlquiler(alquilerTotal);
+                            this.getDuenho().sumarCobroAlquiler(alquilerTotal);
+                        }
                     }
                 } else {
                     System.out.println("Has caído en tu propio transporte.");
@@ -218,10 +261,15 @@ public class Casilla {
                         int tirada = tablero.getUltimaTirada();
                         float alquiler = this.evaluarAlquiler(tirada);
                         System.out.println("Debes pagar " + (long)alquiler + "€ por el servicio.");
-                        jugador.pagar(alquiler, this.getDuenho());
-                        jugador.sumarPagoAlquiler(alquiler);
-                        this.getDuenho().sumarCobroAlquiler(alquiler);
-                        this.sumarIngresos(alquiler);/////////estadisticas juego
+                        if (jugador.getFortuna() < alquiler) {
+                            manejarDeuda(jugador, alquiler, this.getDuenho(),
+                                    "Alquiler de servicio " + this.nombre);
+                        } else {
+                            jugador.pagar(alquiler, this.getDuenho());
+                            jugador.sumarPagoAlquiler(alquiler);
+                            this.getDuenho().sumarCobroAlquiler(alquiler);
+                            this.sumarIngresos(alquiler);
+                        }
                     }
                 } else {
                     System.out.println("Has caído en tu propio servicio.");
@@ -232,26 +280,18 @@ public class Casilla {
             case "impuesto":
                 System.out.println("Debes pagar un impuesto de " + (long)this.impuesto + "€.");
 
-
                 if (jugador.getFortuna() < impuesto) {
-                    System.out.println("No puedes pagar el alquiler. Te declaras en bancarrota.");
-                    jugador.declararBancarrota(this.getDuenho());
-
-                    // Notificar al sistema que ocurrió una bancarrota
-                    if (tablero != null) {
-                        tablero.notificarBancarrota(jugador);
-                    }
-
-                    return;
+                    manejarDeuda(jugador, impuesto, null, "Impuesto de " + this.nombre);
+                } else {
+                    jugador.restarFortuna(this.impuesto);
+                    jugador.sumarGastos(this.impuesto);
+                    jugador.sumarPagoTasasEImpuestos(impuesto);
+                    tablero.añadirAlParking(this.impuesto);
+                    System.out.println("El dinero se ha depositado en el parking. Total acumulado: " +
+                            (long)tablero.getFondoParking() + "€.");
                 }
-
-
-                jugador.restarFortuna(this.impuesto);
-                jugador.sumarGastos(this.impuesto);
-                jugador.sumarPagoTasasEImpuestos(impuesto);
-                tablero.añadirAlParking(this.impuesto);
-                System.out.println("El dinero se ha depositado en el parking. Total acumulado: " + (long)tablero.getFondoParking() + "€.");
                 break;
+
 
             case "suerte":
                 System.out.println("Has caído en Suerte. Robas una carta...");
@@ -659,5 +699,141 @@ public class Casilla {
     public void incrementarVisita(){vecesVisitada++; }
     public void sumarIngresos(float cantidad){ingresosGenerados += cantidad; } //para calcular la casilla mas rentable, sumamos cada vcez que pagan un alquiler
 
+    ///   /////////////BANCARROTA
+    ///
+    public float calcularValorHipotecable(Jugador jugador) { //calcula el valor de la hipoteca total de un jugador
+
+        float total = 0;
+        for (Casilla c : jugador.getPropiedades()) {
+            if (puedeHipotecar(c)) {
+                total += c.getHipoteca();
+            }
+        }
+        return total;
+    }
+
+    /**
+     * Verifica si una casilla puede ser hipotecada
+     */
+    public boolean puedeHipotecar(Casilla c) {
+        if (c.estaHipotecada() || !c.esHipotecable()) {
+            return false;
+        }
+
+        // Solares solo si no tienen edificios
+        if ("solar".equalsIgnoreCase(c.getTipo())) {
+            return !c.tieneEdificios();
+        }
+
+        // Transportes y servicios NO se hipotecan según PDF Parte 1
+        return false;
+    }
+
+    public void procesarPagoDeuda(Jugador jugador, Tablero tablero) {
+        float deuda = jugador.getDeudaPendiente();
+
+        if (jugador.getFortuna() >= deuda) {
+            System.out.println("\n¡Ahora tienes suficiente dinero para pagar tu deuda!");
+            System.out.println("Deuda pendiente: " + (long)deuda + "€");
+            System.out.println("Tu fortuna: " + (long)jugador.getFortuna() + "€");
+
+            // Pagar automáticamente
+            Jugador acreedor = jugador.getAcreedorDeuda();
+
+            if (acreedor != null) {
+                // Deuda con otro jugador (alquiler)
+                jugador.pagar(deuda, acreedor);
+                System.out.println("Has pagado " + (long)deuda + "€ a " + acreedor.getNombre());
+                jugador.sumarPagoAlquiler(deuda);
+                acreedor.sumarCobroAlquiler(deuda);
+
+                // Registrar ingresos en la casilla que generó el alquiler
+                Casilla casillaActual = jugador.getAvatar().getCasilla();
+                if (casillaActual != null && casillaActual.getDuenho() == acreedor) {
+                    casillaActual.sumarIngresos(deuda);
+                }
+
+            } else {
+                // Deuda con la banca (impuestos, tasas, etc.)
+                jugador.restarFortuna(deuda);
+                jugador.sumarGastos(deuda);
+                jugador.sumarPagoTasasEImpuestos(deuda);
+                tablero.añadirAlParking(deuda);
+                System.out.println("Has pagado " + (long)deuda + "€");
+                System.out.println("El dinero ha sido depositado en el parking.");
+            }
+
+            // Limpiar deuda
+            jugador.setDeudaPendiente(0);
+            jugador.setAcreedorDeuda(null);
+
+            System.out.println("\n✓ La deuda ha sido saldada.");
+            System.out.println("Puedes continuar con tu turno.");
+            System.out.println("Usa 'acabar turno' cuando hayas terminado.");
+
+        } else {
+            // Todavía no tiene suficiente dinero
+            float faltante = deuda - jugador.getFortuna();
+            System.out.println("\nAún te faltan " + (long)faltante + "€ para pagar la deuda.");
+            System.out.println("Tu fortuna actual: " + (long)jugador.getFortuna() + "€");
+            System.out.println("Deuda total: " + (long)deuda + "€");
+
+            // Calcular cuánto más puede hipotecar
+            float valorHipotecableRestante = calcularValorHipotecable(jugador);
+
+            if (valorHipotecableRestante >= faltante) {
+                System.out.println("\nPuedes seguir hipotecando propiedades.");
+                System.out.println("Valor hipotecable restante: " + (long)valorHipotecableRestante + "€");
+                System.out.println("\nPropiedades disponibles para hipotecar:");
+                for (Casilla c : jugador.getPropiedades()) {
+                    if (puedeHipotecar(c)) {
+                        System.out.println("  - " + c.getNombre() +
+                                " (recibes " + (long)c.getHipoteca() + "€)");
+                    }
+                }
+            } else {
+                System.out.println("\n⚠ No puedes reunir el dinero suficiente.");
+                System.out.println("Valor hipotecable total restante: " + (long)valorHipotecableRestante + "€");
+                System.out.println("Debes declararte en BANCARROTA.");
+                System.out.println("Usa el comando: declarar bancarrota");
+            }
+        }
+    }
+    /**
+     * Maneja una deuda: informa al jugador y marca la deuda pendiente
+     */
+    public void manejarDeuda(Jugador jugador, float cantidad, Jugador acreedor, String motivo) {
+
+        float faltante = cantidad - jugador.getFortuna();
+
+        System.out.println("\n¡No tienes suficiente dinero para pagar!");
+        System.out.println("Cantidad a pagar: " + (long)cantidad + "€");
+        System.out.println("Tu fortuna: " + (long)jugador.getFortuna() + "€");
+        System.out.println("Te faltan: " + (long)faltante + "€");
+
+        float valorHipotecable = calcularValorHipotecable(jugador);
+
+        if (valorHipotecable >= faltante) { //si puede reunir el dinero para pagarlo, puede hipotecar casas o declaase en bancarpota
+            System.out.println("\nPuedes hipotecar propiedades para reunir el dinero.");
+            System.out.println("Valor hipotecable disponible: " + (long)valorHipotecable + "€");
+            System.out.println("\nOPCIONES:");
+            System.out.println("1. Hipotecar propiedades: hipotecar <casilla>");
+            System.out.println("2. Declarar bancarrota: declarar bancarrota");
+
+            // Marcar deuda pendiente
+            jugador.setDeudaPendiente(cantidad);
+            jugador.setAcreedorDeuda(acreedor);
+
+        } else {
+            System.out.println("\nNo puedes reunir el dinero necesario."); // si no lo puede reunir
+            System.out.println("Valor total hipotecable: " + (long)valorHipotecable + "€");
+            System.out.println("Te declaras en BANCARROTA.");
+
+            jugador.declararBancarrota(acreedor);
+            if (tablero != null) {
+                tablero.notificarBancarrota(jugador);
+            }
+        }
+    }
 }
 

@@ -45,9 +45,9 @@ public class Carta {
         mazoCaja.add(new Carta("Paga 500.000€ por un fin de semana en un balneario de 5 estrellas", "caja", 1));
         mazoCaja.add(new Carta("Te investigan por fraude de identidad. Ve a la Cárcel. Ve directamente sin pasar por la casilla de Salida y sin cobrar los 2.000.000€", "caja", 2));
         mazoCaja.add(new Carta("Colócate en la casilla de Salida. Cobra 2.000.000€", "caja", 3));
-        mazoCaja.add(new Carta("Tu compañía de Internet obtiene beneficios. Recibe 2.000.000€", "caja", 4));
-        mazoCaja.add(new Carta("Paga 1.000.000€ por invitar a todos tus amigos a un viaje a Solar12", "caja", 5));
-        mazoCaja.add(new Carta("Alquilas a tus compañeros una villa en Solar7 durante una semana. Paga 200.000€ a cada jugador", "caja", 6));
+        mazoCaja.add(new Carta("Devolución de Hacienda. Cobra 500.000€", "caja", 4));
+        mazoCaja.add(new Carta("Retrocede hasta Solar1 para comprar antigüedades exóticas.", "caja", 5));
+        mazoCaja.add(new Carta("Ve a Solar20 para disfrutar del San Fermín. Si pasas por la casilla de Salida, cobra 2.000.000€.", "caja", 6));
 
     }
 
@@ -139,11 +139,6 @@ public class Carta {
                     jugador.sumarGastos(totalAPagar);
                     jugador.sumarPagoTasasEImpuestos(totalAPagar);
 
-                    for (Jugador c : jugadores) {
-                        if (!c.equals(jugador) && !c.isBancarrota()) {
-                            c.sumarFortuna(250000);
-                        }
-                    }
 
                     System.out.println("Pagas " + totalAPagar + "€ como presidente de la junta.");
                     break;

@@ -32,6 +32,15 @@ public class Jugador {
     private float pasarPorCasillaDeSalida = 0;
     private float premiosInversionesOBote = 0;
 
+    private float deudaPendiente = 0;
+    private Jugador acreedorDeuda = null;
+
+    public float getDeudaPendiente() { return deudaPendiente; }
+    public void setDeudaPendiente(float deuda) { this.deudaPendiente = deuda; }
+    public Jugador getAcreedorDeuda() { return acreedorDeuda; }
+    public void setAcreedorDeuda(Jugador acreedor) { this.acreedorDeuda = acreedor; }
+
+
 
 
     //Constructor vacío. Se usará para crear la banca.
@@ -162,20 +171,49 @@ public class Jugador {
         propiedades.add(c);
     }
 
+    // En Jugador.java
     public void declararBancarrota(Jugador acreedor) {
-        System.out.println(this.nombre + " se ha declarado en bancarrota.");
+        System.out.println("\n" + this.nombre + " se ha declarado en BANCARROTA.");
 
-        // Transferir propiedades
-        for (Casilla propiedad : propiedades) {
-            propiedad.setDuenho(acreedor);
-            acreedor.anhadirPropiedad(propiedad);
+        if (acreedor != null) {
+            // Deuda con otro jugador
+            System.out.println("Todas las propiedades pasan a " + acreedor.getNombre());
+
+            for (Casilla propiedad : new ArrayList<>(propiedades)) {
+                if (propiedad.estaHipotecada()) {
+                    propiedad.deshipotecar();
+                }
+                propiedad.setDuenho(acreedor);
+                acreedor.anhadirPropiedad(propiedad);
+            }
+
+            // Transferir edificaciones
+            for (Edificacion edif : new ArrayList<>(edificaciones)) {
+                acreedor.agregarEdificacion(edif);
+            }
+
+        } else {
+            // Deuda con la banca (impuestos, multas, etc.)
+            System.out.println("Las propiedades vuelven a la banca (quedan en venta).");
+
+            for (Casilla propiedad : new ArrayList<>(propiedades)) {
+                if (propiedad.estaHipotecada()) {
+                    propiedad.deshipotecar();
+                }
+                // Las edificaciones se pierden
+                propiedad.setDuenho(null);  // Vuelve a estar en venta
+            }
+
+            // Las edificaciones se destruyen (no se transfieren)
         }
 
         propiedades.clear();
+        edificaciones.clear();
         fortuna = 0;
         activo = false;
-
-        // si usas un flag para saber si sigue en juego
+        bancarrota = true;
+        deudaPendiente = 0;
+        acreedorDeuda = null;
     }
 
     public boolean estaActivo() {
