@@ -741,7 +741,7 @@ public class Menu { // la clase menu
     }
 
 
-     private void salirCarcel(Jugador jugador) {
+    private void salirCarcel(Jugador jugador) {
         // Verificar que está en cárcel
         if (!jugador.isEnCarcel() && !jugador.getAvatar().estaEnCarcel()) {
             System.out.println("No estás en la cárcel.");
@@ -1644,7 +1644,7 @@ public class Menu { // la clase menu
                 nombreGrupo + ".");
     }
 
-    private void venderPropiedad(String tipo, String nombreCasilla, int cantidad) {
+    public void venderPropiedad(String tipo, String nombreCasilla, int cantidad) {
 
         Jugador jugadorActual = jugadores.get(turno); //el jugador actual
         Casilla c = tablero.encontrarCasilla(nombreCasilla); //cogemos la casilla que nos introdujo el jugador por linea de comandos
@@ -1688,7 +1688,7 @@ public class Menu { // la clase menu
     }
 
     // Método auxiliar para eliminar edificaciones
-    private void eliminarEdificaciones(Casilla casilla, String tipo, int cantidad, Jugador jugador) {
+    public void eliminarEdificaciones(Casilla casilla, String tipo, int cantidad, Jugador jugador) {
 
         List<Edificacion> aEliminar = new ArrayList<>();
         int eliminadas = 0;

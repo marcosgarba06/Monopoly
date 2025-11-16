@@ -123,8 +123,19 @@ public class Casilla {
 
             case "servicio":
                 int k = (tirada > 0) ? tirada : 1;
-                return 4 * k * 50000f;
+                if (this.duenho == null) return 0f;
 
+                int cantidadServicios = 0;
+                for(Casilla c : this.duenho.getPropiedades()){
+                    if("servicio".equalsIgnoreCase(c.getTipo()) && !c.estaHipotecada()){
+                        cantidadServicios++;
+                    }
+                }
+                if (cantidadServicios == 1) return 4 * k * 50000f;
+                if (cantidadServicios >= 2){
+                    return 10 * k * 50000f;
+                }
+                return 0f;
             default:
                 return 0f;
         }
@@ -150,12 +161,18 @@ public class Casilla {
                                 ". Debes pagar alquiler.");
 
                         float alquiler = this.evaluarAlquiler(tablero.getUltimaTirada());
+
+                        if(!this.tieneEdificios() && jugador.poseeGrupoCompleto(this, tablero)){
+                            alquiler *= 2;
+                            System.out.println("El dueño posee todo el grupo, ¡así que alquiler doble!");
+                        }
+
                         System.out.println("El alquiler total es de " + (long)alquiler + "€.");
 
                         if (jugador.getFortuna() < alquiler) {
                             float faltante = alquiler - jugador.getFortuna();
 
-                            System.out.println("\n⚠️  ¡No tienes suficiente dinero para pagar!");
+                            System.out.println("\n⚠¡No tienes suficiente dinero para pagar!");
                             System.out.println("Alquiler a pagar: " + (long)alquiler + "€");
                             System.out.println("Tu fortuna: " + (long)jugador.getFortuna() + "€");
                             System.out.println("Te faltan: " + (long)faltante + "€");
@@ -164,7 +181,7 @@ public class Casilla {
                             float valorHipotecable = calcularValorHipotecable(jugador);
 
                             if (valorHipotecable >= faltante) {
-                                System.out.println("\n💡 OPCIONES:");
+                                System.out.println("\nOPCIONES:");
                                 System.out.println("1. Hipoteca propiedades para reunir el dinero");
                                 System.out.println("   Valor hipotecable disponible: " + (long)valorHipotecable + "€");
                                 System.out.println("   Usa el comando: hipotecar <casilla>");
@@ -187,7 +204,7 @@ public class Casilla {
 
                             } else {
                                 // No puede reunir el dinero ni hipotecando todo
-                                System.out.println("\n❌ No puedes reunir el dinero necesario.");
+                                System.out.println("\nNo puedes reunir el dinero necesario.");
                                 System.out.println("Valor total hipotecable: " + (long)valorHipotecable + "€");
                                 System.out.println("Debes declararte en BANCARROTA.");
 
@@ -382,6 +399,20 @@ public class Casilla {
 
         switch (t) {
             case "solar":
+                if (grupo != null) sb.append("  grupo: ").append(grupo.getNombre()).append(",\n");
+                sb.append("  propietario: ").append(duenho != null ? duenho.getNombre() : "Sin propietario").append(",\n");
+                sb.append("  valor: ").append((long) valor).append(",\n");
+                sb.append("  alquiler: ").append((long) alquilerBase).append(",\n");
+                sb.append("  valor hotel: ").append((long) precioHotel).append(",\n");
+                sb.append("  valor casa: ").append((long) precioCasa).append(",\n");
+                sb.append("  valor piscina: ").append((long) precioPiscina).append(",\n");
+                sb.append("  valor pista de deporte: ").append((long) precioPista).append(",\n");
+                sb.append("  alquiler casa: ").append((long) alquilerCasa).append(",\n");
+                sb.append("  alquiler hotel: ").append((long) alquilerHotel).append(",\n");
+                sb.append("  alquiler piscina: ").append((long) alquilerPiscina).append(",\n");
+                sb.append("  alquiler pista de deporte: ").append((long) alquilerPista).append("\n");
+                break;
+                
             case "servicio":
             case "transporte":
                 if (grupo != null) sb.append("  grupo: ").append(grupo.getNombre()).append(",\n");
@@ -725,12 +756,11 @@ public class Casilla {
             return !c.tieneEdificios();
         }
 
-        // Transportes y servicios NO se hipotecar
+        // Transportes y servicios NO se hipotecan según PDF Parte 1
         return false;
     }
 
     public void procesarPagoDeuda(Jugador jugador, Tablero tablero) {
-
         float deuda = jugador.getDeudaPendiente();
 
         if (jugador.getFortuna() >= deuda) {
@@ -738,6 +768,7 @@ public class Casilla {
             System.out.println("Deuda pendiente: " + (long)deuda + "€");
             System.out.println("Tu fortuna: " + (long)jugador.getFortuna() + "€");
 
+            // Pagar automáticamente
             Jugador acreedor = jugador.getAcreedorDeuda();
 
             if (acreedor != null) {
@@ -792,7 +823,7 @@ public class Casilla {
                     }
                 }
             } else {
-                System.out.println("\nNo puedes reunir el dinero suficiente.");
+                System.out.println("\n⚠ No puedes reunir el dinero suficiente.");
                 System.out.println("Valor hipotecable total restante: " + (long)valorHipotecableRestante + "€");
                 System.out.println("Debes declararte en BANCARROTA.");
                 System.out.println("Usa el comando: declarar bancarrota");

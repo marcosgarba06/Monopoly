@@ -23,7 +23,7 @@ public class Grupo {
     }
 
     /*Constructor para cuando el grupo está formado por DOS CASILLAS:
-    * Requiere como parámetros las dos casillas miembro y el color del grupo.
+     * Requiere como parámetros las dos casillas miembro y el color del grupo.
      */
     public Grupo(Casilla cas1, Casilla cas2, String colorGrupo) {
         this.miembros = new ArrayList<>();
@@ -34,7 +34,7 @@ public class Grupo {
     }
 
     /*Constructor para cuando el grupo está formado por TRES CASILLAS:
-    * Requiere como parámetros las tres casillas miembro y el color del grupo.
+     * Requiere como parámetros las tres casillas miembro y el color del grupo.
      */
     public Grupo(Casilla cas1, Casilla cas2, Casilla cas3, String colorGrupo) {
         this.miembros = new ArrayList<>();
@@ -46,7 +46,7 @@ public class Grupo {
     }
 
     /* Método que añade una casilla al array de casillas miembro de un grupo.
-    * Parámetro: casilla que se quiere añadir.
+     * Parámetro: casilla que se quiere añadir.
      */
     public void anhadirCasilla(Casilla miembro) {
         if (miembros.size() <= 4) {
@@ -58,18 +58,18 @@ public class Grupo {
     }
 
     /*Método que comprueba si el jugador pasado tiene en su haber todas las casillas del grupo:
-    * Parámetro: jugador que se quiere evaluar.
-    * Valor devuelto: true si es dueño de todas las casillas del grupo, false en otro caso.
+     * Parámetro: jugador que se quiere evaluar.
+     * Valor devuelto: true si es dueño de todas las casillas del grupo, false en otro caso.
      */
 
     //TERMINAR CUANDO ESTE HECHO SI UN JUGADOR ES DUEÑO DE UNA CASILLA
-   public boolean esDuenhoGrupo(Jugador jugador) {
-       for (Casilla casilla : miembros) {
-           if (casilla.getDuenho() == null || !casilla.getDuenho().equals(jugador)) {
-               return false;
-           }
-       }
-       return true;
+    public boolean esDuenhoGrupo(Jugador jugador) {
+        for (Casilla casilla : miembros) {
+            if (casilla.getDuenho() == null || !casilla.getDuenho().equals(jugador)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
@@ -93,9 +93,9 @@ public class Grupo {
             if (c.getDuenho() != jugador) return false;
         }
         return true;
-   }
-   public String toString() {
+    }
+    public String toString() {
         return colorGrupo;
-   }
+    }
 
 }
