@@ -27,4 +27,7 @@ public class Edificacion {
     public String getTipo() { return tipo; }
     public float getCoste() { return coste; }
 
+
+
+
 }

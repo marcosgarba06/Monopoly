@@ -412,7 +412,7 @@ public class Casilla {
                 sb.append("  alquiler piscina: ").append((long) alquilerPiscina).append(",\n");
                 sb.append("  alquiler pista de deporte: ").append((long) alquilerPista).append("\n");
                 break;
-                
+
             case "servicio":
             case "transporte":
                 if (grupo != null) sb.append("  grupo: ").append(grupo.getNombre()).append(",\n");

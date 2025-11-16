@@ -156,7 +156,7 @@ public class Menu { // la clase menu
 
             // Solo permitir hipotecar y declarar bancarrota
             if (!cmd.startsWith("hipotecar") && !cmd.equals("declarar bancarrota")) {
-                System.out.println("\nTienen una deuda pendiente:");
+                System.out.println("\nTienes una deuda pendiente:");
                 System.out.println("Debes pagar: " + (long)actual.getDeudaPendiente() + "€");
                 System.out.println("Tu fortuna: " + (long)actual.getFortuna() + "€");
                 System.out.println("Faltante: " + (long)(actual.getDeudaPendiente() - actual.getFortuna()) + "€");
@@ -767,7 +767,8 @@ public class Menu { // la clase menu
 
             if (jugador.getFortuna() < 500000) {
                 System.out.println("No tienes dinero suficiente. BANCARROTA.");
-                jugador.setBancarrota(true);
+                jugador.declararBancarrota(null);
+                tablero.notificarBancarrota(jugador);
                 tirado = true;
                 intentoSalirCarcel = true;
                 return;
