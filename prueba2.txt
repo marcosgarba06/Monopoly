@@ -1,0 +1,65 @@
+crear jugador Pedro pelota
+crear jugador Maria coche
+empezar
+lanzar dados 6+6
+edificar casa
+lanzar dados 6+6
+lanzar dados 5+6
+acabar turno
+lanzar dados 3+3
+comprar Sol3
+edificar piscina
+lanzar dados 1+1
+comprar Sol4
+edificar casa
+lanzar dados 5+6
+acabar turno
+jugador
+lanzar dados 6+6
+comprar Sol19
+lanzar dados 4+4
+edificar casa
+lanzar dados 5+3
+acabar turno
+lanzar dados 6+6
+comprar Sol19
+lanzar dados 6+6
+lanzar dados 4+2
+comprar Sol5
+edificar casa
+edificar casa
+edificar casa
+edificar casa
+acabar turno
+lanzar dados 6+6
+lanzar dados 6+6
+lanzar dados 5+6
+acabar turno
+lanzar dados 4+4
+lanzar dados 2+1
+acabar turno
+lanzar dados 3+3
+lanzar dados 3+5
+acabar turno
+lanzar dados 6+6
+lanzar dados 6+6
+lanzar dados 3+2
+edificar hotel
+acabar turno
+salir carcel
+lanzar dados 5+5
+lanzar dados 4+5
+acabar turno
+lanzar dados 1+4
+acabar turno
+lanzar dados 1+1
+comprar Sol18
+lanzar dados 1+2
+comprar Sol20
+edificar casa
+edificar casa
+edificar casa
+acabar turno
+lanzar dados 5+3
+acabar turno
+

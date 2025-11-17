@@ -801,7 +801,7 @@ public class Menu { // la clase menu
         Scanner sc = new Scanner(System.in);
         while (true) {
             System.out.println("\nOpciones:");
-            System.out.println("1) Pagar 500.000€ (sales, pero NO te mueves este turno)");
+            System.out.println("1) Pagar 500.000€ (sales, y te puedes mover en este turno)");
             System.out.println("2) Usar carta de 'Salir de la cárcel' (sales, pero NO te mueves)");
             System.out.println("3) Intentar sacar dobles (si sacas dobles: sales y mueves)");
             System.out.print("Elige opción: ");
@@ -822,9 +822,9 @@ public class Menu { // la clase menu
                 jugador.setEnCarcel(false);
                 av.setTurnosEnCarcel(0);
                 System.out.println("Has pagado 500.000€ y sales de la cárcel.");
-                System.out.println("No te mueves este turno. Usa 'acabar turno'.");
+                System.out.println("Tira los dados.");
 
-                tirado = true; // Bloquea tirar dados
+                tirado = false; // así puede tirar los dados
                 intentoSalirCarcel = true;
                 break;
             }
