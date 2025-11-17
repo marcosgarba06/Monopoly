@@ -926,6 +926,7 @@ public class Menu { // la clase menu
 
 
     // Método que realiza las acciones asociadas al comando 'listar jugadores'.
+    // Método que realiza las acciones asociadas al comando 'listar jugadores'.
     public void listarJugadores() {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
@@ -939,24 +940,44 @@ public class Menu { // la clase menu
 
             System.out.println("{");
             System.out.println("nombre: " + j.getNombre() + ",");
-            // toString del Avatar debe ser informativo; en caso contrario, imprimir id y tipo por separado
             System.out.println("avatar: " + (j.getAvatar() != null ? j.getAvatar().toString() : "-") + ",");
             System.out.println("fortuna: " + (long) j.getFortuna() + ",");
 
+            // PROPIEDADES
             if (j.getPropiedades().isEmpty()) {
                 System.out.println("propiedades: -,");
             } else {
-                String props = j.getPropiedades().stream().map(Casilla::getNombre).collect(Collectors.joining(", "));
+                String props = j.getPropiedades().stream()
+                        .map(Casilla::getNombre)
+                        .collect(Collectors.joining(", "));
                 System.out.println("propiedades: [" + props + "],");
             }
 
-            // Por ahora, imprime guiones para hipotecas y edificios
-            System.out.println("hipotecas: -,");
-            System.out.println("edificios: -");
+            // HIPOTECAS - mostrar solo las propiedades hipotecadas
+            List<String> hipotecas = j.getPropiedades().stream()
+                    .filter(Casilla::estaHipotecada)
+                    .map(Casilla::getNombre)
+                    .collect(Collectors.toList());
+
+            if (hipotecas.isEmpty()) {
+                System.out.println("hipotecas: -,");
+            } else {
+                System.out.println("hipotecas: " + hipotecas + ",");
+            }
+
+            // EDIFICIOS - mostrar IDs de todas las edificaciones del jugador
+            if (j.getEdificaciones().isEmpty()) {
+                System.out.println("edificios: -");
+            } else {
+                List<String> idsEdificios = j.getEdificaciones().stream()
+                        .map(Edificacion::getId)
+                        .collect(Collectors.toList());
+                System.out.println("edificios: " + idsEdificios);
+            }
 
             System.out.print("}");
             if (i < jugadores.size() - 1) {
-                System.out.println(","); //separa los jugadores con ","
+                System.out.println(","); // Separa los jugadores con ","
             } else {
                 System.out.println();  // Última entrada sin coma final
             }
