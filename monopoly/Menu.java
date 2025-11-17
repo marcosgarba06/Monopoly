@@ -947,15 +947,15 @@ public class Menu { // la clase menu
             if (j.getPropiedades().isEmpty()) {
                 System.out.println("propiedades: -,");
             } else {
-                String props = j.getPropiedades().stream()
-                        .map(Casilla::getNombre)
-                        .collect(Collectors.joining(", "));
+                String props = j.getPropiedades().stream() // stream -> crea un flujo de datos
+                        .map(Casilla::getNombre) // convierte cada casilla en su nombre
+                        .collect(Collectors.joining(", ")); // las recoge en una lista
                 System.out.println("propiedades: [" + props + "],");
             }
 
             // HIPOTECAS - mostrar solo las propiedades hipotecadas
             List<String> hipotecas = j.getPropiedades().stream()
-                    .filter(Casilla::estaHipotecada)
+                    .filter(Casilla::estaHipotecada) // filtramos solo las que están hipotecadas
                     .map(Casilla::getNombre)
                     .collect(Collectors.toList());
 
