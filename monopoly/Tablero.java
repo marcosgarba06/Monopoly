@@ -3,7 +3,6 @@ package monopoly;
 import partida.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 
 public class Tablero {
@@ -472,11 +471,11 @@ public class Tablero {
     public int getNumeroCasillas() {
         return casillas.size();
     }
-    private Menu menu; // asegúrate de tener una referencia al menú
+    private Juego juego; // asegúrate de tener una referencia al menú
 
     public void notificarBancarrota(Jugador jugador) {
-        if (menu != null) {
-            menu.verificarGanadorTrasBancarrota();
+        if (juego != null) {
+            juego.verificarGanadorTrasBancarrota();
         }
     }
 
@@ -644,8 +643,8 @@ public class Tablero {
         this.ultimaTirada = tirada;
     }
 
-    public void setMenu(Menu menu) {
-        this.menu = menu;
+    public void setMenu(Juego juego) {
+        this.juego = juego;
     }
 
     public Grupo getGrupo(String nombreGrupo) {
