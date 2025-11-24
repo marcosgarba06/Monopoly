@@ -1619,7 +1619,7 @@ public class Menu { // la clase menu
         if (jugador.getDeudaPendiente() > 0) {
             casilla.procesarPagoDeuda(jugador, tablero);
         }
-}
+    }
 
     public void deshipotecarPropiedad(String nombreCasilla) {
 
