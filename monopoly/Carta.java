@@ -24,12 +24,12 @@ public class Carta {
         this.id = id;
     }
 
-    public static void setJugadores(ArrayList<Jugador> listaJugadores) {
+    public static void setJugadores(ArrayList<Jugador> listaJugadores) { // metodo para asignar la lista de jugadores
         jugadores = listaJugadores; // asigna la lista de jugadores al sistema de cartas, hace que haya una sola lista para todas las cartas
     }
 
 
-    public static void inicializarMazos() {
+    public static void inicializarMazos() { // metodo para inicializar los mazos de cartas, se llama al iniciar la partida
         // Inicializar mazo de suerte
         mazoSuerte = new ArrayList<>();
         mazoSuerte.add(new Carta("Decides hacer un viaje de placer. Avanza hasta Solar19", "suerte", 1));
@@ -51,7 +51,7 @@ public class Carta {
 
     }
 
-    public static Carta seleccionarCarta(String tipo) {
+    public static Carta seleccionarCarta(String tipo) { // metodo para seleccionar una carta del mazo correspondiente
 
         if (mazoSuerte == null || mazoCaja == null) {
             inicializarMazos();
@@ -65,14 +65,16 @@ public class Carta {
                 System.out.println("Error: No hay cartas de Suerte disponibles.");
                 return null;
             }
-            cartaSeleccionada = mazoSuerte.get(contadorSuerte % mazoSuerte.size()); //El uso de % mazo.size() hace que el orden sea circular: después de la última carta, vuelve a la primera.
+            cartaSeleccionada = mazoSuerte.get(contadorSuerte % mazoSuerte.size()); //contadorSuerte % mazoSuerte.size() devuelve un valor entre 0 y el tamaño del mazo -1
+            //El uso de % mazo.size() hace que el orden sea circular: después de la última carta, vuelve a la primera.
             contadorSuerte++; //para que la próxima vez se avance a la siguiente carta.
         } else {
             if (mazoCaja.isEmpty()) {
                 System.out.println("Error: No hay cartas de Caja disponibles.");
                 return null;
             }
-            cartaSeleccionada = mazoCaja.get(contadorCaja % mazoCaja.size());
+            cartaSeleccionada = mazoCaja.get(contadorCaja % mazoCaja.size()); //contadorCaja % mazoCaja.size() devuelve un valor entre 0 y el tamaño del mazo -1
+            //El uso de % mazo.size() hace que el orden sea circular: después de la última carta, vuelve a la primera.
             contadorCaja++; //para que la próxima vez se avance a la siguiente carta.
         }
         return cartaSeleccionada;
@@ -96,14 +98,14 @@ public class Carta {
         if (tipo.equals("suerte")) {
             switch (id) {
                 case 1: // Avanza a Solar19
-                    casillaDestino = tablero.encontrarCasilla("Sol19");
-                    if (casillaDestino != null) {
+                    casillaDestino = tablero.encontrarCasilla("Sol19"); //buscamos la casilla Sol19 en el tablero
+                    if (casillaDestino != null) { //si la casilla existe
                         System.out.println("Avanzas a la casilla Sol19.");
-                        casillaActual.eliminarAvatar(jugador.getAvatar());
-                        jugador.getAvatar().setCasilla(casillaDestino);
-                        jugador.getAvatar().setPosicion(casillaDestino.getPosicion());
-                        casillaDestino.anhadirAvatar(jugador.getAvatar());
-                        casillaDestino.evaluarCasilla(jugador);
+                        casillaActual.eliminarAvatar(jugador.getAvatar()); //eliminamos el avatar de la casilla actual
+                        jugador.getAvatar().setCasilla(casillaDestino); //asignamos la nueva casilla al avatar
+                        jugador.getAvatar().setPosicion(casillaDestino.getPosicion()); //actualizamos la posicion del avatar
+                        casillaDestino.anhadirAvatar(jugador.getAvatar()); //añadimos el avatar a la casilla destino
+                        casillaDestino.evaluarCasilla(jugador); //evaluamos la casilla destino (compra o pago alquiler)
                     } else {
                         System.out.println("Error: No se encontró la casilla Sol19.");
                     }
@@ -116,28 +118,28 @@ public class Carta {
                 case 3: // Ganar lotería
                     jugador.sumarFortuna(1000000);
                     System.out.println("¡Has recibido 1.000.000€ por el bote de la lotería!");
-                    jugador.sumarPremios(1000000);
+                    jugador.sumarPremios(1000000); // Contabiliza el premio
                     break;
 
-                case 4: // Pagar a cada jugador (CORREGIDO)
+                case 4: // Pagar a cada jugador
                     int totalAPagar = 0;
-                    for (Jugador c : jugadores) {
-                        if (!c.equals(jugador) && !c.isBancarrota()) {
+                    for (Jugador c : jugadores) { // Los demás JUGADORES RECIBEN dinero
+                        if (!c.equals(jugador) && !c.isBancarrota()) { // Si no es el jugador que saca la carta y no está en bancarrota
                             c.sumarFortuna(250000); // Los otros RECIBEN dinero
                             c.sumarPremios(250000);
                             totalAPagar += 250000;
                         }
                     }
-                    if (jugador.getFortuna() < totalAPagar) {
+                    if (jugador.getFortuna() < totalAPagar) { // El jugador que saca la carta PAGA, si no tiene suficiente, se declara en bancarrota
                         System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
                         jugador.declararBancarrota(null);
                         tablero.notificarBancarrota(jugador);
                         return;
                     }
 
-                    jugador.restarFortuna(totalAPagar);
-                    jugador.sumarGastos(totalAPagar);
-                    jugador.sumarPagoTasasEImpuestos(totalAPagar);
+                    jugador.restarFortuna(totalAPagar); // El jugador que saca la carta PAGA
+                    jugador.sumarGastos(totalAPagar); // Contabiliza el gasto
+                    jugador.sumarPagoTasasEImpuestos(totalAPagar); // Contabiliza el pago de tasas e impuestos
 
 
                     System.out.println("Pagas " + totalAPagar + "€ como presidente de la junta.");
@@ -145,9 +147,10 @@ public class Carta {
 
 
                 case 5: // Retroceder tres casillas
-                    int nuevaPosicion = casillaActual.getPosicion() - 3;
-                    if (nuevaPosicion < 0) nuevaPosicion += 40;
-                    casillaDestino = tablero.getCasilla(nuevaPosicion);
+                    int nuevaPosicion = casillaActual.getPosicion() - 3; // Calcula la nueva posición retrocediendo tres casillas
+                    if (nuevaPosicion < 0) nuevaPosicion += 40; // Ajusta si la posición es negativa (vuelta al inicio del tablero)
+                    casillaDestino = tablero.getCasilla(nuevaPosicion); // Obtiene la casilla de destino
+
                     if (casillaDestino != null) {
                         System.out.println("Retrocedes tres casillas hasta " + casillaDestino.getNombre());
                         casillaActual.eliminarAvatar(jugador.getAvatar());
@@ -181,15 +184,15 @@ public class Carta {
                     int distanciaMin = 40;
 
                     for (int posT : posicionesTransporte) {
-                        int distancia = (posT - posActual + 40) % 40;
-                        if (distancia == 0) distancia = 40;
-                        if (distancia < distanciaMin) {
-                            distanciaMin = distancia;
-                            posCercana = posT;
+                        int distancia = (posT - posActual + 40) % 40; // Distancia en sentido horario
+                        if (distancia == 0) distancia = 40; // Si está en la misma casilla, considerar como 40 para evitar elegirla
+                        if (distancia < distanciaMin) { // Encontrar la más cercana,
+                            distanciaMin = distancia; // Actualizar la distancia mínima
+                            posCercana = posT; // Actualizar la posición más cercana
                         }
                     }
 
-                    casillaDestino = tablero.getCasilla(posCercana);
+                    casillaDestino = tablero.getCasilla(posCercana); // Obtener la casilla de destino, la más cercana
                     if (casillaDestino != null) {
                         System.out.println("Avanzas al transporte más cercano: " + casillaDestino.getNombre());
 
@@ -206,10 +209,11 @@ public class Carta {
                         casillaDestino.anhadirAvatar(jugador.getAvatar());
 
                         // Evaluar la casilla (compra o pago doble)
+
                         if (casillaDestino.getDuenho() == null) {
                             System.out.println("La casilla está en venta. Puedes comprarla con: comprar " + casillaDestino.getNombre());
                         } else if (!casillaDestino.getDuenho().equals(jugador)) {
-                            float alquilerDoble = casillaDestino.getAlquiler() * 2;
+                            float alquilerDoble = casillaDestino.getAlquiler() * 2; // Calcular el alquiler doble
                             System.out.println("Debes pagar el doble del alquiler: " + (long)alquilerDoble + "€");
 
                             if (jugador.getFortuna() < alquilerDoble) {

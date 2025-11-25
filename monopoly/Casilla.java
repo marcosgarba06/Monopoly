@@ -250,7 +250,7 @@ public class Casilla {
                                 "€ por el uso del transporte.");
                         if (jugador.getFortuna() < alquilerTotal) {
                             manejarDeuda(jugador, alquilerTotal, this.getDuenho(),
-                                    "Alquiler de transporte " + this.nombre);
+                                    "Alquiler de transporte " + this.nombre); //método para manejar deuda, , hipotecar o bancarrota
                         } else {
                             jugador.pagar(alquilerTotal, this.getDuenho());
                             this.sumarIngresos(alquilerTotal);
@@ -412,7 +412,7 @@ public class Casilla {
                 sb.append("  alquiler piscina: ").append((long) alquilerPiscina).append(",\n");
                 sb.append("  alquiler pista de deporte: ").append((long) alquilerPista).append("\n");
                 break;
-
+                
             case "servicio":
             case "transporte":
                 if (grupo != null) sb.append("  grupo: ").append(grupo.getNombre()).append(",\n");
@@ -761,9 +761,10 @@ public class Casilla {
     }
 
     public void procesarPagoDeuda(Jugador jugador, Tablero tablero) {
+        // Verificar si el jugador tiene deuda pendiente, si no, salir
         float deuda = jugador.getDeudaPendiente();
 
-        if (jugador.getFortuna() >= deuda) {
+        if (jugador.getFortuna() >= deuda) { //si tiene suficiente dinero para pagar la deuda
             System.out.println("\n¡Ahora tienes suficiente dinero para pagar tu deuda!");
             System.out.println("Deuda pendiente: " + (long)deuda + "€");
             System.out.println("Tu fortuna: " + (long)jugador.getFortuna() + "€");
@@ -833,7 +834,7 @@ public class Casilla {
     /**
      * Maneja una deuda: informa al jugador y marca la deuda pendiente
      */
-    public void manejarDeuda(Jugador jugador, float cantidad, Jugador acreedor, String motivo) {
+    public void manejarDeuda(Jugador jugador, float cantidad, Jugador acreedor, String motivo) { // cuando un jugador no tiene suficiente dinero para pagar una cantidad determinada
 
         float faltante = cantidad - jugador.getFortuna();
 
