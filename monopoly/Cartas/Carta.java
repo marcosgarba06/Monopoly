@@ -1,5 +1,6 @@
-package monopoly;
+package monopoly.Cartas;
 
+import monopoly.Tablero;
 import partida.*;
 import java.util.ArrayList;
 
