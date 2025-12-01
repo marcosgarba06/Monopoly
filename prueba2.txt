@@ -50,7 +50,7 @@ salir carcel
 lanzar dados 5+5
 lanzar dados 4+5
 acabar turno
-lanzar dados 1+4
+lanzar dados 1+3
 acabar turno
 lanzar dados 1+1
 comprar Sol18
@@ -60,6 +60,6 @@ edificar casa
 edificar casa
 edificar casa
 acabar turno
-lanzar dados 5+3
+lanzar dados 5+2
 acabar turno
 

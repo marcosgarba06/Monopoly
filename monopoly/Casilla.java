@@ -3,9 +3,6 @@ package monopoly;
 import partida.*;
 import java.util.ArrayList;
 
-
-import static java.awt.SystemColor.menu;
-
 public class Casilla {
 
     // Atributos
