@@ -1,8 +1,11 @@
 package partida;
 
 import java.util.ArrayList;
+import monopoly.Casillas.Casilla;
 import java.util.List;
 import java.util.Random;
+import monopoly.Casillas.Grupo;
+import monopoly.Casillas.Propiedades.Propiedad;
 import monopoly.Edificios.Edificacion;
 
 import monopoly.*;
@@ -17,7 +20,7 @@ public class Jugador {
     private int tiradasCarcel;
     private int vecesEnLaCarcel;
     private int vueltas;
-    private ArrayList<Casilla> propiedades;
+    private ArrayList<Propiedad> propiedades;
     private boolean bancarrota;
     private boolean tieneCartaSalirCarcel = false;
     private boolean activo = true;
@@ -103,7 +106,7 @@ public class Jugador {
 
     public void anadirPropiedad(Casilla casilla) {
         if (!propiedades.contains(casilla)) {
-            this.propiedades.add(casilla);
+            this.propiedades.add((Propiedad) casilla);
         }
     }
 
@@ -169,7 +172,7 @@ public class Jugador {
 
 
     public void anhadirPropiedad(Casilla c) {
-        propiedades.add(c);
+        propiedades.add((Propiedad) c);
     }
 
     // En Jugador.java
@@ -180,13 +183,16 @@ public class Jugador {
             // Deuda con otro jugador
             System.out.println("Todas las propiedades pasan a " + acreedor.getNombre());
 
-            for (Casilla propiedad : new ArrayList<>(propiedades)) {
+            for (Propiedad propiedad : new ArrayList<>(propiedades)) {
                 if (propiedad.estaHipotecada()) {
                     propiedad.deshipotecar();
                 }
                 propiedad.setDuenho(acreedor);
-                acreedor.anhadirPropiedad(propiedad);
+                acreedor.anadirPropiedad(propiedad);
             }
+
+
+
 
             // Transferir edificaciones
             for (Edificacion edif : new ArrayList<>(edificaciones)) {
@@ -197,13 +203,13 @@ public class Jugador {
             // Deuda con la banca (impuestos, multas, etc.)
             System.out.println("Las propiedades vuelven a la banca (quedan en venta).");
 
-            for (Casilla propiedad : new ArrayList<>(propiedades)) {
+            for (Propiedad propiedad : new ArrayList<>(propiedades)) {
                 if (propiedad.estaHipotecada()) {
                     propiedad.deshipotecar();
                 }
-                // Las edificaciones se pierden
-                propiedad.setDuenho(null);  // Vuelve a estar en venta
+                propiedad.setDuenho(null);  // vuelve a estar en venta
             }
+
 
             // Las edificaciones se destruyen (no se transfieren)
         }
@@ -219,6 +225,20 @@ public class Jugador {
 
     public boolean estaActivo() {
         return activo;
+    }
+
+    public void anadirPropiedad(Propiedad propiedad) {
+        if (!propiedades.contains(propiedad)) {
+            propiedades.add(propiedad);
+        }
+    }
+
+    public void eliminarPropiedad(Propiedad propiedad) {
+        propiedades.remove(propiedad);
+    }
+
+    public ArrayList<Propiedad> getPropiedades() {
+        return propiedades;
     }
 
     // Métodos para gestionar el dinero más detallado (para estadísticas)
@@ -262,9 +282,6 @@ public class Jugador {
     public int getVueltas() {
         return vueltas;
     }
-    public ArrayList<Casilla> getPropiedades() {
-        return propiedades;
-    }
     public boolean isBancarrota() {
         return bancarrota;
     }
@@ -302,6 +319,9 @@ public class Jugador {
         this.tablero = t;
     }
 
+    public boolean tieneDeudaPendiente() {
+        return deudaPendiente > 0;
+    }
 
     public boolean poseeGrupoCompleto(Casilla casilla, Tablero tablero) {
 

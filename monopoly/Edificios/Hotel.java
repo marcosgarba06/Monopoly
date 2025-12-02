@@ -1,14 +1,12 @@
 package monopoly.Edificios;
 
 import partida.Jugador;
-import monopoly.Casilla;
+import monopoly.Casillas.Propiedades.Solar;
 
-import java.util.ArrayList;
-import java.util.List;
+public class Hotel extends Edificacion {
 
-public class Hotel extends Edificacion{
-    public Hotel(String id, Jugador propietario, Casilla casilla, float coste){
-        super(id, propietario, casilla, coste);
+    public Hotel(String id, Jugador propietario, Solar solar, float coste) {
+        super(id, propietario, solar, coste);
     }
 
     @Override
@@ -17,43 +15,35 @@ public class Hotel extends Edificacion{
     }
 
     @Override
-    public boolean puedeEdificar(Jugador jugador, Casilla casilla) {
-        if (casilla.getNumCasas() != 4) {
-            System.out.println("No se puede edificar un hotel. Necesitas exactamente 4 casas y en esta casilla hay " + casilla.getNumCasas() + ".");
+    public boolean puedeEdificar(Jugador jugador, Solar solar) {
+        if (solar.getNumCasas() != 4) {
+            System.out.println("No se puede edificar un hotel. Necesitas exactamente 4 casas y en esta casilla hay " + solar.getNumCasas() + ".");
             return false;
         }
 
-        if (casilla.tieneHotel()) {
+        if (solar.tieneHotel()) {
             System.out.println("No se puede edificar ningún edificio más en esta casilla.");
             return false;
         }
 
-        float coste = casilla.getPrecioHotel();
+        double coste = solar.getPrecioHotel();
         if (jugador.getFortuna() < coste) {
             System.out.println("La fortuna de " + jugador.getNombre() +
                     " no es suficiente para edificar un hotel en la casilla " +
-                    casilla.getNombre() + ".");
+                    solar.getNombre() + ".");
             return false;
         }
 
         return true;
     }
 
-    public void construir(Jugador jugador, Casilla casilla, List<Edificacion> edificacionesGlobal) {
-        casilla.construirHotel(jugador);
+    // ✅ Construcción sin necesidad de pasar edificacionesGlobal
+    // La eliminación de casas la maneja Juego.java
+    public void construir(Jugador jugador, Solar solar) {
+        solar.construirHotel(jugador);
+        double coste = solar.getPrecioHotel();
 
-        // Eliminar las 4 casas para sustituirlas por el hotel
-        List<Edificacion> casasAEliminar = new ArrayList<>();
-        for (Edificacion e : edificacionesGlobal) {
-            if (e.getCasilla().equals(casilla) && e instanceof Casa) {
-                casasAEliminar.add(e);
-            }
-        }
-        edificacionesGlobal.removeAll(casasAEliminar);
-        jugador.getEdificaciones().removeAll(casasAEliminar);
-
-        float coste = casilla.getPrecioHotel();
-        System.out.println("Se ha edificado un hotel en " + casilla.getNombre() +
+        System.out.println("Se ha edificado un hotel en " + solar.getNombre() +
                 ". La fortuna de " + jugador.getNombre() +
                 " se reduce en " + (long)coste + "€.");
     }

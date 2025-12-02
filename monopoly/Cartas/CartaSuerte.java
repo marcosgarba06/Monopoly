@@ -1,6 +1,7 @@
 package monopoly.Cartas;
 
-import monopoly.Casilla;
+import monopoly.Casillas.Casilla;
+import monopoly.Casillas.Propiedades.Propiedad;
 import monopoly.Tablero;
 import partida.*;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class CartaSuerte extends Carta {
                     jugador.getAvatar().setCasilla(casillaDestino); //asignamos la nueva casilla al avatar
                     jugador.getAvatar().setPosicion(casillaDestino.getPosicion()); //actualizamos la posicion del avatar
                     casillaDestino.anhadirAvatar(jugador.getAvatar()); //añadimos el avatar a la casilla destino
-                    casillaDestino.evaluarCasilla(jugador); //evaluamos la casilla destino (compra o pago alquiler)
+                    casillaDestino.evaluarCasilla(jugador, tablero); //evaluamos la casilla destino (compra o pago alquiler)
                 } else {
                     System.out.println("Error: No se encontró la casilla Sol19.");
                 }
@@ -87,7 +88,7 @@ public class CartaSuerte extends Carta {
                     jugador.getAvatar().setCasilla(casillaDestino);
                     jugador.getAvatar().setPosicion(nuevaPosicion);
                     casillaDestino.anhadirAvatar(jugador.getAvatar());
-                    casillaDestino.evaluarCasilla(jugador);
+                    casillaDestino.evaluarCasilla(jugador, tablero);
                 } else {
                     System.out.println("No se encontró la casilla de destino.");
                 }
@@ -141,21 +142,20 @@ public class CartaSuerte extends Carta {
 
                     // Evaluar la casilla (compra o pago doble)
 
-                    if (casillaDestino.getDuenho() == null) {
-                        System.out.println("La casilla está en venta. Puedes comprarla con: comprar " + casillaDestino.getNombre());
-                    } else if (!casillaDestino.getDuenho().equals(jugador)) {
-                        float alquilerDoble = casillaDestino.getAlquiler() * 2; // Calcular el alquiler doble
+                    if (casillaDestino instanceof Propiedad) {
+                        Propiedad propiedad = (Propiedad) casillaDestino;
+                        float alquilerDoble = propiedad.alquiler(tablero.getUltimaTirada()) * 2;
                         System.out.println("Debes pagar el doble del alquiler: " + (long) alquilerDoble + "€");
 
                         if (jugador.getFortuna() < alquilerDoble) {
                             System.out.println("No puedes pagar. Te declaras en bancarrota.");
-                            jugador.declararBancarrota(casillaDestino.getDuenho());
+                            jugador.declararBancarrota(propiedad.getDuenho());
                             tablero.notificarBancarrota(jugador);
                         } else {
-                            jugador.pagar(alquilerDoble, casillaDestino.getDuenho());
+                            jugador.pagar(alquilerDoble, propiedad.getDuenho());
                             jugador.sumarPagoAlquiler(alquilerDoble);
-                            casillaDestino.getDuenho().sumarCobroAlquiler(alquilerDoble);
-                            casillaDestino.sumarIngresos(alquilerDoble);
+                            propiedad.getDuenho().sumarCobroAlquiler(alquilerDoble);
+                            propiedad.sumarIngresos(alquilerDoble);
                         }
                     }
                 }

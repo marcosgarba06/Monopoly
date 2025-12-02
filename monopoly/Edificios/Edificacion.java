@@ -1,35 +1,29 @@
 package monopoly.Edificios;
 
+import monopoly.Casillas.Propiedades.Solar;
 import partida.Jugador;
-import monopoly.Casilla;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 public abstract class Edificacion {
 
     protected String id;
     protected Jugador propietario;
-    protected Casilla casilla;
+    protected Solar solar;
     protected float coste;
 
-    public Edificacion(String id, Jugador propietario, Casilla casilla, float coste) {
+    public Edificacion(String id, Jugador propietario, Solar solar, float coste) {
         this.id = id;
         this.propietario = propietario;
-        this.casilla = casilla;
+        this.solar = solar;
         this.coste = coste;
     }
 
-
+    // Métodos abstractos
     public abstract String obtenerTipo();
-    public abstract boolean puedeEdificar(Jugador jugador, Casilla casilla);
+    public abstract boolean puedeEdificar(Jugador jugador, Solar solar);
 
+    // Getters
     public String getId() { return id; }
     public Jugador getPropietario() { return propietario; }
-    public Casilla getCasilla() { return casilla; }
+    public Solar getSolar() { return solar; }
     public float getCoste() { return coste; }
-
-
-
 }

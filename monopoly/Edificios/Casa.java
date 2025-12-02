@@ -1,11 +1,12 @@
 package monopoly.Edificios;
+import monopoly.Casillas.Casilla;
+import monopoly.Casillas.Propiedades.Solar;
 
 import partida.Jugador;
-import monopoly.Casilla;
 
 public class Casa extends Edificacion {
-    public Casa(String id, Jugador propietario, Casilla casilla, float coste){
-        super(id, propietario, casilla, coste);
+    public Casa(String id, Jugador propietario, Solar solar, float coste){
+        super(id, propietario, solar, coste);
     }
 
 
@@ -15,40 +16,39 @@ public class Casa extends Edificacion {
     }
 
     @Override
-    public boolean puedeEdificar(Jugador jugador, Casilla casilla) {
+    public boolean puedeEdificar(Jugador jugador, Solar solar) {
         // En un solar se puede construir un único hotel si en ese solar ya se ha construido,
         // no se puede edificar mas casas
-        if (casilla.tieneHotel()) {
+        if (solar.tieneHotel()) {
             System.out.println("No se puede edificar casas en esta casilla porque hay un hotel construido en ella.");
             return false;
         }
 
         // No se pueden edificar mas de cuatro casas
-        if (casilla.getNumCasas() >= 4) {
+        if (solar.getNumCasas() >= 4) {
             System.out.println("No se puede edificar ninguna casa más porque ya se han edificado cuatro casas en esta casilla.");
             return false;
         }
 
-        float coste = casilla.getPrecioCasa();
+        double coste = solar.getPrecioCasa();
         if (jugador.getFortuna() < coste) {
             System.out.println("La fortuna de " + jugador.getNombre() +
                     " no es suficiente para edificar una casa en la casilla " +
-                    casilla.getNombre() + ".");
+                    solar.getNombre() + ".");
             return false;
         }
 
         return true;
     }
 
+
     // Método específico para construir la casa
-    public void construir(Jugador jugador, Casilla casilla) {
-        casilla.construirCasas(jugador, 1);
-        float coste = casilla.getPrecioCasa();
-        System.out.println("Se ha edificado una casa en " + casilla.getNombre() +
+    public void construir(Jugador jugador, Solar solar) {
+        solar.construirCasas(jugador, 1);
+        double coste = solar.getPrecioCasa();
+        System.out.println("Se ha edificado una casa en " + solar.getNombre() +
                 ". La fortuna de " + jugador.getNombre() +
                 " se reduce en " + (long)coste + "€.");
     }
-
-
 
 }

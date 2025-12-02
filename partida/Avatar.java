@@ -3,6 +3,8 @@ package partida;
 
 
 import monopoly.*;
+import monopoly.Casillas.Casilla;
+
 
 import java.util.*;
 
@@ -63,7 +65,7 @@ public class Avatar {
         setCasilla(nuevaCasilla); // ← unifica y mantiene listas de avatares
 
         System.out.println("El avatar " + id + " ha avanzado hasta la casilla " + nuevaCasilla.getNombre());
-        nuevaCasilla.evaluarCasilla(jugador);
+        nuevaCasilla.evaluarCasilla(jugador, tablero);
     }
 
     /*Método que permite generar un ID para un avatar. Sólo lo usamos en esta clase (por ello es privado).

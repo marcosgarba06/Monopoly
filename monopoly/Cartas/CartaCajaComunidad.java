@@ -1,5 +1,6 @@
 package monopoly.Cartas;
 
+import monopoly.Casillas.Casilla;
 import monopoly.Tablero;
 import monopoly.*;
 import partida.*;
@@ -52,7 +53,7 @@ public class CartaCajaComunidad extends Carta {
                 jugador.sumarFortuna(2000000);
                 jugador.sumarSalida(2000000);
                 System.out.println("Has cobrado 2.000.000€ al llegar a Salida.");
-                casillaDestino.evaluarCasilla(jugador);
+                casillaDestino.evaluarCasilla(jugador, tablero);
                 break;
 
             case 4: // Devolución de Hacienda: +500.000€
@@ -69,7 +70,7 @@ public class CartaCajaComunidad extends Carta {
                     jugador.getAvatar().setCasilla(casillaDestino);
                     jugador.getAvatar().setPosicion(casillaDestino.getPosicion());
                     casillaDestino.anhadirAvatar(jugador.getAvatar());
-                    casillaDestino.evaluarCasilla(jugador);
+                    casillaDestino.evaluarCasilla(jugador, tablero);
                 }
                 break;
 
@@ -88,7 +89,7 @@ public class CartaCajaComunidad extends Carta {
                     jugador.getAvatar().setCasilla(casillaDestino);
                     jugador.getAvatar().setPosicion(casillaDestino.getPosicion());
                     casillaDestino.anhadirAvatar(jugador.getAvatar());
-                    casillaDestino.evaluarCasilla(jugador);
+                    casillaDestino.evaluarCasilla(jugador, tablero);
                 }
                 break;
         }

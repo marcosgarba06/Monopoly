@@ -1,11 +1,12 @@
 package monopoly.Edificios;
 
 import partida.Jugador;
-import monopoly.Casilla;
+import monopoly.Casillas.Casilla;
+import monopoly.Casillas.Propiedades.Solar;
 
 public class Piscina extends Edificacion {
-    public Piscina(String id, Jugador propietario, Casilla casilla, float coste){
-        super(id, propietario, casilla, coste);
+    public Piscina(String id, Jugador propietario, Solar solar, float coste){
+        super(id, propietario, solar, coste);
     }
 
     @Override
@@ -13,41 +14,29 @@ public class Piscina extends Edificacion {
         return "piscina";
     }
 
+
     @Override
-    public boolean puedeEdificar(Jugador jugador, Casilla casilla) {
-        //En un solar se puede construir una única piscina si se ha construido un hotel
-        if (!casilla.tieneHotel()) {
-            System.out.println("No se puede edificar una piscina, ya que no se dispone de un hotel la casilla.");
+    public boolean puedeEdificar(Jugador jugador, Solar solar) {
+        if (!solar.tieneHotel()) {
+            System.out.println("Necesitas un hotel para construir una piscina.");
             return false;
         }
-
-        // Verificar que no hay piscina ya, solo se puede cosntruir una unica.
-        if (casilla.tienePiscina()) {
-            System.out.println("No se puede edificar ningún edificio más en esta casilla ni en el grupo al que la casilla pertenece.");
+        if (solar.tienePiscina()) {
+            System.out.println("Ya hay una piscina en este solar.");
             return false;
         }
-
-        float coste = casilla.getPrecioPiscina();
+        double coste = solar.getPrecioPiscina();
         if (jugador.getFortuna() < coste) {
-            System.out.println("La fortuna de " + jugador.getNombre() +
-                    " no es suficiente para edificar una piscina en la casilla " +
-                    casilla.getNombre() + ".");
+            System.out.println("No tienes suficiente dinero.");
             return false;
         }
-
-        // Construir en esta funcion, manejamos la fortuna del jugador
-        casilla.construirPiscina(jugador);
-
-        System.out.println("Se ha edificado una piscina en " + casilla.getNombre() +
-                ". La fortuna de " + jugador.getNombre() +
-                " se reduce en " + (long)coste + "€.");
         return true;
     }
 
-    public void construir(Jugador jugador, Casilla casilla) {
-        casilla.construirPiscina(jugador);
-        float coste = casilla.getPrecioPiscina();
-        System.out.println("Se ha edificado una piscina en " + casilla.getNombre() +
+    public void construir(Jugador jugador, Solar solar) {
+        solar.construirPiscina(jugador);
+        double coste = solar.getPrecioPiscina();
+        System.out.println("Se ha edificado una piscina en " + solar.getNombre() +
                 ". La fortuna de " + jugador.getNombre() +
                 " se reduce en " + (long)coste + "€.");
     }

@@ -1,53 +1,48 @@
 package monopoly;
 
-import partida.*;
+import monopoly.Casillas.Casilla;
+import monopoly.Casillas.Propiedades.Solar;
+import monopoly.Casillas.Propiedades.Transporte;
+import monopoly.Casillas.Propiedades.Servicio;
+import monopoly.Casillas.Impuesto;
+import monopoly.Casillas.Especial;
+import monopoly.Casillas.Grupo;
+import monopoly.Casillas.Acciones.CajaComunidad;
+import monopoly.Casillas.Acciones.Suerte;
+import partida.Jugador;
+import partida.Avatar;
+
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
 public class Tablero {
 
-    private int ultimaTirada;
+    private ArrayList<ArrayList<Casilla>> posiciones;
     private ArrayList<Casilla> casillas;
-
-    // Lados
+    private HashMap<String, Grupo> grupos;
+    private Jugador banca;
+    int ultimaTirada = 0;
+    private float fondoParking = 0;
     private static final int SUR = 0;
     private static final int OESTE = 1;
     private static final int NORTE = 2;
     private static final int ESTE = 3;
 
-    // Atributos
-    private ArrayList<ArrayList<Casilla>> posiciones;
-    private HashMap<String, Grupo> grupos;
-    private Jugador banca;
-    private float fondoParking = 0;
-
-    // Constructor
     public Tablero(Jugador banca) {
         this.banca = banca;
-        this.posiciones = new ArrayList<>();
-        for (int i = 0; i < 4; i++) this.posiciones.add(new ArrayList<>());
-        this.grupos = new HashMap<>();
+        posiciones = new ArrayList<>();
+        for (int i = 0; i < 4; i++) posiciones.add(new ArrayList<>());
+        grupos = new HashMap<>();
         generarCasillas();
-    }
-
-    // ======== Generación del tablero ========
-
-    private void vincularTableroACasillas() {
-        for (ArrayList<Casilla> lado : posiciones) {
-            for (Casilla c : lado) {
-                c.setTablero(this);
-            }
-        }
+        crearGrupos();
     }
 
     private void generarCasillas() {
-        this.insertarLadoSur();
-        this.insertarLadoOeste();
-        this.insertarLadoNorte();
-        this.insertarLadoEste();
-        crearGrupos();
-        vincularTableroACasillas();
+        insertarLadoSur();
+        insertarLadoOeste();
+        insertarLadoNorte();
+        insertarLadoEste();
 
         casillas = new ArrayList<>();
         for (ArrayList<Casilla> lado : posiciones) {
@@ -55,365 +50,263 @@ public class Tablero {
         }
     }
 
-    // NORTE (derecha->izquierda visual, indices 20..30)
-    private void insertarLadoNorte() {
-        ArrayList<Casilla> norte = posiciones.get(NORTE);
-
-        norte.add(new Casilla("IrCarcel", "Especial", 30, banca));
-
-        Casilla sol17 = new Casilla("Sol17", "Solar", 29, 2800000, banca);
-        sol17.setHipoteca(1400000);
-        sol17.setAlquilerBase(240000);
-        sol17.setAlquilerCasa(2600000);
-        sol17.setAlquilerHotel(12000000);
-        sol17.setAlquilerPiscina(2400000);
-        sol17.setAlquilerPista(2400000);
-        sol17.setPrecioCasa(1500000);
-        sol17.setPrecioHotel(1500000);
-        sol17.setPrecioPiscina(300000);
-        sol17.setPrecioPista(600000);
-        norte.add(sol17);
-
-        Casilla serv2 = new Casilla("Serv2", "Servicio", 28, 500000, banca);
-        norte.add(serv2);
-
-        Casilla sol16 = new Casilla("Sol16", "Solar", 27, 2600000, banca);
-        sol16.setHipoteca(1300000);
-        sol16.setAlquilerBase(220000);
-        sol16.setAlquilerCasa(2450000);
-        sol16.setAlquilerHotel(11500000);
-        sol16.setAlquilerPiscina(2300000);
-        sol16.setAlquilerPista(2300000);
-        sol16.setPrecioCasa(1500000);
-        sol16.setPrecioHotel(1500000);
-        sol16.setPrecioPiscina(300000);
-        sol16.setPrecioPista(600000);
-        norte.add(sol16);
-
-        Casilla sol15 = new Casilla("Sol15", "Solar", 26, 2600000, banca);
-        sol15.setHipoteca(1300000);
-        sol15.setAlquilerBase(220000);
-        sol15.setAlquilerCasa(2450000);
-        sol15.setAlquilerHotel(11500000);
-        sol15.setAlquilerPiscina(2300000);
-        sol15.setAlquilerPista(2300000);
-        sol15.setPrecioCasa(1500000);
-        sol15.setPrecioHotel(1500000);
-        sol15.setPrecioPiscina(300000);
-        sol15.setPrecioPista(600000);
-        norte.add(sol15);
-
-        Casilla tran3 = new Casilla("Tran3", "Transporte", 25, 500000, banca);
-        tran3.setAlquilerBase(250000);
-        norte.add(tran3);
-
-        Casilla sol14 = new Casilla("Sol14", "Solar", 24, 2400000, banca);
-        sol14.setHipoteca(1200000);
-        sol14.setAlquilerBase(200000);
-        sol14.setAlquilerCasa(2325000);
-        sol14.setAlquilerHotel(11000000);
-        sol14.setAlquilerPiscina(2200000);
-        sol14.setAlquilerPista(2200000);
-        sol14.setPrecioCasa(1500000);
-        sol14.setPrecioHotel(1500000);
-        sol14.setPrecioPiscina(300000);
-        sol14.setPrecioPista(600000);
-        norte.add(sol14);
-
-        Casilla sol13 = new Casilla("Sol13", "Solar", 23, 2200000, banca);
-        sol13.setHipoteca(1100000);
-        sol13.setAlquilerBase(180000);
-        sol13.setAlquilerCasa(2200000);
-        sol13.setAlquilerHotel(10500000);
-        sol13.setAlquilerPiscina(2100000);
-        sol13.setAlquilerPista(2100000);
-        sol13.setPrecioCasa(1500000);
-        sol13.setPrecioHotel(1500000);
-        sol13.setPrecioPiscina(300000);
-        sol13.setPrecioPista(600000);
-        norte.add(sol13);
-
-        norte.add(new Casilla("Suerte", "Suerte", 22, banca));
-
-        Casilla sol12 = new Casilla("Sol12", "Solar", 21, 2200000, banca);
-        sol12.setHipoteca(1100000);
-        sol12.setAlquilerBase(180000);
-        sol12.setAlquilerCasa(2200000);
-        sol12.setAlquilerHotel(10500000);
-        sol12.setAlquilerPiscina(2100000);
-        sol12.setAlquilerPista(2100000);
-        sol12.setPrecioCasa(1500000);
-        sol12.setPrecioHotel(1500000);
-        sol12.setPrecioPiscina(300000);
-        sol12.setPrecioPista(600000);
-        norte.add(sol12);
-
-        norte.add(new Casilla("Parking", "Especial", 20, banca));
-
-    }
-
-    // SUR (izquierda->derecha visual, indices 0..10)
+    // ======== LADO SUR ========
     private void insertarLadoSur() {
         ArrayList<Casilla> sur = posiciones.get(SUR);
 
-        sur.add(new Casilla("Carcel", "Especial", 10, banca));
+        sur.add(new Especial("Carcel", 10, "carcel"));
 
-        Casilla sol5 = new Casilla("Sol5", "Solar", 9, 1200000, banca);
+        Solar sol5 = new Solar("Solar5", 9, 1200000, 80000);
         sol5.setHipoteca(600000);
-        sol5.setAlquilerBase(80000);
-        sol5.setAlquilerCasa(1250000);
-        sol5.setAlquilerHotel(6000000);
-        sol5.setAlquilerPiscina(1200000);
-        sol5.setAlquilerPista(1200000);
-        sol5.setPrecioCasa(500000);
-        sol5.setPrecioHotel(500000);
-        sol5.setPrecioPiscina(100000);
-        sol5.setPrecioPista(200000);
+        sol5.setPrecioCasa(500000); sol5.setPrecioHotel(500000);
+        sol5.setPrecioPiscina(100000); sol5.setPrecioPista(200000);
+        sol5.setAlquilerCasa(1250000); sol5.setAlquilerHotel(6000000);
+        sol5.setAlquilerPiscina(1200000); sol5.setAlquilerPista(1200000);
         sur.add(sol5);
 
-        Casilla sol4 = new Casilla("Sol4", "Solar", 8, 1000000, banca);
+        Solar sol4 = new Solar("Solar4", 8, 1000000, 60000);
         sol4.setHipoteca(500000);
-        sol4.setAlquilerBase(60000);
-        sol4.setAlquilerCasa(1000000);
-        sol4.setAlquilerHotel(5500000);
-        sol4.setAlquilerPiscina(1100000);
-        sol4.setAlquilerPista(1100000);
-        sol4.setPrecioCasa(500000);
-        sol4.setPrecioHotel(500000);
-        sol4.setPrecioPiscina(100000);
-        sol4.setPrecioPista(200000);
+        sol4.setPrecioCasa(500000); sol4.setPrecioHotel(500000);
+        sol4.setPrecioPiscina(100000); sol4.setPrecioPista(200000);
+        sol4.setAlquilerCasa(1000000); sol4.setAlquilerHotel(5500000);
+        sol4.setAlquilerPiscina(1100000); sol4.setAlquilerPista(1100000);
         sur.add(sol4);
 
-        sur.add(new Casilla("Suerte", "Suerte", 7, banca));
+        sur.add(new Suerte("Suerte", 7));
 
-        Casilla sol3 = new Casilla("Sol3", "Solar", 6, 1000000, banca);
+        Solar sol3 = new Solar("Solar3", 6, 1000000, 60000);
         sol3.setHipoteca(500000);
-        sol3.setAlquilerBase(60000);
-        sol3.setAlquilerCasa(1000000);
-        sol3.setAlquilerHotel(5500000);
-        sol3.setAlquilerPiscina(1100000);
-        sol3.setAlquilerPista(1100000);
-        sol3.setPrecioCasa(500000);
-        sol3.setPrecioHotel(500000);
-        sol3.setPrecioPiscina(100000);
-        sol3.setPrecioPista(200000);
+        sol3.setPrecioCasa(500000); sol3.setPrecioHotel(500000);
+        sol3.setPrecioPiscina(100000); sol3.setPrecioPista(200000);
+        sol3.setAlquilerCasa(1000000); sol3.setAlquilerHotel(5500000);
+        sol3.setAlquilerPiscina(1100000); sol3.setAlquilerPista(1100000);
         sur.add(sol3);
 
-        Casilla tran1 = new Casilla("Tran1", "Transporte", 5, 500000, banca);
+        Transporte tran1 = new Transporte("Tran1", 5, 500000);
         tran1.setAlquilerBase(250000);
         sur.add(tran1);
 
-        Casilla imp1 = new Casilla("Imp1", "Impuesto", 4, 2000000, banca);
+        Impuesto imp1 = new Impuesto("Imp1", 4, 2000000);
         sur.add(imp1);
 
-        Casilla sol2 = new Casilla("Sol2", "Solar", 3, 600000, banca);
+        Solar sol2 = new Solar("Solar2", 3, 600000, 40000);
         sol2.setHipoteca(300000);
-        sol2.setAlquilerBase(40000);
-        sol2.setAlquilerCasa(800000);
-        sol2.setAlquilerHotel(4500000);
-        sol2.setAlquilerPiscina(900000);
-        sol2.setAlquilerPista(900000);
-        sol2.setPrecioCasa(500000);
-        sol2.setPrecioHotel(500000);
-        sol2.setPrecioPiscina(100000);
-        sol2.setPrecioPista(200000);
+        sol2.setPrecioCasa(500000); sol2.setPrecioHotel(500000);
+        sol2.setPrecioPiscina(100000); sol2.setPrecioPista(200000);
+        sol2.setAlquilerCasa(800000); sol2.setAlquilerHotel(4500000);
+        sol2.setAlquilerPiscina(900000); sol2.setAlquilerPista(900000);
         sur.add(sol2);
 
-        sur.add(new Casilla("Caja", "Caja", 2, banca));
 
-        Casilla sol1 = new Casilla("Sol1", "Solar", 1, 600000, banca);
+        sur.add(new CajaComunidad("Caja", 2));
+
+        Solar sol1 = new Solar("Solar1", 1, 600000, 20000);
         sol1.setHipoteca(300000);
-        sol1.setAlquilerBase(20000);
-        sol1.setAlquilerCasa(400000);
-        sol1.setAlquilerHotel(2500000);
-        sol1.setAlquilerPiscina(500000);
-        sol1.setAlquilerPista(500000);
-        sol1.setPrecioCasa(500000);
-        sol1.setPrecioHotel(500000);
-        sol1.setPrecioPiscina(100000);
-        sol1.setPrecioPista(200000);
+        sol1.setPrecioCasa(500000); sol1.setPrecioHotel(500000);
+        sol1.setPrecioPiscina(100000); sol1.setPrecioPista(200000);
+        sol1.setAlquilerCasa(400000); sol1.setAlquilerHotel(2500000);
+        sol1.setAlquilerPiscina(500000); sol1.setAlquilerPista(500000);
         sur.add(sol1);
 
-        sur.add(new Casilla("Salida", "Especial", 0, banca));
+
+        sur.add(new Especial("Salida", 0, "salida"));
     }
 
-
-    // OESTE (abajo->arriba visual, indices 11..19)
+    // ======== LADO OESTE ========
     private void insertarLadoOeste() {
         ArrayList<Casilla> oeste = posiciones.get(OESTE);
 
-        Casilla sol6 = new Casilla("Sol6", "Solar", 11, 1400000, banca);
+        Solar sol6 = new Solar("Solar6", 11, 1400000, 100000);
         sol6.setHipoteca(700000);
-        sol6.setAlquilerBase(100000);
-        sol6.setAlquilerCasa(1500000);
-        sol6.setAlquilerHotel(7500000);
-        sol6.setAlquilerPiscina(1500000);
-        sol6.setAlquilerPista(1500000);
-        sol6.setPrecioCasa(1000000);
-        sol6.setPrecioHotel(1000000);
-        sol6.setPrecioPiscina(200000);
-        sol6.setPrecioPista(400000);
+        sol6.setPrecioCasa(1000000); sol6.setPrecioHotel(1000000);
+        sol6.setPrecioPiscina(200000); sol6.setPrecioPista(400000);
+        sol6.setAlquilerCasa(1500000); sol6.setAlquilerHotel(7500000);
+        sol6.setAlquilerPiscina(1500000); sol6.setAlquilerPista(1500000);
         oeste.add(sol6);
 
-        Casilla serv1 = new Casilla("Serv1", "Servicio", 12, 500000, banca);
+        Servicio serv1 = new Servicio("Serv1", 12, 500000);
         oeste.add(serv1);
 
-        Casilla sol7 = new Casilla("Sol7", "Solar", 13, 1400000, banca);
+
+        Solar sol7 = new Solar("Solar7", 13, 1400000, 100000);
         sol7.setHipoteca(700000);
-        sol7.setAlquilerBase(100000);
-        sol7.setAlquilerCasa(1500000);
-        sol7.setAlquilerHotel(7500000);
-        sol7.setAlquilerPiscina(1500000);
-        sol7.setAlquilerPista(1500000);
-        sol7.setPrecioCasa(1000000);
-        sol7.setPrecioHotel(1000000);
-        sol7.setPrecioPiscina(200000);
-        sol7.setPrecioPista(400000);
+        sol7.setPrecioCasa(1000000); sol7.setPrecioHotel(1000000);
+        sol7.setPrecioPiscina(200000); sol7.setPrecioPista(400000);
+        sol7.setAlquilerCasa(1500000); sol7.setAlquilerHotel(7500000);
+        sol7.setAlquilerPiscina(1500000); sol7.setAlquilerPista(1500000);
         oeste.add(sol7);
 
-        Casilla sol8 = new Casilla("Sol8", "Solar", 14, 1600000, banca);
+
+        Solar sol8 = new Solar("Solar8", 14, 1600000, 120000);
         sol8.setHipoteca(800000);
-        sol8.setAlquilerBase(120000);
-        sol8.setAlquilerCasa(1750000);
-        sol8.setAlquilerHotel(9000000);
-        sol8.setAlquilerPiscina(1800000);
-        sol8.setAlquilerPista(1800000);
-        sol8.setPrecioCasa(1000000);
-        sol8.setPrecioHotel(1000000);
-        sol8.setPrecioPiscina(200000);
-        sol8.setPrecioPista(400000);
+        sol8.setPrecioCasa(1000000); sol8.setPrecioHotel(1000000);
+        sol8.setPrecioPiscina(200000); sol8.setPrecioPista(400000);
+        sol8.setAlquilerCasa(1750000); sol8.setAlquilerHotel(9000000);
+        sol8.setAlquilerPiscina(1800000); sol8.setAlquilerPista(1800000);
         oeste.add(sol8);
 
-        Casilla tran2 = new Casilla("Tran2", "Transporte", 15, 500000, banca);
-        tran2.setAlquilerBase(250000);
+        Transporte tran2 = new Transporte("Tran2", 15, 500000);
         oeste.add(tran2);
 
-        Casilla sol9 = new Casilla("Sol9", "Solar", 16, 1800000, banca);
+        Solar sol9 = new Solar("Solar9", 16, 1800000, 140000);
         sol9.setHipoteca(900000);
-        sol9.setAlquilerBase(140000);
-        sol9.setAlquilerCasa(1850000);
-        sol9.setAlquilerHotel(9500000);
-        sol9.setAlquilerPiscina(1900000);
-        sol9.setAlquilerPista(1900000);
-        sol9.setPrecioCasa(1000000);
-        sol9.setPrecioHotel(1000000);
-        sol9.setPrecioPiscina(200000);
-        sol9.setPrecioPista(400000);
+        sol9.setPrecioCasa(1000000); sol9.setPrecioHotel(1000000);
+        sol9.setPrecioPiscina(200000); sol9.setPrecioPista(400000);
+        sol9.setAlquilerCasa(1850000); sol9.setAlquilerHotel(9500000);
+        sol9.setAlquilerPiscina(1900000); sol9.setAlquilerPista(1900000);
         oeste.add(sol9);
 
-        oeste.add(new Casilla("Caja", "Caja", 17, banca));
+        oeste.add(new CajaComunidad("Caja", 17));
 
-        Casilla sol10 = new Casilla("Sol10", "Solar", 18, 1800000, banca);
+        Solar sol10 = new Solar("Solar10", 18, 1800000, 140000);
         sol10.setHipoteca(900000);
-        sol10.setAlquilerBase(140000);
-        sol10.setAlquilerCasa(1850000);
-        sol10.setAlquilerHotel(9500000);
-        sol10.setAlquilerPiscina(1900000);
-        sol10.setAlquilerPista(1900000);
-        sol10.setPrecioCasa(1000000);
-        sol10.setPrecioHotel(1000000);
-        sol10.setPrecioPiscina(200000);
-        sol10.setPrecioPista(400000);
+        sol10.setPrecioCasa(1000000); sol10.setPrecioHotel(1000000);
+        sol10.setPrecioPiscina(200000); sol10.setPrecioPista(400000);
+        sol10.setAlquilerCasa(1850000); sol10.setAlquilerHotel(9500000);
+        sol10.setAlquilerPiscina(1900000); sol10.setAlquilerPista(1900000);
         oeste.add(sol10);
 
-        Casilla sol11 = new Casilla("Sol11", "Solar", 19, 2000000, banca);
+        Solar sol11 = new Solar("Solar11", 19, 2200000, 160000);
         sol11.setHipoteca(1000000);
-        sol11.setAlquilerBase(160000);
-        sol11.setAlquilerCasa(2000000);
-        sol11.setAlquilerHotel(10000000);
-        sol11.setAlquilerPiscina(2000000);
-        sol11.setAlquilerPista(2000000);
-        sol11.setPrecioCasa(1000000);
-        sol11.setPrecioHotel(1000000);
-        sol11.setPrecioPiscina(200000);
-        sol11.setPrecioPista(400000);
+        sol11.setPrecioCasa(1000000); sol11.setPrecioHotel(1000000);
+        sol11.setPrecioPiscina(200000); sol11.setPrecioPista(400000);
+        sol11.setAlquilerCasa(2000000); sol11.setAlquilerHotel(10000000);
+        sol11.setAlquilerPiscina(2000000); sol11.setAlquilerPista(2000000);
         oeste.add(sol11);
     }
 
+    // ======== LADO NORTE ========
+    private void insertarLadoNorte() {
+        ArrayList<Casilla> norte = posiciones.get(NORTE);
 
-    // ESTE (arriba->abajo visual, indices 31..39)
+        norte.add(new Especial("IrCarcel", 30, "ircarcel"));
+
+        Solar sol17 = new Solar("Solar17", 29, 2800000, 240000);
+        sol17.setHipoteca(1400000);
+        sol17.setPrecioCasa(1500000); sol17.setPrecioHotel(1500000);
+        sol17.setPrecioPiscina(300000); sol17.setPrecioPista(600000);
+        sol17.setAlquilerCasa(2600000); sol17.setAlquilerHotel(12000000);
+        sol17.setAlquilerPiscina(2400000); sol17.setAlquilerPista(2400000);
+        norte.add(sol17);
+
+        Servicio serv2 = new Servicio("Serv2", 28, 500000);
+        norte.add(serv2);
+
+        Solar sol16 = new Solar("Solar16", 27, 2600000, 220000);
+        sol16.setHipoteca(1300000);
+        sol16.setPrecioCasa(1500000); sol16.setPrecioHotel(1500000);
+        sol16.setPrecioPiscina(300000); sol16.setPrecioPista(600000);
+        sol16.setAlquilerCasa(2450000); sol16.setAlquilerHotel(11500000);
+        sol16.setAlquilerPiscina(2300000);
+        sol16.setAlquilerPista(2300000);
+        norte.add(sol16);
+
+        Solar sol15 = new Solar("Solar15", 26, 2600000, 220000);
+        sol15.setHipoteca(1300000);
+        sol15.setPrecioCasa(1500000); sol15.setPrecioHotel(1500000);
+        sol15.setPrecioPiscina(300000); sol15.setPrecioPista(600000);
+        sol15.setAlquilerCasa(2450000); sol15.setAlquilerHotel(11500000);
+        sol15.setAlquilerPiscina(2300000); sol15.setAlquilerPista(2300000);
+        norte.add(sol15);
+
+
+        Transporte tran3 = new Transporte("Tran3", 25, 500000);
+        norte.add(tran3);
+
+        Solar sol14 = new Solar("Sol14", 24, 2400000, 200000);
+        sol14.setHipoteca(1200000);
+        sol14.setPrecioCasa(1500000); sol14.setPrecioHotel(1500000);
+        sol14.setPrecioPiscina(300000); sol14.setPrecioPista(600000);
+        sol14.setAlquilerCasa(2325000); sol14.setAlquilerHotel(11000000);
+        sol14.setAlquilerPiscina(2200000); sol14.setAlquilerPista(2200000);
+        norte.add(sol14);
+
+        Solar sol13 = new Solar("Solar13", 23, 2200000, 180000);
+        sol13.setHipoteca(1100000);
+        sol13.setPrecioCasa(1500000); sol13.setPrecioHotel(1500000);
+        sol13.setPrecioPiscina(300000); sol13.setPrecioPista(600000);
+        sol13.setAlquilerCasa(2200000); sol13.setAlquilerHotel(10500000);
+        sol13.setAlquilerPiscina(2100000); sol13.setAlquilerPista(2100000);
+        norte.add(sol13);
+
+        norte.add(new Suerte("Suerte", 22));
+
+        Solar sol12 = new Solar("Solar12", 21, 2200000, 180000);
+        sol12.setHipoteca(1100000);
+        sol12.setPrecioCasa(1500000); sol12.setPrecioHotel(1500000);
+        sol12.setPrecioPiscina(300000); sol12.setPrecioPista(600000);
+        sol12.setAlquilerCasa(2200000); sol12.setAlquilerHotel(10500000);
+        sol12.setAlquilerPiscina(2100000); sol12.setAlquilerPista(2100000);
+        norte.add(sol12);
+
+        norte.add(new Especial("Parking", 20, "parking"));
+    }
+
+    // ======== LADO ESTE ========
     private void insertarLadoEste() {
         ArrayList<Casilla> este = posiciones.get(ESTE);
 
-        Casilla sol18 = new Casilla("Sol18", "Solar", 31, 3000000, banca);
+        Solar sol18 = new Solar("Solar18", 31, 3000000, 260000);
         sol18.setHipoteca(1500000);
-        sol18.setAlquilerBase(260000);
-        sol18.setAlquilerCasa(2750000);
-        sol18.setAlquilerHotel(12750000);
-        sol18.setAlquilerPiscina(2550000);
-        sol18.setAlquilerPista(2550000);
-        sol18.setPrecioCasa(2000000);
-        sol18.setPrecioHotel(2000000);
-        sol18.setPrecioPiscina(400000);
-        sol18.setPrecioPista(800000);
+        sol18.setPrecioCasa(2000000); sol18.setPrecioHotel(2000000);
+        sol18.setPrecioPiscina(400000); sol18.setPrecioPista(800000);
+        sol18.setAlquilerCasa(2750000); sol18.setAlquilerHotel(12750000);
+        sol18.setAlquilerPiscina(2550000); sol18.setAlquilerPista(2550000);
         este.add(sol18);
 
-        Casilla sol19 = new Casilla("Sol19", "Solar", 32, 3000000, banca);
+        Solar sol19 = new Solar("Solar19", 32, 3000000, 260000);
         sol19.setHipoteca(1500000);
-        sol19.setAlquilerBase(260000);
-        sol19.setAlquilerCasa(2750000);
-        sol19.setAlquilerHotel(12750000);
-        sol19.setAlquilerPiscina(2550000);
-        sol19.setAlquilerPista(2550000);
-        sol19.setPrecioCasa(2000000);
-        sol19.setPrecioHotel(2000000);
-        sol19.setPrecioPiscina(400000);
-        sol19.setPrecioPista(800000);
+        sol19.setPrecioCasa(2000000); sol19.setPrecioHotel(2000000);
+        sol19.setPrecioPiscina(400000); sol19.setPrecioPista(800000);
+        sol19.setAlquilerCasa(2750000); sol19.setAlquilerHotel(12750000);
+        sol19.setAlquilerPiscina(2550000); sol19.setAlquilerPista(2550000);
         este.add(sol19);
 
-        este.add(new Casilla("Caja", "Caja", 33, banca));
 
-        Casilla sol20 = new Casilla("Sol20", "Solar", 34, 3200000, banca);
+        este.add(new CajaComunidad("Caja", 33));
+
+        Solar sol20 = new Solar("Solar20", 34, 3200000, 280000);
         sol20.setHipoteca(1600000);
-        sol20.setAlquilerBase(280000);
-        sol20.setAlquilerCasa(3000000);
-        sol20.setAlquilerHotel(14000000);
-        sol20.setAlquilerPiscina(2800000);
-        sol20.setAlquilerPista(2800000);
-        sol20.setPrecioCasa(2000000);
-        sol20.setPrecioHotel(2000000);
-        sol20.setPrecioPiscina(400000);
-        sol20.setPrecioPista(800000);
+        sol20.setPrecioCasa(2000000); sol20.setPrecioHotel(2000000);
+        sol20.setPrecioPiscina(400000); sol20.setPrecioPista(800000);
+        sol20.setAlquilerCasa(3000000); sol20.setAlquilerHotel(14000000);
+        sol20.setAlquilerPiscina(2800000); sol20.setAlquilerPista(2800000);
         este.add(sol20);
 
-        Casilla tran4 = new Casilla("Tran4", "Transporte", 35, 500000, banca);
-        tran4.setAlquilerBase(250000);
+
+        Transporte tran4 = new Transporte("Tran4", 35, 500000);
         este.add(tran4);
 
-        este.add(new Casilla("Suerte", "Suerte", 36, banca));
+        este.add(new Suerte("Suerte", 36));
 
-        Casilla sol21 = new Casilla("Sol21", "Solar", 37, 3500000, banca);
+        Solar sol21 = new Solar("Solar21", 37, 3500000, 350000);
         sol21.setHipoteca(1750000);
-        sol21.setAlquilerBase(350000);
-        sol21.setAlquilerCasa(3250000);
-        sol21.setAlquilerHotel(17000000);
-        sol21.setAlquilerPiscina(3400000);
-        sol21.setAlquilerPista(3400000);
-        sol21.setPrecioCasa(2000000);
-        sol21.setPrecioHotel(2000000);
-        sol21.setPrecioPiscina(400000);
-        sol21.setPrecioPista(800000);
+        sol21.setPrecioCasa(2000000); sol21.setPrecioHotel(2000000);
+        sol21.setPrecioPiscina(400000); sol21.setPrecioPista(800000);
+        sol21.setAlquilerCasa(3250000); sol21.setAlquilerHotel(17000000);
+        sol21.setAlquilerPiscina(3400000); sol21.setAlquilerPista(3400000);
         este.add(sol21);
 
-        Casilla imp2 = new Casilla("Imp2", "Impuesto", 38, 2000000, banca);
+
+        Impuesto imp2 = new Impuesto("Imp2", 38, 2000000);
         este.add(imp2);
 
-        Casilla sol22 = new Casilla("Sol22", "Solar", 39, 4000000, banca);
+        Solar sol22 = new Solar("Solar22", 39, 4000000, 500000);
         sol22.setHipoteca(2000000);
-        sol22.setAlquilerBase(500000);
-        sol22.setAlquilerCasa(4250000);
-        sol22.setAlquilerHotel(20000000);
-        sol22.setAlquilerPiscina(4000000);
-        sol22.setAlquilerPista(4000000);
-        sol22.setPrecioCasa(2000000);
-        sol22.setPrecioHotel(2000000);
-        sol22.setPrecioPiscina(400000);
-        sol22.setPrecioPista(800000);
+        sol22.setPrecioCasa(2000000); sol22.setPrecioHotel(2000000);
+        sol22.setPrecioPiscina(400000); sol22.setPrecioPista(800000);
+        sol22.setAlquilerCasa(4250000); sol22.setAlquilerHotel(20000000);
+        sol22.setAlquilerPiscina(4000000); sol22.setAlquilerPista(4000000);
         este.add(sol22);
+
+
     }
 
+    public ArrayList<Casilla> getCasillas() { return casillas; }
 
-    // ======== Grupos ========
+
+
+// ======== Grupos ========
     private String norm(String s) {
         if (s == null) return "";
         return s.trim().toLowerCase();
@@ -423,14 +316,14 @@ public class Tablero {
         grupos.clear();
 
         String[][] def = {
-                {"marron", "Sol1", "Sol2"},
-                {"cian", "Sol3", "Sol4", "Sol5"},
-                {"magenta", "Sol6", "Sol7", "Sol8"},
-                {"amarillo", "Sol9", "Sol10", "Sol11"},
-                {"rojo", "Sol12", "Sol13", "Sol14"},
-                {"naranja", "Sol15", "Sol16", "Sol17"},
-                {"verde", "Sol18", "Sol19", "Sol20"},
-                {"azul", "Sol21", "Sol22"},
+                {"marron", "Solar1", "Solar2"},
+                {"cian", "Solar3", "Solar4", "Solar5"},
+                {"magenta", "Solar6", "Solar7", "Solar8"},
+                {"amarillo", "Solar9", "Solar10", "Solar11"},
+                {"rojo", "Solar12", "Solar13", "Sol14"},   // ← Este sí es "Sol14" (sin 'ar')
+                {"naranja", "Solar15", "Solar16", "Solar17"},
+                {"verde", "Solar18", "Solar19", "Solar20"},
+                {"azul", "Solar21", "Solar22"},
                 {"transporte", "Tran1", "Tran2", "Tran3", "Tran4"},
                 {"servicio", "Serv1", "Serv2"}
         };
@@ -447,13 +340,6 @@ public class Tablero {
                 g.anhadirCasilla(c);
             }
             grupos.put(nombreGrupo, g);
-        }
-
-        // Asignar el grupo a cada casilla
-        for (Grupo g : grupos.values()) {
-            for (Casilla c : g.getMiembros()) {
-                if (c != null) c.setGrupo(g);
-            }
         }
     }
 
@@ -616,11 +502,6 @@ public class Tablero {
 
     }
 
-//    public Jugador getBanca() {
-//        return banca;
-//    }
-
-
     public void añadirAlParking(float cantidad) {
         fondoParking += cantidad;
     }
@@ -636,6 +517,7 @@ public class Tablero {
     }
 
     public int getUltimaTirada() {
+
         return ultimaTirada;
     }
 
@@ -652,7 +534,6 @@ public class Tablero {
         return grupos.get(nombreGrupo.toLowerCase().trim());
     }
 
-    public ArrayList<Casilla> getCasillas() { return casillas;}
     public ArrayList<Grupo> getGrupos() { return new ArrayList<>(grupos.values());}
 
 }
