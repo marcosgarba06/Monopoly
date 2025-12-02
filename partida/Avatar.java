@@ -49,9 +49,8 @@ public class Avatar {
 
     public void moverAvatar(int pasos, Tablero tablero) {
         int posicionActual = this.posicion;
-        int nuevaPos = (posicionActual + pasos) % 40;//calcular la nueva posición del avatar en el tablero, asegurándose de que no se salga del rango de casillas.
+        int nuevaPos = (posicionActual + pasos) % 40;
 
-        // Si la nueva posición es menor que la actual, significa que pasó por la salida
         if (nuevaPos < posicionActual) {
             jugador.sumarFortuna(2000000);
             jugador.sumarSalida(2000000);
@@ -60,9 +59,8 @@ public class Avatar {
         }
 
         this.posicion = nuevaPos;
-
         Casilla nuevaCasilla = tablero.getCasilla(nuevaPos);
-        setCasilla(nuevaCasilla); // ← unifica y mantiene listas de avatares
+        setCasilla(nuevaCasilla); // ahora limpia y añade correctamente
 
         System.out.println("El avatar " + id + " ha avanzado hasta la casilla " + nuevaCasilla.getNombre());
         nuevaCasilla.evaluarCasilla(jugador, tablero);
@@ -130,10 +128,12 @@ public class Avatar {
         return enCarcel;
     }
 
-    public void setCasilla(Casilla c) {
-        if (this.casilla != null) this.casilla.eliminarAvatar(this);
-        this.casilla = c;
-        if (c != null) c.anhadirAvatar(this);
+    public void setCasilla(Casilla nuevaCasilla) {
+        if (this.casilla != null) {
+            this.casilla.eliminarAvatar(this); // siempre limpiar
+        }
+        this.casilla = nuevaCasilla;
+        nuevaCasilla.anhadirAvatar(this);      // añadir en la nueva casilla
     }
 
     public String getTipo() {

@@ -42,8 +42,11 @@ public abstract class Casilla {
     }
 
     public void anhadirAvatar(Avatar avatar) {
-        avatares.add(avatar);
+        if (!avatares.contains(avatar)) {
+            avatares.add(avatar);
+        }
     }
+
 
     public void eliminarAvatar(Avatar avatar) {
         avatares.remove(avatar);
