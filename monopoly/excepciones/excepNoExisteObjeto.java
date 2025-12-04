@@ -1,7 +1,7 @@
 package monopoly.excepciones;
 
 public class excepNoExisteObjeto extends excepcionMonopoly {
-    public excepNoExisteObjeto() {
-        super("No existe");
+    public excepNoExisteObjeto(String tipo, String objeto) {
+        super("No existe " + tipo + " '" + objeto + "'");
     }
 }

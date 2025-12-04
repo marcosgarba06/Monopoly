@@ -5,6 +5,7 @@ import monopoly.Casillas.Propiedades.Propiedad;
 import monopoly.Casillas.Propiedades.Solar;
 import partida.*;
 import monopoly.Casillas.*;
+import monopoly.excepciones.*;
 
 import monopoly.Edificios.*;
 import java.util.regex.Pattern;
@@ -62,7 +63,7 @@ public class Juego { // la clase menu
         this.dado2 = new Dado();
     }
 
-    public void iniciarPartida() {
+    public void iniciarPartida() throws excepcionMonopoly {
 
         menuSetUp(); //immprime el menu de inicializacion
 
@@ -80,7 +81,7 @@ public class Juego { // la clase menu
 
     }
 
-    public void iniciarJuego() {
+    public void iniciarJuego() throws excepcionMonopoly {
 
         juegoIniciado = true; //El juego ha iniciado correctamente
         Scanner sc = new Scanner(System.in);
@@ -148,53 +149,110 @@ public class Juego { // la clase menu
 
 
 
-    public void analizarComando(String comando) {
-
-        if (!juegoIniciado) { //Si estamos en el apartado de setup (la partida no empezÃ³ se usa otra opcion)
-            analizarComandoSetup(comando);
-            return;
-        }
-
-        Jugador actual = jugadores.get(turno);
-        if (actual.tieneDeudaPendiente()) {
-            String cmd = comando.trim().toLowerCase();
-
-            // Solo permitir hipotecar y declarar bancarrota
-            if (!cmd.startsWith("hipotecar") && !cmd.equals("declarar bancarrota")) {
-                System.out.println("\nTienes una deuda pendiente:");
-                System.out.println("Debes pagar: " + (long)actual.getDeudaPendiente() + "â‚¬");
-                System.out.println("Tu fortuna: " + (long)actual.getFortuna() + "â‚¬");
-                System.out.println("Faltante: " + (long)(actual.getDeudaPendiente() - actual.getFortuna()) + "â‚¬");
-                System.out.println("\nComandos permitidos:");
-                System.out.println("  - hipotecar <casilla>");
-                System.out.println("  - declarar bancarrota");
+    public void analizarComando(String comando) throws excepcionMonopoly {
+        try {
+            if (!juegoIniciado) { //Si estamos en el apartado de setup (la partida no empezÃ³ se usa otra opcion)
+                analizarComandoSetup(comando);
                 return;
             }
+
+            Jugador actual = jugadores.get(turno);
+
+            if (actual.isBancarrota()) {
+                throw new excepEstJugEnBancarrota(actual.getNombre());
+            }
+
+            if (actual.tieneDeudaPendiente()) {
+                String cmd = comando.trim().toLowerCase();
+
+                // Solo permitir hipotecar y declarar bancarrota
+                if (!cmd.startsWith("hipotecar") && !cmd.equals("declarar bancarrota")) {
+                    System.out.println("\nTienes una deuda pendiente:");
+                    System.out.println("Debes pagar: " + (long) actual.getDeudaPendiente() + "â‚¬");
+                    System.out.println("Tu fortuna: " + (long) actual.getFortuna() + "â‚¬");
+                    System.out.println("Faltante: " + (long) (actual.getDeudaPendiente() - actual.getFortuna()) + "â‚¬");
+                    System.out.println("\nComandos permitidos:");
+                    System.out.println("  - hipotecar <casilla>");
+                    System.out.println("  - declarar bancarrota");
+                    return;
+                }
+            }
+            String comandoLimpio = comando.trim(); //quita espacio del principio y del final
+            String comandoMinusculas = comandoLimpio.toLowerCase(Locale.ROOT);// pone todo en minusculas
+
+            if (procesarComandoDados(comandoLimpio)) { // para procesar el tirar dados con diferentes parametros
+                return;
+            }
+
+            if (procesarComandoArchivo(comandoLimpio, comandoMinusculas)) { //para comandos desde archivos
+                return;
+            }
+
+            if (procesarComandoSimple(comandoMinusculas)) {
+                return;
+            }
+
+            if (procesarComandoConParametros(comandoMinusculas, comandoLimpio)) {
+                return;
+            }
+
+            throw new excepComandoInvalido("Comando introducido incorrecto");
+        } catch (excepSinRecDinero e) {
+            System.out.println(e.getMessage());
+            System.out.println("Opciones:");
+            System.out.println("   - Hipoteca propiedades: 'hipotecar <casilla>'");
+            System.out.println("   - Declara bancarrota: 'declarar bancarrota'");
+
+        } catch (excepSinRecPropInsuficientes e) {
+            System.out.println(e.getMessage());
+
+        } catch (excepSinRecursos e) {
+            System.out.println(e.getMessage());
+
+        } catch (excepTransPropHipotecada e) {
+            System.out.println(e.getMessage());
+            System.out.println("Sugerencia: Deshipoteca la propiedad con 'deshipotecar <casilla>'");
+
+        } catch (excepTransEdNoPermitida e) {
+            System.out.println(e.getMessage());
+            System.out.println("Sugerencia: Verifica que posees el grupo completo y no hay hipotecas");
+
+        } catch (excepTransPropNoPermitida e) {
+            System.out.println(e.getMessage());
+
+        } catch (excepTransaccion e) {
+            System.out.println(e.getMessage());
+
+        } catch (excepEstTurnoInvalido e) {
+            System.out.println(e.getMessage());
+
+        } catch (excepEstJugEnCarcel e) {
+            System.out.println(e.getMessage());
+            System.out.println("Usa 'salir carcel' para intentar salir de la cárcel");
+
+        } catch (excepEstJugEnBancarrota e) {
+            System.out.println(e.getMessage());
+
+        } catch (excepEstadoJuego e) {
+            System.out.println(e.getMessage());
+
+        } catch (excepNoExisteObjeto e) {
+            System.out.println(e.getMessage());
+            System.out.println("💡 Sugerencia: Usa 'ver tablero' o 'listar enventa' para ver las opciones");
+
+        } catch (excepComandoInvalido e) {
+            System.out.println(e.getMessage());
+            System.out.println("Comandos disponibles:");
+            menuComandos();
+
+        } catch (excepcionMonopoly e) {
+            System.out.println("Error: " + e.getMessage());
+
+        } catch (Exception e) {
+            System.out.println("Error inesperado: " + e.getMessage());
+            e.printStackTrace();
         }
-        String comandoLimpio = comando.trim(); //quita espacio del principio y del final
-        String comandoMinusculas = comandoLimpio.toLowerCase(Locale.ROOT);// pone todo en minusculas
-
-        if (procesarComandoDados(comandoLimpio)) { // para procesar el tirar dados con diferentes parametros
-            return;
-        }
-
-        if (procesarComandoArchivo(comandoLimpio, comandoMinusculas)) { //para comandos desde archivos
-            return;
-        }
-
-        if (procesarComandoSimple(comandoMinusculas)) {
-            return;
-        }
-
-        if (procesarComandoConParametros(comandoMinusculas, comandoLimpio)) {
-            return;
-        }
-
-        System.out.println("Comando no reconocido. Prueba con alguno de estos:");
-        menuComandos();
-
     }
-
 
     //MÃ©todo para analizar comandos en la parte de setup (en la que se pueden crear personajes)
     private void analizarComandoSetup(String comando) {
@@ -236,7 +294,7 @@ public class Juego { // la clase menu
         menuSetUp();
     }
 
-    private boolean procesarComandoDados(String comandoOriginal) {
+    private boolean procesarComandoDados(String comandoOriginal) throws excepcionMonopoly {
         Pattern patronDados = Pattern.compile(
                 "^(tirar|lanzar)\\s+dados(?:\\s+(\\d)\\s*\\+\\s*(\\d))?$",
                 Pattern.CASE_INSENSITIVE
@@ -292,7 +350,7 @@ public class Juego { // la clase menu
         return true;
     }
 
-    private boolean procesarComandoSimple(String comandoMinusculas) {
+    private boolean procesarComandoSimple(String comandoMinusculas) throws excepcionMonopoly {
 
         switch (comandoMinusculas) {
             case "listar jugadores":
@@ -354,7 +412,7 @@ public class Juego { // la clase menu
         }
     }
 
-    private boolean procesarComandoConParametros(String comandoMinusculas, String comandoOriginal) {
+    private boolean procesarComandoConParametros(String comandoMinusculas, String comandoOriginal) throws excepcionMonopoly {
         String[] palabras = comandoMinusculas.split("\\s+");
 
         // "comprar <propiedad>"
@@ -486,6 +544,8 @@ public class Juego { // la clase menu
         } catch (IOException e) {
             // Captura errores y los muestra
             System.out.println("Error leyendo el archivo: " + e.getMessage());
+        } catch (excepcionMonopoly e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -576,24 +636,21 @@ public class Juego { // la clase menu
         }
     }
 
-    private int lanzarDados() {
+    private int lanzarDados() throws excepcionMonopoly{
         if (jugadores == null || jugadores.isEmpty()) {
-            System.out.println("No hay jugadores en la partida.");
-            return 0;
+            throw new excepEstadoJuego("No hay jugadores en la partida");
         }
 
         if (tirado) {
-            System.out.println("Ya has tirado los dados este turno.");
-            return 0;
+            throw new excepEstTurnoInvalido("tirar dados");
         }
 
         Jugador actual = jugadores.get(turno);
         Avatar av = actual.getAvatar();
 
-        // *** CAMBIO CLAVE: Si estÃ¡ en cÃ¡rcel, NO mostrar menÃº aquÃ­ ***
+        // *** CAMBIO CLAVE: Si estÃ¡ en carcel, NO mostrar menu aqui ***
         if (actual.isEnCarcel() || av.estaEnCarcel()) {
-            System.out.println("Estas en la carcel. Usa el comando 'salir carcel' para intentar salir.");
-            return 0;
+            throw new excepEstJugEnCarcel("tirar dados", actual.getNombre());
         }
 
         // Tirada normal (fuera de cÃ¡rcel)
@@ -978,32 +1035,23 @@ public class Juego { // la clase menu
         }
     }
 
-    private void acabarTurno() {
+    private void acabarTurno() throws excepcionMonopoly{
         if (jugadores == null || jugadores.isEmpty()) {
-            System.out.println("No hay jugadores en la partida.");
-            return;
+            throw new excepEstadoJuego("No hay jugadores en la partida");
         }
 
         Jugador actual = jugadores.get(turno);
 
         if (actual.getDeudaPendiente() > 0) {
-            System.out.println("No puedes acabar el turno con una deuda pendiente.");
-            System.out.println("Deuda: " + (long)actual.getDeudaPendiente() + "â‚¬");
-            System.out.println("Tu fortuna: " + (long)actual.getFortuna() + "â‚¬");
-            System.out.println("\nOPCIONES:");
-            System.out.println("1. Hipotecar mÃ¡s propiedades");
-            System.out.println("2. Declarar bancarrota");
-            return;
+            throw new excepSinRecDinero((long)actual.getDeudaPendiente(), (long)actual.getFortuna());
         }
 
         if (!tirado) {
-            System.out.println("No puedes acabar el turno sin haber tirado los dados o intentado salir de la cÃ¡rcel.");
-            return;
+            throw new excepEstTurnoInvalido("acabar turno (no has tirado los dados)");
         }
 
         if (contadorDobles > 0) {
-            System.out.println("Has sacado dobles. Debes volver a tirar antes de acabar el turno.");
-            return;
+            throw new excepEstTurnoInvalido("acabar turno (has sacado dobles, debes volver a tirar)");
         }
 
         // Contar jugadores activos
@@ -1016,7 +1064,7 @@ public class Juego { // la clase menu
 
         // Si solo queda un jugador activo, terminar el juego
         if (jugadoresActivos <= 1) {
-            System.out.println("Â¡La partida ha terminado!");
+            System.out.println("¡La partida ha terminado!");
             return;
         }
 
@@ -1030,8 +1078,7 @@ public class Juego { // la clase menu
                 intentos++;
 
                 if (intentos >= maxIntentos) {
-                    System.out.println("Error: No se encontra jugador activo.");
-                    return;
+                    throw new excepEstadoJuego("No se encontró jugador activo");
                 }
             } while (jugadores.get(turno).isBancarrota());
         }
@@ -1054,6 +1101,7 @@ public class Juego { // la clase menu
             System.out.println("CUIDADO " + actual.getNombre() + " esta en la Carcel.");
         }
     }
+
 
     // Determina si hay un Ãºnico jugador activo (no en bancarrota) y lo retorna como ganador.
     private Jugador verificarGanador() {
@@ -1132,38 +1180,33 @@ public class Juego { // la clase menu
         }
     }
 
-    public void comprarCasilla(String nombreCasilla) {
+    public void comprarCasilla(String nombreCasilla) throws excepcionMonopoly {
         Jugador jugador = jugadores.get(turno);
         Casilla casilla = tablero.encontrarCasilla(nombreCasilla);
 
         if (casilla == null) {
-            System.out.println("No se encontró la casilla '" + nombreCasilla + "'.");
-            return;
+            throw new excepNoExisteObjeto("La casilla", nombreCasilla);
         }
 
         // Verifica que el jugador esté en la casilla
         Casilla casillaActual = jugador.getAvatar().getCasilla();
         if (!casillaActual.equals(casilla)) {
-            System.out.println("No puedes comprar esta casilla porque no estás en ella.");
-            return;
+            throw new excepTransPropNoPermitida("No estás en la casilla " + nombreCasilla);
         }
 
         // Solo propiedades son comprables
         if (!(casilla instanceof Propiedad)) {
-            System.out.println("Esta casilla no se puede comprar.");
-            return;
+            throw new excepTransPropNoPermitida("esta casilla no se puede comprar.");
         }
 
         Propiedad propiedad = (Propiedad) casilla;
 
-        if (!propiedad.estaEnVenta()) {
-            System.out.println("Esta casilla ya tiene dueño.");
-            return;
+        if (casilla.getDuenho() != null) {
+            throw new excepTransPropNoPermitida("la casilla ya tiene dueño (" + propiedad.getDuenho() + ").");
         }
 
         if (jugador.getFortuna() < propiedad.getValor()) {
-            System.out.println("No tienes suficiente dinero para comprar esta casilla.");
-            return;
+            throw new excepSinRecDinero(((Propiedad) casilla).getValor(), jugador.getFortuna());
         }
 
         // Compra
@@ -1175,32 +1218,27 @@ public class Juego { // la clase menu
         System.out.println("Has comprado " + propiedad.getNombre() + " por " + (long) propiedad.getValor() + "€.");
     }
 
-    private void edificarPropiedad(String tipo) {
+    private void edificarPropiedad(String tipo) throws excepcionMonopoly {
         Jugador jugadorActual = jugadores.get(turno);
         Avatar avatar = jugadorActual.getAvatar();
         Casilla casilla = avatar.getCasilla();
 
         if (!(casilla instanceof Solar)) {
-            System.out.println("No puedes edificar en esta casilla porque no es un solar.");
-            return;
+            throw new excepTransEdNoPermitida("solo se puede edificar en solares");
         }
 
         Solar solar = (Solar) casilla;
 
         if (solar.getDuenho() == null || !solar.getDuenho().equals(jugadorActual)) {
-            System.out.println("No eres dueño de " + solar.getNombre() + ", no puedes edificar en ella.");
-            return;
+            throw new excepTransEdNoPermitida("no eres dueño de " + casilla.getNombre());
         }
 
         if (!jugadorActual.poseeGrupoCompleto(solar, tablero)) {
-            System.out.println("No puedes construir aquí. No posees todo el grupo " +
-                    solar.getGrupo().getNombre() + ".");
-            return;
+            throw new excepTransEdNoPermitida("no posees todo el grupo " + casilla.getGrupo().getNombre());
         }
 
         if (solar.estaHipotecada()) {
-            System.out.println("No puedes edificar en " + solar.getNombre() + " porque está hipotecada.");
-            return;
+            throw new excepTransPropHipotecada(tipo);
         }
 
         String tipoNormalizado = tipo.toLowerCase().trim();
@@ -1254,8 +1292,7 @@ public class Juego { // la clase menu
                 break;
 
             default:
-                System.out.println("Tipo de edificación no válido. Usa: casa, hotel, piscina o pista deporte");
-                break;
+                throw  new excepComandoInvalido("Tipo de edificación no válido. Usa: casa, hotel, piscina o pista deporte");
         }
     }
 
@@ -1425,33 +1462,34 @@ public class Juego { // la clase menu
     }
 
 
-    private void hipotecarPropiedad(String nombreCasilla) {
+    private void hipotecarPropiedad(String nombreCasilla) throws excepcionMonopoly {
         Jugador jugador = jugadores.get(turno);
         Casilla casilla = tablero.encontrarCasilla(nombreCasilla);
 
+        if (casilla == null) {
+            throw new excepNoExisteObjeto("la casilla", nombreCasilla);
+        }
+
         if (!(casilla instanceof Propiedad)) {
-            System.out.println("La casilla '" + nombreCasilla + "' no es hipotecable.");
-            return;
+            throw new excepTransaccion("no es hipotecable");
         }
 
         Propiedad propiedad = (Propiedad) casilla;
 
         if (!propiedad.perteneceAJugador(jugador)) {
-            System.out.println("No eres dueño de " + propiedad.getNombre() + ".");
-            return;
-        }
-
-        if (propiedad.estaHipotecada()) {
-            System.out.println("La propiedad ya está hipotecada.");
-            return;
+            throw new excepTransPropNoPermitida("la propiedad no pertenece a ningún jugador");
         }
 
         propiedad.hipotecar(); //Hipotecar en Propiedad, metodo que realiza la hipoteca
     }
 
-    private void deshipotecarPropiedad(String nombreCasilla) {
+    private void deshipotecarPropiedad(String nombreCasilla) throws excepcionMonopoly{
         Jugador jugador = jugadores.get(turno);
         Casilla casilla = tablero.encontrarCasilla(nombreCasilla);
+
+        if (casilla == null) {
+            throw new excepNoExisteObjeto("la casilla", nombreCasilla);
+        }
 
         if (!(casilla instanceof Propiedad)) {
             System.out.println("La casilla '" + nombreCasilla + "' no es una propiedad.");
@@ -1461,28 +1499,34 @@ public class Juego { // la clase menu
         Propiedad propiedad = (Propiedad) casilla;
 
         if (!propiedad.perteneceAJugador(jugador)) {
-            System.out.println("No eres dueño de " + propiedad.getNombre() + ".");
-            return;
+            throw new excepTransPropNoPermitida("no eres dueño de esta propiedad");
         }
 
         propiedad.deshipotecar(); //Deshipotecar en Propiedad, metodo que realiza la deshipoteca
     }
 
 
-    private void venderPropiedad(String tipo, String nombreCasilla, int cantidad) {
+
+    private void venderPropiedad(String tipo, String nombreCasilla, int cantidad) throws excepcionMonopoly {
         Jugador jugador = jugadores.get(turno);
         Casilla casilla = tablero.encontrarCasilla(nombreCasilla);
 
+        if (casilla == null) {
+            throw new excepNoExisteObjeto("la casilla", nombreCasilla);
+        }
+
         if (!(casilla instanceof Solar)) {
-            System.out.println("La casilla '" + nombreCasilla + "' no es un solar edificable.");
-            return;
+            throw new excepEstadoJuego("La casilla" + nombreCasilla + "no es un solar edificable");
+        }
+
+        if (cantidad <= 0) {
+            throw new excepComandoInvalido("Cantidad incorrecta de propiedades.");
         }
 
         Solar solar = (Solar) casilla;
 
         if (!solar.getDuenho().equals(jugador)) {
-            System.out.println("No eres dueño de " + solar.getNombre() + ".");
-            return;
+            throw new excepTransPropNoPermitida("la propiedad " + nombreCasilla + " no te pertenece");
         }
 
         switch (tipo.toLowerCase()) {
