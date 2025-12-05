@@ -6,6 +6,7 @@ import monopoly.Casillas.Propiedades.Solar;
 import partida.*;
 import monopoly.Casillas.*;
 import monopoly.excepciones.*;
+import monopoly.Interfaces.Comando;
 
 import monopoly.Edificios.*;
 import java.util.regex.Pattern;
@@ -19,7 +20,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Juego { // la clase menu
+public class Juego implements Comando { // la clase menu
 
     ////////Atributos//////////
 
@@ -81,6 +82,7 @@ public class Juego { // la clase menu
 
     }
 
+    @Override
     public void iniciarJuego() throws excepcionMonopoly {
 
         juegoIniciado = true; //El juego ha iniciado correctamente
@@ -100,7 +102,8 @@ public class Juego { // la clase menu
     }
 
     //metodo para crear un jugador con su avatar asociado
-    private void crearJugador(String nombre, String avatarElegido) {
+    @Override
+    public void crearJugador(String nombre, String avatarElegido) {
 
         if (jugadores.size() >= 4) { //no crea mas si hay 4, LIMITE MAX 4
             System.out.println("Ya hay 4 jugadores. No se pueden crear mas.");
@@ -266,7 +269,7 @@ public class Juego { // la clase menu
         }
 
         if (comandoMinusculas.equals("salir")) {
-            IO.println("Saliendo...");
+            System.out.println("Saliendo...");
             System.exit(0);
             return;
         }
@@ -306,7 +309,7 @@ public class Juego { // la clase menu
 //        (?:                     // Inicio de grupo opcional (no captura)
 //        \\s+                 // Uno o mÃ¡s espacios
 //        (\\d)                // Primer nÃºmero (dado1), un solo dÃ­gito
-//        \\s*\\+\\s*          // El signo + con espacios opcionales
+//        \\s*\\+\\s* // El signo + con espacios opcionales
 //        (\\d)                // Segundo nÃºmero (dado2), un solo dÃ­gito
 //        )?                      // Fin del grupo opcional
 //        $                       // Fin de la lÃ­nea
@@ -359,7 +362,7 @@ public class Juego { // la clase menu
                 return true;
 
             case "ver tablero":
-                System.out.println(tablero);
+                verTablero();
                 return true;
 
             case "salir":
@@ -372,8 +375,7 @@ public class Juego { // la clase menu
                 return true;
 
             case "salir carcel":
-                Jugador jugadorActual = jugadores.get(turno);
-                salirCarcel(jugadorActual);
+                salirCarcel();
                 return true;
 
             case "listar enventa":
@@ -388,15 +390,7 @@ public class Juego { // la clase menu
                 return true;
 
             case "declarar bancarrota":
-
-                Jugador jugadorActuaal = jugadores.get(turno);
-                if (jugadorActuaal.getDeudaPendiente() > 0) {
-                    jugadorActuaal.declararBancarrota(jugadorActuaal.getAcreedorDeuda());
-                    tablero.notificarBancarrota(jugadorActuaal);
-                } else {
-                    System.out.println("No tienes deudas pendientes.");
-                    System.out.println("No puedes declararte en bancarrota voluntariamente.");
-                }
+                declararBancarrota();
                 return true;
 
             case "acabar turno":
@@ -430,7 +424,7 @@ public class Juego { // la clase menu
 
         // "describir jugador <nombre>"
         if (palabras.length >= 3 && palabras[0].equals("describir") && palabras[1].equals("jugador")) {
-            descJugador(palabras);
+            descJugador(palabras[2]);
             return true;
         }
 
@@ -549,17 +543,13 @@ public class Juego { // la clase menu
         }
     }
 
-    private void descJugador(String[] partes) {
-        if (partes.length < 3) {
-            System.out.println("Uso: describir jugador <nombre>");
-            return;
-        }
-
-        String nombreBuscado = partes[2].toLowerCase();
+    @Override
+    public void descJugador(String nombreBuscado) { // Se modificó la firma para la interfaz, recibía String[]
+        // String nombreBuscado = partes[2].toLowerCase(); // Lógica original usaba array
 
         for (Jugador j : jugadores) { //un for each para encontrar el jugador entre los que hay en la partida
 
-            if (j.getNombre().toLowerCase().equals(nombreBuscado)) { //si lo encuentra lo imprime
+            if (j.getNombre().toLowerCase().equals(nombreBuscado.toLowerCase())) { //si lo encuentra lo imprime
                 System.out.println("$> describir jugador " + j.getNombre());
                 System.out.println("{");
                 System.out.println("nombre: " + j.getNombre() + ",");
@@ -605,7 +595,8 @@ public class Juego { // la clase menu
     }
 
 
-    private void descAvatar(String ID) {
+    @Override
+    public void descAvatar(String ID) {
 
         for (Avatar av : avatares) { //for each para recorrer los avatares de los jugadores creados
             if (av.getId().equalsIgnoreCase(ID)) { //si lo encuentra imprime su tipo, el jugador y la casilla en la que esta
@@ -621,7 +612,8 @@ public class Juego { // la clase menu
         System.out.println("No se encontra ningun avatar con ID '" + ID + "'.");
     }
 
-    private void descCasilla(String nombre) {
+    @Override
+    public void descCasilla(String nombre) {
         //Busca la casilla en el tablero
         Casilla casilla = tablero.encontrarCasilla(nombre);
         if (casilla != null) {
@@ -636,7 +628,8 @@ public class Juego { // la clase menu
         }
     }
 
-    private int lanzarDados() throws excepcionMonopoly{
+    @Override
+    public void lanzarDados() throws excepcionMonopoly{
         if (jugadores == null || jugadores.isEmpty()) {
             throw new excepEstadoJuego("No hay jugadores en la partida");
         }
@@ -669,7 +662,7 @@ public class Juego { // la clase menu
                 actual.irACarcel(tablero);
                 contadorDobles = 0;
                 tirado = true;
-                return total;
+                return; // Changed return int to return void logic
             }
         } else {
             contadorDobles = 0;
@@ -683,7 +676,7 @@ public class Juego { // la clase menu
             System.out.println("Has caido en 'Ir a Carcel'. Usa 'salir carcel'.");
             tirado = true;
             contadorDobles = 0;
-            return total;
+            return; // Changed return int to return void logic
         }
 
         // Marcar tirada completada
@@ -693,23 +686,24 @@ public class Juego { // la clase menu
         }
 
         System.out.println(tablero);
-        return total;
+        // return total; // Removed return to match void interface
     }
 
-    private int lanzarDadosForzados(int d1, int d2) {
+    @Override
+    public void lanzarDadosForzados(int d1, int d2) {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
-            return 0;
+            return; // return 0 -> return
         }
 
         if (tirado) {
             System.out.println("Ya has tirado los dados este turno.");
-            return 0;
+            return; // return 0 -> return
         }
 
         if (d1 < 1 || d1 > 6 || d2 < 1 || d2 > 6) {
             System.out.println("Valores invalidos. Usa numeros entre 1 y 6.");
-            return 0;
+            return; // return 0 -> return
         }
 
         Jugador actual = jugadores.get(turno);
@@ -718,7 +712,7 @@ public class Juego { // la clase menu
         // *** CAMBIO: No mostrar menÃº automÃ¡ticamente ***
         if (actual.isEnCarcel() || av.estaEnCarcel()) {
             System.out.println("Estas en la Carcel. Usa el comando 'salir carcel'.");
-            return 0;
+            return; // return 0 -> return
         }
 
         // Guardar valores en los dados
@@ -738,7 +732,7 @@ public class Juego { // la clase menu
                 actual.irACarcel(tablero);
                 contadorDobles = 0;
                 tirado = true;
-                return total;
+                return; // return total -> return
             }
         } else {
             contadorDobles = 0;
@@ -750,7 +744,7 @@ public class Juego { // la clase menu
             System.out.println("Has caido en 'Ir a Carcel'. Usa 'salir carcel'.");
             tirado = true;
             contadorDobles = 0;
-            return total;
+            return; // return total -> return
         }
 
         tirado = true;
@@ -759,11 +753,14 @@ public class Juego { // la clase menu
         }
 
         System.out.println(tablero);
-        return total;
+        // return total; // Removed return
     }
 
 
-    private void salirCarcel(Jugador jugador) {
+    @Override
+    public void salirCarcel() { // Se modificó firma (sin args) para interfaz, se obtiene jugador del turno
+        Jugador jugador = jugadores.get(turno);
+
         // Verificar que estÃ¡ en cÃ¡rcel
         if (!jugador.isEnCarcel() && !jugador.getAvatar().estaEnCarcel()) {
             System.out.println("No estas en la Carcel.");
@@ -902,7 +899,8 @@ public class Juego { // la clase menu
 
 
     //Metodo que indica el jugador que tiene el turno
-    private void indicarTurno() {
+    @Override
+    public void indicarTurno() {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
             return;
@@ -924,7 +922,8 @@ public class Juego { // la clase menu
 
 
     //Metodo que muestra las casillas que estÃ¡n a la venta actualmente
-    private void listarVenta() {
+    @Override
+    public void listarVenta() {
         ArrayList<Casilla> enVenta = tablero.getCasillasEnVenta();
 
         if (enVenta.isEmpty()) {
@@ -958,6 +957,7 @@ public class Juego { // la clase menu
 
     // MÃ©todo que realiza las acciones asociadas al comando 'listar jugadores'.
     // MÃ©todo que realiza las acciones asociadas al comando 'listar jugadores'.
+    @Override
     public void listarJugadores() {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
@@ -1017,7 +1017,8 @@ public class Juego { // la clase menu
     }
 
     // MÃ©todo que realiza las acciones asociadas al comando 'listar avatares'.
-    private void listarAvatares() {
+    @Override
+    public void listarAvatares() {
         if (avatares.isEmpty()) {
             System.out.println("No hay avatares en juego.");
             return;
@@ -1035,7 +1036,8 @@ public class Juego { // la clase menu
         }
     }
 
-    private void acabarTurno() throws excepcionMonopoly{
+    @Override
+    public void acabarTurno() throws excepcionMonopoly{
         if (jugadores == null || jugadores.isEmpty()) {
             throw new excepEstadoJuego("No hay jugadores en la partida");
         }
@@ -1180,6 +1182,7 @@ public class Juego { // la clase menu
         }
     }
 
+    @Override
     public void comprarCasilla(String nombreCasilla) throws excepcionMonopoly {
         Jugador jugador = jugadores.get(turno);
         Casilla casilla = tablero.encontrarCasilla(nombreCasilla);
@@ -1218,7 +1221,8 @@ public class Juego { // la clase menu
         System.out.println("Has comprado " + propiedad.getNombre() + " por " + (long) propiedad.getValor() + "€.");
     }
 
-    private void edificarPropiedad(String tipo) throws excepcionMonopoly {
+    @Override
+    public void edificarPropiedad(String tipo) throws excepcionMonopoly {
         Jugador jugadorActual = jugadores.get(turno);
         Avatar avatar = jugadorActual.getAvatar();
         Casilla casilla = avatar.getCasilla();
@@ -1315,6 +1319,7 @@ public class Juego { // la clase menu
         }
     }
 
+    @Override
     public void listarEdificaciones() {
         if (edificaciones.isEmpty()) { //si la lista global de edificios esta vacia, es que no hay edificios
             System.out.println("No hay edificaciones construidas.");
@@ -1332,7 +1337,8 @@ public class Juego { // la clase menu
         }
     }
 
-    private void listarEdificiosGrupo(String nombreGrupo) {
+    @Override
+    public void listarEdificiosGrupo(String nombreGrupo) {
 
         // Buscar el grupo en el tablero
         Grupo grupo = tablero.getGrupo(nombreGrupo);
@@ -1462,7 +1468,8 @@ public class Juego { // la clase menu
     }
 
 
-    private void hipotecarPropiedad(String nombreCasilla) throws excepcionMonopoly {
+    @Override
+    public void hipotecarPropiedad(String nombreCasilla) throws excepcionMonopoly {
         Jugador jugador = jugadores.get(turno);
         Casilla casilla = tablero.encontrarCasilla(nombreCasilla);
 
@@ -1483,7 +1490,8 @@ public class Juego { // la clase menu
         propiedad.hipotecar(); //Hipotecar en Propiedad, metodo que realiza la hipoteca
     }
 
-    private void deshipotecarPropiedad(String nombreCasilla) throws excepcionMonopoly{
+    @Override
+    public void deshipotecarPropiedad(String nombreCasilla) throws excepcionMonopoly{
         Jugador jugador = jugadores.get(turno);
         Casilla casilla = tablero.encontrarCasilla(nombreCasilla);
 
@@ -1507,7 +1515,8 @@ public class Juego { // la clase menu
 
 
 
-    private void venderPropiedad(String tipo, String nombreCasilla, int cantidad) throws excepcionMonopoly {
+    @Override
+    public void venderPropiedad(String tipo, String nombreCasilla, int cantidad) throws excepcionMonopoly {
         Jugador jugador = jugadores.get(turno);
         Casilla casilla = tablero.encontrarCasilla(nombreCasilla);
 
@@ -1548,7 +1557,8 @@ public class Juego { // la clase menu
         }
     }
 
-    private void mostrarEstadisticasUnJugador(String nombreJugador) {
+    @Override
+    public void mostrarEstadisticasUnJugador(String nombreJugador) {
         for (Jugador j : jugadores) {
             if (j.getNombre().equalsIgnoreCase(nombreJugador)) {
                 System.out.println("$> estadisticas " + j.getNombre());
@@ -1567,7 +1577,8 @@ public class Juego { // la clase menu
         System.out.println("No se encontrÃ³ ningÃºn jugador con el nombre '" + nombreJugador + "'.");
     }
 
-    private void mostrarEstadisticasJuego() {
+    @Override
+    public void mostrarEstadisticasJuego() {
 
         // 1. Casilla más rentable
         Propiedad casillaMasRentable = null;
@@ -1657,6 +1668,25 @@ public class Juego { // la clase menu
         System.out.println("jugadorMasVueltas: " + (jugadorMasVueltas != null ? jugadorMasVueltas.getNombre() : "-") + ",");
         System.out.println("jugadorEnCabeza: " + (jugadorEnCabeza != null ? jugadorEnCabeza.getNombre() : "-"));
         System.out.println("}");
+    }
+
+    // ========== MÉTODOS EXTRAÍDOS DE ANALIZAR COMANDO ==========
+
+    @Override
+    public void verTablero() {
+        System.out.println(tablero);
+    }
+
+    @Override
+    public void declararBancarrota() {
+        Jugador jugadorActuaal = jugadores.get(turno);
+        if (jugadorActuaal.getDeudaPendiente() > 0) {
+            jugadorActuaal.declararBancarrota(jugadorActuaal.getAcreedorDeuda());
+            tablero.notificarBancarrota(jugadorActuaal);
+        } else {
+            System.out.println("No tienes deudas pendientes.");
+            System.out.println("No puedes declararte en bancarrota voluntariamente.");
+        }
     }
 
 }
