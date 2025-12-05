@@ -7,6 +7,8 @@ import partida.*;
 import monopoly.Casillas.*;
 import monopoly.excepciones.*;
 import monopoly.Interfaces.Comando;
+import monopoly.Interfaces.Consola;
+import monopoly.Interfaces.ConsolaNormal;
 
 import monopoly.Edificios.*;
 import java.util.regex.Pattern;
@@ -21,6 +23,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Juego implements Comando { // la clase menu
+    // Es buena práctica declarar la variable con el tipo de la interfaz (Consola)
+    // e instanciarla con la implementación (ConsolaNormal).
+    public static ConsolaNormal consola = new ConsolaNormal();
 
     ////////Atributos//////////
 
@@ -66,16 +71,13 @@ public class Juego implements Comando { // la clase menu
 
     public void iniciarPartida() throws excepcionMonopoly {
 
-        menuSetUp(); //immprime el menu de inicializacion
-
-        Scanner sc = new Scanner(System.in); //objeto para leer comandos desde consola
+        menuSetUp(); //imprime el menu de inicializacion
 
         while (!juegoIniciado) { //si aun no se ha iniciado la partida
-            System.out.print("[setup]> ");
-            String comando = sc.nextLine();
+
+            String comando = consola.leer("[setup]> ");
             analizarComando(comando); // redirige a analizarComandoSetup() mientras no haya empezado el juego
         }
-
 
         // Cuando hay 2-4 jugadores y se ejecuta 'empezar', arranca la fase de juego
         iniciarJuego();
@@ -86,17 +88,16 @@ public class Juego implements Comando { // la clase menu
     public void iniciarJuego() throws excepcionMonopoly {
 
         juegoIniciado = true; //El juego ha iniciado correctamente
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Comandos disponibles:");
+        //Scanner sc = new Scanner(System.in);
+        //System.out.println("Comandos disponibles:");
+        consola.imprimir("Comandos disponibles:");
         menuComandos(); //imprime el menu de comados
-
 
         while (true) {
             Jugador actual = jugadores.get(turno); //obtiene el jugador que tiene el turno actual
-            System.out.println("\nTurno de " + actual.getNombre());
-            System.out.print("> ");
-            String comando = sc.nextLine(); //lee lo que el jugador escribe
-
+            //System.out.println("\nTurno de " + actual.getNombre());
+            consola.imprimir("\nTurno de " + actual.getNombre());
+            String comando =  consola.leer("> ");
             analizarComando(comando); //analiza el comando
         }
     }
