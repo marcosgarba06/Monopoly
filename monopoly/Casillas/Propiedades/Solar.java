@@ -1,5 +1,6 @@
 package monopoly.Casillas.Propiedades;
 
+import monopoly.Juego;
 import partida.Jugador;
 
 /**
@@ -60,7 +61,7 @@ public final class Solar extends Propiedad {
 
     public void construirCasas(Jugador jugador, int cantidad) {
         if (numCasas + cantidad > 4) {
-            System.out.println("No puedes tener más de 4 casas.");
+            Juego.consola.imprimir("No puedes tener más de 4 casas.");
             return;
         }
         numCasas += cantidad;
@@ -94,25 +95,25 @@ public final class Solar extends Propiedad {
     // Métodos para vender edificaciones
     public void venderCasa(Jugador jugador, int cantidad) {
         if (numCasas < cantidad) {
-            System.out.println("No tienes tantas casas para vender.");
+            Juego.consola.imprimir("No tienes tantas casas para vender.");
             return;
         }
         for (int i = 0; i < cantidad; i++) {
             numCasas--;
             jugador.sumarFortuna(precioCasa / 2); // se recupera la mitad del coste
-            System.out.println("Has vendido una casa en " + nombre +
+            Juego.consola.imprimir("Has vendido una casa en " + nombre +
                     " por " + (precioCasa / 2) + "€.");
         }
     }
 
     public void venderHotel(Jugador jugador) {
         if (hotel == 0) {
-            System.out.println("No tienes hotel para vender.");
+            Juego.consola.imprimir("No tienes hotel para vender.");
             return;
         }
         hotel = 0;
         jugador.sumarFortuna(precioHotel / 2);
-        System.out.println("Has vendido el hotel en " + nombre +
+        Juego.consola.imprimir("Has vendido el hotel en " + nombre +
                 " por " + (precioHotel / 2) + "€.");
         // Regla clásica: al vender un hotel se devuelven 4 casas
         numCasas = 4;
@@ -120,23 +121,23 @@ public final class Solar extends Propiedad {
 
     public void venderPiscina(Jugador jugador) {
         if (piscina == 0) {
-            System.out.println("No tienes piscina para vender.");
+            Juego.consola.imprimir("No tienes piscina para vender.");
             return;
         }
         piscina = 0;
         jugador.sumarFortuna(precioPiscina / 2);
-        System.out.println("Has vendido la piscina en " + nombre +
+        Juego.consola.imprimir("Has vendido la piscina en " + nombre +
                 " por " + (precioPiscina / 2) + "€.");
     }
 
     public void venderPista(Jugador jugador) {
         if (pista == 0) {
-            System.out.println("No tienes pista para vender.");
+            Juego.consola.imprimir("No tienes pista para vender.");
             return;
         }
         pista = 0;
         jugador.sumarFortuna(precioPista / 2);
-        System.out.println("Has vendido la pista de deporte en " + nombre +
+        Juego.consola.imprimir("Has vendido la pista de deporte en " + nombre +
                 " por " + (precioPista / 2) + "€.");
     }
 

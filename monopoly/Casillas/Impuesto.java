@@ -1,6 +1,7 @@
 package monopoly.Casillas;
 
 
+import monopoly.Juego;
 import monopoly.Tablero;
 import partida.Jugador;
 
@@ -18,17 +19,17 @@ public class Impuesto extends Casilla {
     public void evaluarCasilla(Jugador jugador, Tablero tablero) {
         incrementarVisita();
 
-        System.out.println("Debes pagar un impuesto de " + (long)cantidadAPagar + "€.");
+        Juego.consola.imprimir("Debes pagar un impuesto de " + (long)cantidadAPagar + "€.");
 
         if (jugador.getFortuna() >= cantidadAPagar) {
             jugador.restarFortuna(cantidadAPagar);
             jugador.sumarGastos(cantidadAPagar);
             jugador.sumarPagoTasasEImpuestos(cantidadAPagar);
             tablero.añadirAlParking(cantidadAPagar);
-            System.out.println("El dinero se ha depositado en el parking. Total acumulado: " +
+            Juego.consola.imprimir("El dinero se ha depositado en el parking. Total acumulado: " +
                     (long)tablero.getFondoParking() + "€.");
         } else {
-            System.out.println("No tienes suficiente dinero para pagar el impuesto.");
+            Juego.consola.imprimir("No tienes suficiente dinero para pagar el impuesto.");
             jugador.setDeudaPendiente(cantidadAPagar);
             jugador.setAcreedorDeuda(null); // Deuda con la banca
         }
@@ -37,7 +38,5 @@ public class Impuesto extends Casilla {
     public float getCantidadAPagar() {
         return cantidadAPagar;
     }
-
-
 }
 

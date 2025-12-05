@@ -2,6 +2,7 @@ package monopoly.Cartas;
 
 import monopoly.Casillas.Casilla;
 import monopoly.Casillas.Propiedades.Propiedad;
+import monopoly.Juego;
 import monopoly.Tablero;
 import partida.*;
 import java.util.ArrayList;
@@ -14,12 +15,12 @@ public class CartaSuerte extends Carta {
 
     @Override
     public void aplicarAccion(Jugador jugador, Tablero tablero) {
-        System.out.println("Carta de Suerte seleccionada: " + descripcion);
+        Juego.consola.imprimir("Carta de Suerte seleccionada: " + descripcion);
 
         ArrayList<Jugador> jugadores = Carta.getJugadores();
 
         if (jugadores == null || jugadores.isEmpty()) {
-            System.out.println("ERROR: Lista de jugadores no inicializada.");
+            Juego.consola.imprimir("ERROR: Lista de jugadores no inicializada.");
             return;
         }
 
@@ -30,14 +31,14 @@ public class CartaSuerte extends Carta {
             case 1: // Avanza a Solar19
                 casillaDestino = tablero.encontrarCasilla("Sol19"); //buscamos la casilla Sol19 en el tablero
                 if (casillaDestino != null) { //si la casilla existe
-                    System.out.println("Avanzas a la casilla Sol19.");
+                    Juego.consola.imprimir("Avanzas a la casilla Sol19.");
                     casillaActual.eliminarAvatar(jugador.getAvatar()); //eliminamos el avatar de la casilla actual
                     jugador.getAvatar().setCasilla(casillaDestino); //asignamos la nueva casilla al avatar
                     jugador.getAvatar().setPosicion(casillaDestino.getPosicion()); //actualizamos la posicion del avatar
                     casillaDestino.anhadirAvatar(jugador.getAvatar()); //añadimos el avatar a la casilla destino
                     casillaDestino.evaluarCasilla(jugador, tablero); //evaluamos la casilla destino (compra o pago alquiler)
                 } else {
-                    System.out.println("Error: No se encontró la casilla Sol19.");
+                    Juego.consola.imprimir("Error: No se encontró la casilla Sol19.");
                 }
                 break;
 
@@ -47,7 +48,7 @@ public class CartaSuerte extends Carta {
 
             case 3: // Ganar lotería
                 jugador.sumarFortuna(1000000);
-                System.out.println("¡Has recibido 1.000.000€ por el bote de la lotería!");
+                Juego.consola.imprimir("¡Has recibido 1.000.000€ por el bote de la lotería!");
                 jugador.sumarPremios(1000000); // Contabiliza el premio
                 break;
 
@@ -61,7 +62,7 @@ public class CartaSuerte extends Carta {
                     }
                 }
                 if (jugador.getFortuna() < totalAPagar) { // El jugador que saca la carta PAGA, si no tiene suficiente, se declara en bancarrota
-                    System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
+                    Juego.consola.imprimir("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
                     jugador.declararBancarrota(null);
                     tablero.notificarBancarrota(jugador);
                     return;
@@ -72,7 +73,7 @@ public class CartaSuerte extends Carta {
                 jugador.sumarPagoTasasEImpuestos(totalAPagar); // Contabiliza el pago de tasas e impuestos
 
 
-                System.out.println("Pagas " + totalAPagar + "€ como presidente de la junta.");
+                Juego.consola.imprimir("Pagas " + totalAPagar + "€ como presidente de la junta.");
                 break;
 
 
@@ -83,20 +84,20 @@ public class CartaSuerte extends Carta {
                 casillaDestino = tablero.getCasilla(nuevaPosicion); // Obtiene la casilla de destino
 
                 if (casillaDestino != null) {
-                    System.out.println("Retrocedes tres casillas hasta " + casillaDestino.getNombre());
+                    Juego.consola.imprimir("Retrocedes tres casillas hasta " + casillaDestino.getNombre());
                     casillaActual.eliminarAvatar(jugador.getAvatar());
                     jugador.getAvatar().setCasilla(casillaDestino);
                     jugador.getAvatar().setPosicion(nuevaPosicion);
                     casillaDestino.anhadirAvatar(jugador.getAvatar());
                     casillaDestino.evaluarCasilla(jugador, tablero);
                 } else {
-                    System.out.println("No se encontró la casilla de destino.");
+                    Juego.consola.imprimir("No se encontró la casilla de destino.");
                 }
                 break;
 
             case 6: // Multa por móvil
                 if (jugador.getFortuna() < 150000) {
-                    System.out.println("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
+                    Juego.consola.imprimir("¡No tienes suficiente dinero! Debes declararte en bancarrota.");
                     jugador.declararBancarrota(null);
                     tablero.notificarBancarrota(jugador);
                     return;
@@ -105,7 +106,7 @@ public class CartaSuerte extends Carta {
                 jugador.restarFortuna(150000);
                 jugador.sumarGastos(150000);
                 jugador.sumarPagoTasasEImpuestos(150000);
-                System.out.println("Pagas 150.000€ por conducir indebidamente.");
+                Juego.consola.imprimir("Pagas 150.000€ por conducir indebidamente.");
                 break;
             case 7:
                 int posActual = casillaActual.getPosicion();
@@ -126,13 +127,13 @@ public class CartaSuerte extends Carta {
 
                 casillaDestino = tablero.getCasilla(posCercana); // Obtener la casilla de destino, la más cercana
                 if (casillaDestino != null) {
-                    System.out.println("Avanzas al transporte más cercano: " + casillaDestino.getNombre());
+                    Juego.consola.imprimir("Avanzas al transporte más cercano: " + casillaDestino.getNombre());
 
                     // Verificar si pasa por la salida
                     if (posCercana < posActual) {
                         jugador.sumarFortuna(2000000);
                         jugador.sumarSalida(2000000);
-                        System.out.println("Has pasado por la casilla de salida. Recibes 2.000.000€.");
+                        Juego.consola.imprimir("Has pasado por la casilla de salida. Recibes 2.000.000€.");
                     }
 
                     casillaActual.eliminarAvatar(jugador.getAvatar());
@@ -145,10 +146,10 @@ public class CartaSuerte extends Carta {
                     if (casillaDestino instanceof Propiedad) {
                         Propiedad propiedad = (Propiedad) casillaDestino;
                         float alquilerDoble = propiedad.alquiler(tablero.getUltimaTirada()) * 2;
-                        System.out.println("Debes pagar el doble del alquiler: " + (long) alquilerDoble + "€");
+                        Juego.consola.imprimir("Debes pagar el doble del alquiler: " + (long) alquilerDoble + "€");
 
                         if (jugador.getFortuna() < alquilerDoble) {
-                            System.out.println("No puedes pagar. Te declaras en bancarrota.");
+                            Juego.consola.imprimir("No puedes pagar. Te declaras en bancarrota.");
                             jugador.declararBancarrota(propiedad.getDuenho());
                             tablero.notificarBancarrota(jugador);
                         } else {

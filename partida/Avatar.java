@@ -54,7 +54,7 @@ public class Avatar {
         if (nuevaPos < posicionActual) {
             jugador.sumarFortuna(2000000);
             jugador.sumarSalida(2000000);
-            System.out.println("Has pasado por la casilla de salida. Recibes 2.000.000€.");
+            Juego.consola.imprimir("Has pasado por la casilla de salida. Recibes 2.000.000€.");
             jugador.incrementarVueltas();
         }
 
@@ -62,7 +62,7 @@ public class Avatar {
         Casilla nuevaCasilla = tablero.getCasilla(nuevaPos);
         setCasilla(nuevaCasilla); // ahora limpia y añade correctamente
 
-        System.out.println("El avatar " + id + " ha avanzado hasta la casilla " + nuevaCasilla.getNombre());
+        Juego.consola.imprimir("El avatar " + id + " ha avanzado hasta la casilla " + nuevaCasilla.getNombre());
         nuevaCasilla.evaluarCasilla(jugador, tablero);
     }
 

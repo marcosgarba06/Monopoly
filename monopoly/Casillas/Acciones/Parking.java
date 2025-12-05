@@ -1,5 +1,6 @@
 package monopoly.Casillas.Acciones;
 
+import monopoly.Juego;
 import partida.Jugador;
 import monopoly.Tablero;
 
@@ -16,9 +17,9 @@ public final class Parking extends Accion {
         if (premio > 0) {
             jugador.sumarFortuna(premio);
             jugador.sumarPremios(premio);
-            System.out.println("¡Has recogido " + (long)premio + "€ del parking gratuito!");
+            Juego.consola.imprimir("¡Has recogido " + (long)premio + "€ del parking gratuito!");
         } else {
-            System.out.println("El parking está vacío. No hay premio.");
+            Juego.consola.imprimir("El parking está vacío. No hay premio.");
         }
     }
 

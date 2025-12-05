@@ -1,5 +1,6 @@
 package monopoly.Casillas.Acciones;
 
+import monopoly.Juego;
 import partida.Jugador;
 import monopoly.Tablero;
 import monopoly.Cartas.Carta;
@@ -15,7 +16,7 @@ public final class Suerte extends Accion {
 
     @Override
     public void ejecutarAccion(Jugador jugador, Tablero tablero) {
-        System.out.println("Has caído en Suerte. Robas una carta...");
+        Juego.consola.imprimir("Has caído en Suerte. Robas una carta...");
         Carta carta = Carta.seleccionarCarta("suerte");
         carta.aplicarAccion(jugador, tablero);
     }

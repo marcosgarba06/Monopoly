@@ -334,7 +334,7 @@ public class Tablero {
             for (int i = 1; i < fila.length; i++) {
                 Casilla c = encontrarCasilla(fila[i]);
                 if (c == null) {
-                    System.out.println("Aviso: no existe la casilla " + fila[i] + " para el grupo " + nombreGrupo);
+                    Juego.consola.imprimir("Aviso: no existe la casilla " + fila[i] + " para el grupo " + nombreGrupo);
                     continue;
                 }
                 g.anhadirCasilla(c);

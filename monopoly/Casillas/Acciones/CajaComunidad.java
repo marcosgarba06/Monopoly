@@ -1,4 +1,5 @@
 package monopoly.Casillas.Acciones;
+import monopoly.Juego;
 import partida.Jugador;
 import monopoly.Tablero;
 import monopoly.Cartas.Carta;
@@ -12,7 +13,7 @@ public final class CajaComunidad extends Accion {
 
     @Override
     public void ejecutarAccion(Jugador jugador, Tablero tablero) {
-        System.out.println("Has caído en Caja de Comunidad. Robas una carta...");
+        Juego.consola.imprimir("Has caído en Caja de Comunidad. Robas una carta...");
         Carta carta = Carta.seleccionarCarta("caja");
         carta.aplicarAccion(jugador, tablero);
     }

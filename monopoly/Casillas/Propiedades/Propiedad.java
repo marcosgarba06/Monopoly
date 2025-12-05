@@ -1,6 +1,7 @@
 package monopoly.Casillas.Propiedades;
 
 import monopoly.Casillas.Casilla;
+import monopoly.Juego;
 import partida.Jugador;
 import monopoly.Tablero;
 import monopoly.Casillas.Grupo;
@@ -25,17 +26,17 @@ public abstract class Propiedad extends Casilla {
     public void deshipotecar() {
 
         if (!hipotecada) {
-            System.out.println("La propiedad no está hipotecada.");
+            Juego.consola.imprimir("La propiedad no está hipotecada.");
             return;
         }
         if (duenho != null) {
             if (duenho.getFortuna() < hipoteca) {
-                System.out.println("No tienes suficiente dinero para deshipotecar " + nombre);
+                Juego.consola.imprimir("No tienes suficiente dinero para deshipotecar " + nombre);
                 return;
             }
             duenho.restarFortuna(hipoteca);
             hipotecada = false;
-            System.out.println(duenho.getNombre() + " paga " + (long)hipoteca +
+            Juego.consola.imprimir(duenho.getNombre() + " paga " + (long)hipoteca +
                     "€ por deshipotecar " + nombre);
         } else {
             hipotecada = false;
@@ -44,13 +45,13 @@ public abstract class Propiedad extends Casilla {
 
     public void hipotecar() {
         if (hipotecada) {
-            System.out.println("La propiedad ya está hipotecada.");
+            Juego.consola.imprimir("La propiedad ya está hipotecada.");
             return;
         }
         hipotecada = true;
         if (duenho != null) {
             duenho.sumarFortuna(hipoteca);
-            System.out.println(duenho.getNombre() + " recibe " + (long)hipoteca +
+            Juego.consola.imprimir(duenho.getNombre() + " recibe " + (long)hipoteca +
                     "€ por la hipoteca de " + nombre);
         }
     }
@@ -69,12 +70,12 @@ public abstract class Propiedad extends Casilla {
 
     public void comprar(Jugador jugador) {
         if (duenho != null) {
-            System.out.println("Esta propiedad ya tiene dueño.");
+            Juego.consola.imprimir("Esta propiedad ya tiene dueño.");
             return;
         }
 
         if (jugador.getFortuna() < valor) {
-            System.out.println("No tienes suficiente dinero para comprar esta propiedad.");
+            Juego.consola.imprimir("No tienes suficiente dinero para comprar esta propiedad.");
             return;
         }
 
@@ -83,7 +84,7 @@ public abstract class Propiedad extends Casilla {
         this.duenho = jugador;
         jugador.anhadirPropiedad(this);
 
-        System.out.println(jugador.getNombre() + " ha comprado " + nombre +
+        Juego.consola.imprimir(jugador.getNombre() + " ha comprado " + nombre +
                 " por " + (long)valor + "€.");
     }
 
@@ -100,16 +101,16 @@ public abstract class Propiedad extends Casilla {
         incrementarVisita();
 
         if (duenho == null) {
-            System.out.println("La propiedad " + nombre + " está en venta por " +
+            Juego.consola.imprimir("La propiedad " + nombre + " está en venta por " +
                     (long)valor + "€.");
-            System.out.println("Puedes comprarla con el comando: comprar " + nombre);
+            Juego.consola.imprimir("Puedes comprarla con el comando: comprar " + nombre);
         } else if (!duenho.equals(jugador)) {
             if (hipotecada) {
-                System.out.println("La propiedad pertenece a " + duenho.getNombre() +
+                Juego.consola.imprimir("La propiedad pertenece a " + duenho.getNombre() +
                         " pero está hipotecada. No pagas alquiler.");
             } else {
                 float alquiler = alquiler(tablero.getUltimaTirada());
-                System.out.println("Debes pagar " + (long)alquiler + "€ a " +
+                Juego.consola.imprimir("Debes pagar " + (long)alquiler + "€ a " +
                         duenho.getNombre());
 
                 if (jugador.getFortuna() >= alquiler) {
@@ -119,13 +120,13 @@ public abstract class Propiedad extends Casilla {
                     duenho.sumarCobroAlquiler(alquiler);
                 } else {
                     // Gestionar deuda
-                    System.out.println("No tienes suficiente dinero.");
+                    Juego.consola.imprimir("No tienes suficiente dinero.");
                     jugador.setDeudaPendiente(alquiler);
                     jugador.setAcreedorDeuda(duenho);
                 }
             }
         } else {
-            System.out.println("Has caído en tu propia propiedad.");
+            Juego.consola.imprimir("Has caído en tu propia propiedad.");
         }
     }
 

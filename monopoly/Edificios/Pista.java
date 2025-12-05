@@ -1,6 +1,7 @@
 package monopoly.Edificios;
 import monopoly.Casillas.Casilla;
 import monopoly.Casillas.Propiedades.Solar;
+import monopoly.Juego;
 import partida.Jugador;
 
 public class Pista extends Edificacion {
@@ -19,19 +20,19 @@ public class Pista extends Edificacion {
         // En un solar se puede construir una única pista de deporte
         // si se ha construido un hotel y una piscina.
         if (!solar.tieneHotel() || !solar.tienePiscina()) {
-            System.out.println("No se puede edificar una pista de deporte, ya que no se dispone de un hotel y una piscina.");
+            Juego.consola.imprimir("No se puede edificar una pista de deporte, ya que no se dispone de un hotel y una piscina.");
             return false;
         }
 
         // Verificar que no hay pista ya, solo puede tener una única pista
         if (solar.tienePista()) {
-            System.out.println("No se puede edificar ningún edificio más en esta casilla ni en el grupo al que la casilla pertenece.");
+            Juego.consola.imprimir("No se puede edificar ningún edificio más en esta casilla ni en el grupo al que la casilla pertenece.");
             return false;
         }
 
         double coste = solar.getPrecioPista();
         if (jugador.getFortuna() < coste) {
-            System.out.println("La fortuna de " + jugador.getNombre() +
+            Juego.consola.imprimir("La fortuna de " + jugador.getNombre() +
                     " no es suficiente para edificar una pista de deporte en la casilla " +
                     solar.getNombre() + ".");
             return false;
@@ -45,7 +46,7 @@ public class Pista extends Edificacion {
     public void construir(Jugador jugador, Solar solar) {
         solar.construirPista(jugador);
         double coste = solar.getPrecioPista();
-        System.out.println("Se ha edificado una pista de deporte en " + solar.getNombre() +
+        Juego.consola.imprimir("Se ha edificado una pista de deporte en " + solar.getNombre() +
                 ". La fortuna de " + jugador.getNombre() +
                 " se reduce en " + (long)coste + "€.");
     }

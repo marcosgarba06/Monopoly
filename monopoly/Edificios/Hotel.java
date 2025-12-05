@@ -1,5 +1,6 @@
 package monopoly.Edificios;
 
+import monopoly.Juego;
 import partida.Jugador;
 import monopoly.Casillas.Propiedades.Solar;
 
@@ -17,18 +18,18 @@ public class Hotel extends Edificacion {
     @Override
     public boolean puedeEdificar(Jugador jugador, Solar solar) {
         if (solar.getNumCasas() != 4) {
-            System.out.println("No se puede edificar un hotel. Necesitas exactamente 4 casas y en esta casilla hay " + solar.getNumCasas() + ".");
+            Juego.consola.imprimir("No se puede edificar un hotel. Necesitas exactamente 4 casas y en esta casilla hay " + solar.getNumCasas() + ".");
             return false;
         }
 
         if (solar.tieneHotel()) {
-            System.out.println("No se puede edificar ningún edificio más en esta casilla.");
+            Juego.consola.imprimir("No se puede edificar ningún edificio más en esta casilla.");
             return false;
         }
 
         double coste = solar.getPrecioHotel();
         if (jugador.getFortuna() < coste) {
-            System.out.println("La fortuna de " + jugador.getNombre() +
+            Juego.consola.imprimir("La fortuna de " + jugador.getNombre() +
                     " no es suficiente para edificar un hotel en la casilla " +
                     solar.getNombre() + ".");
             return false;
@@ -43,7 +44,7 @@ public class Hotel extends Edificacion {
         solar.construirHotel(jugador);
         double coste = solar.getPrecioHotel();
 
-        System.out.println("Se ha edificado un hotel en " + solar.getNombre() +
+        Juego.consola.imprimir("Se ha edificado un hotel en " + solar.getNombre() +
                 ". La fortuna de " + jugador.getNombre() +
                 " se reduce en " + (long)coste + "€.");
     }

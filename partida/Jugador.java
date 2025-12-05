@@ -83,7 +83,7 @@ public class Jugador {
         this.fortuna -= cantidad;
         if (fortuna < 0) { //
             this.bancarrota = true;
-            System.out.println(nombre + " ha caído en bancarrota.");
+            Juego.consola.imprimir(nombre + " ha caído en bancarrota.");
         }
     }
 
@@ -131,7 +131,7 @@ public class Jugador {
 
         Casilla carcel = tablero.encontrarCasilla("Carcel");
         if (carcel == null) {
-            System.out.println("Error: no se encontró la casilla de Cárcel.");
+            Juego.consola.imprimir("Error: no se encontró la casilla de Cárcel.");
             return;
         }
 
@@ -148,7 +148,7 @@ public class Jugador {
         avatar.setTurnosEnCarcel(0);
         avatar.getJugador().incrementarVecesEnCarcel();
 
-        System.out.println(nombre + " ha sido enviado a la cárcel.");
+        Juego.consola.imprimir(nombre + " ha sido enviado a la cárcel.");
     }
 
     // Métodos de pago
@@ -159,7 +159,7 @@ public class Jugador {
             this.gastos += cantidad;
             receptor.sumarFortuna(cantidad);
         } else {
-            System.out.println(nombre + " no tiene suficiente dinero para pagar " + cantidad);
+            Juego.consola.imprimir(nombre + " no tiene suficiente dinero para pagar " + cantidad);
             // Aquí se podría implementar lógica de bancarrota, hipoteca, etc.
         }
     }
@@ -177,11 +177,11 @@ public class Jugador {
 
     // En Jugador.java
     public void declararBancarrota(Jugador acreedor) {
-        System.out.println("\n" + this.nombre + " se ha declarado en BANCARROTA.");
+        Juego.consola.imprimir("\n" + this.nombre + " se ha declarado en BANCARROTA.");
 
         if (acreedor != null) {
             // Deuda con otro jugador
-            System.out.println("Todas las propiedades pasan a " + acreedor.getNombre());
+            Juego.consola.imprimir("Todas las propiedades pasan a " + acreedor.getNombre());
 
             for (Propiedad propiedad : new ArrayList<>(propiedades)) {
                 if (propiedad.estaHipotecada()) {
@@ -201,7 +201,7 @@ public class Jugador {
 
         } else {
             // Deuda con la banca (impuestos, multas, etc.)
-            System.out.println("Las propiedades vuelven a la banca (quedan en venta).");
+            Juego.consola.imprimir("Las propiedades vuelven a la banca (quedan en venta).");
 
             for (Propiedad propiedad : new ArrayList<>(propiedades)) {
                 if (propiedad.estaHipotecada()) {
