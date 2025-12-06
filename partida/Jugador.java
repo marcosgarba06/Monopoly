@@ -45,6 +45,8 @@ public class Jugador {
     public void setAcreedorDeuda(Jugador acreedor) { this.acreedorDeuda = acreedor; }
 
 
+    private ArrayList<Trato> tratosRecibidos = new ArrayList<>();
+    private ArrayList<Trato> tratosPropuestos = new ArrayList<>();
 
 
     //Constructor vacío. Se usará para crear la banca.
@@ -367,5 +369,28 @@ public class Jugador {
         return edificaciones;
     }
 
+    public void agregarTratoRecibido(Trato trato) {
+        tratosRecibidos.add(trato);
+    }
+
+    public void agregarTratoPropuesto(Trato trato) {
+        tratosPropuestos.add(trato);
+    }
+
+    public void eliminarTratoRecibido(Trato trato) {
+        tratosRecibidos.remove(trato);
+    }
+
+    public void eliminarTratoPropuesto(Trato trato) {
+        tratosPropuestos.remove(trato);
+    }
+
+    public ArrayList<Trato> getTratosRecibidos() {
+        return tratosRecibidos;
+    }
+
+    public ArrayList<Trato> getTratosPropuestos() {
+        return tratosPropuestos;
+    }
 
 }

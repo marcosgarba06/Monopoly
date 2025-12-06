@@ -7,6 +7,7 @@ import partida.*;
 import monopoly.Casillas.*;
 import monopoly.excepciones.*;
 import monopoly.Interfaces.Comando;
+import monopoly.Trato;
 import monopoly.Interfaces.Consola;
 import monopoly.Interfaces.ConsolaNormal;
 
@@ -57,6 +58,8 @@ public class Juego implements Comando { // la clase menu
     private int contadorHoteles = 0;
     private int contadorPiscinas = 0;
     private int contadorPistas = 0;
+
+    private int contadorTratos = 0;
 
     ///CONSTRUCTOR sin parametros, que se inicializa pasandole nosotros los valores
     public Juego() {
@@ -440,6 +443,11 @@ public class Juego implements Comando { // la clase menu
             }
             return true;
         }
+        // En procesarComandoConParametros
+        if (comandoMinusculas.startsWith("trato ")) {
+            return procesarComandoTrato(comandoMinusculas, comandoOriginal);
+        }
+
         if (palabras.length >= 2 && palabras[0].equals("edificar")) {
             String tipo;
 
@@ -504,6 +512,23 @@ public class Juego implements Comando { // la clase menu
         return false;
     }
 
+    //esta funcion procesa el comando trato, y permite ejecutar la funcion proponerTrato con el nombre del receptor (al que se le propone el trato) y el contenido del trato
+    private boolean procesarComandoTrato(String comandoMinusculas, String comandoOriginal) throws excepcionMonopoly {
+        // Patrón: trato <jugador>: cambiar (...)
+        Pattern patronTrato = Pattern.compile(
+                "^trato\\s+(\\w+):\\s*cambiar\\s*\\((.+)\\)$",
+                Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher m = patronTrato.matcher(comandoOriginal.trim());
+        if (m.matches()) {
+            String nombreReceptor = m.group(1);
+            String contenidoTrato = m.group(2);
+            proponerTrato(nombreReceptor, contenidoTrato);
+            return true;
+        }
+        return false;
+    }
     // Metodo helper para ejecutar comandos desde un archivo
     private void ejecutarComandosDesdeArchivo(String rutaArchivo) {
         // Crear un objeto Path a partir de la ruta recibida
@@ -819,7 +844,7 @@ public class Juego implements Comando { // la clase menu
         // *** CASO 2: Turno 1 o 2 âl menu de opciones ***
         while (true) {
             consola.imprimir("\nOpciones:");
-            consola.imprimir("1) Pagar 500.000â‚¬ (sales, y te puedes mover en este turno)");
+            consola.imprimir("1) Pagar 500.000$ (sales, y te puedes mover en este turno)");
             consola.imprimir("2) Usar carta de 'Salir de la Carcel' (sales, pero NO te mueves)");
             consola.imprimir("3) Intentar sacar dobles (si sacas dobles: sales y mueves)");
 
@@ -1148,6 +1173,7 @@ public class Juego implements Comando { // la clase menu
         consola.imprimir("  - 'salir carcel'");
         consola.imprimir("  - 'estadistas juego'");
         consola.imprimir("  - 'listar edificios'");
+        consola.imprimir("  - 'trato <jugador>: cambiar (<prop1>, <prop2>)'");
         consola.imprimir("  - 'listar edificios <grupo>'");
         consola.imprimir("  - 'edificar <tipo>'");
         consola.imprimir("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
@@ -1662,8 +1688,6 @@ public class Juego implements Comando { // la clase menu
         consola.imprimir("}");
     }
 
-    // ========== MÉTODOS EXTRAÍDOS DE ANALIZAR COMANDO ==========
-
     @Override
     public void verTablero() {
         consola.imprimir(tablero.toString());
@@ -1680,5 +1704,163 @@ public class Juego implements Comando { // la clase menu
             consola.imprimir("No puedes declararte en bancarrota voluntariamente.");
         }
     }
+    private void proponerTrato(String nombreReceptor, String contenido) throws excepcionMonopoly {
+        Jugador proponente = jugadores.get(turno); // Jugador que propone el trato
+        Jugador receptor = buscarJugador(nombreReceptor); // Jugador que recibe el trato, al que se le propone
+
+        if (receptor == null) {
+            throw new excepNoExisteObjeto("jugador", nombreReceptor); // Verificar que el receptor existe
+        }
+
+        if (receptor.equals(proponente)) {
+            throw new excepTransaccion("no puedes hacer un trato contigo mismo"); // No permitir tratos consigo mismo
+        }
+
+        // Parsear el contenido del trato, analizar y descomponer
+        parsearYCrearTrato(proponente, receptor, contenido);
+    }
+    private void parsearYCrearTrato(Jugador proponente, Jugador receptor, String contenido)
+            throws excepcionMonopoly {
+
+        // Dividir por coma
+        String[] partes;
+        partes = contenido.split(",", 2);
+
+        if (partes.length != 2) {
+            throw new excepComandoInvalido("Formato de trato inválido");
+        }
+
+        String ofrece = partes[0].trim(); // Lo que ofrece el proponente
+        String recibe = partes[1].trim(); // Lo que recibe el proponente (ofrece el receptor)
+
+        // Parsear lo que ofrece y lo que recibe
+        TratoParseado ofrecido = parsearElemento(ofrece, proponente);
+        TratoParseado recibido = parsearElemento(recibe, receptor);
+
+        // Crear el trato
+        crearTrato(proponente, receptor, ofrecido, recibido);
+    }
+
+    // Clase interna simple, servira como contenedor para almacenar los resultados de los tratos
+    private class TratoParseado {
+        Propiedad propiedad;
+        float dinero;
+    }
+
+    private TratoParseado parsearElemento(String elemento, Jugador duenho) throws excepcionMonopoly {
+        TratoParseado resultado = new TratoParseado();
+
+        // Si contiene "y", tiene propiedad Y dinero o otra propiedad
+        if (elemento.contains(" y ")) {
+            String[] partes = elemento.split("\\s+y\\s+");
+
+            for (String parte : partes) {
+                parte = parte.trim(); // Limpiar espacios
+                if (esNumero(parte)) { // Si es un numero, es dinero
+                    resultado.dinero = Float.parseFloat(parte);
+                } else {
+                    resultado.propiedad = buscarPropiedad(parte, duenho); // Si no es numero, es propiedad
+                }
+            }
+        } else {
+            // Solo una cosa: propiedad O dinero
+            elemento = elemento.trim();
+            if (esNumero(elemento)) {
+                resultado.dinero = Float.parseFloat(elemento);
+            } else {
+                resultado.propiedad = buscarPropiedad(elemento, duenho);
+            }
+        }
+
+        return resultado;
+    }
+
+    private boolean esNumero(String str) {
+        try {
+            Float.parseFloat(str.trim());  // Intenta convertir a número
+            return true;                    // Si funciona → es número
+        } catch (NumberFormatException e) {  // Si falla → no es número
+            return false;
+        }
+    }
+
+    private Propiedad buscarPropiedad(String nombre, Jugador duenho) throws excepcionMonopoly {
+        Casilla casilla = tablero.encontrarCasilla(nombre.trim());
+
+        if (casilla == null) {
+            throw new excepNoExisteObjeto("propiedad", nombre);
+        }
+
+        if (!(casilla instanceof Propiedad)) {
+            throw new excepTransaccion(nombre + " no es una propiedad");
+        }
+
+        Propiedad prop = (Propiedad) casilla;
+
+        if (!prop.perteneceAJugador(duenho)) {
+            throw new excepTransaccion(nombre + " no pertenece a " + duenho.getNombre());
+        }
+
+        if (prop.estaHipotecada()) {
+            throw new excepTransPropHipotecada("incluir en un trato");
+        }
+
+        // No permitir propiedades con edificios
+        if (prop instanceof Solar) {
+            Solar solar = (Solar) prop;
+            if (solar.getNumCasas() > 0 || solar.tieneHotel() ||
+                    solar.tienePiscina() || solar.tienePista()) {
+                throw new excepTransaccion(nombre + " tiene edificaciones");
+            }
+        }
+
+        return prop;
+    }
+
+    private void crearTrato(Jugador proponente, Jugador receptor, TratoParseado ofrecido, TratoParseado recibido)
+            throws excepcionMonopoly {
+
+        // Validaciones básicas
+        if (ofrecido.dinero > 0 && proponente.getFortuna() < ofrecido.dinero) {
+            throw new excepSinRecDinero((long)ofrecido.dinero, (long)proponente.getFortuna());
+        }
+
+        if (recibido.dinero > 0 && receptor.getFortuna() < recibido.dinero) {
+            throw new excepTransaccion(receptor.getNombre() + " no tiene suficiente dinero");
+        }
+
+        if (ofrecido.propiedad == null && ofrecido.dinero == 0) {
+            throw new excepTransaccion("debes ofrecer algo");
+        }
+
+        if (recibido.propiedad == null && recibido.dinero == 0) {
+            throw new excepTransaccion(receptor.getNombre() + " debe ofrecer algo");
+        }
+
+        // Crear el trato
+        String id = "trato-" + (++contadorTratos);
+        Trato trato = new Trato(id, proponente, receptor,
+                ofrecido.propiedad, recibido.propiedad,
+                ofrecido.dinero, recibido.dinero);
+
+        // Guardar en listas
+        proponente.agregarTratoPropuesto(trato);
+        receptor.agregarTratoRecibido(trato);
+
+        // Mostrar mensaje
+        consola.imprimir(trato.toString());
+        consola.imprimir("Trato propuesto con ID: " + id);
+        consola.imprimir(receptor.getNombre() + " puede aceptarlo con: aceptar trato " + id);
+    }
+
+    private Jugador buscarJugador(String nombre) {
+        for (Jugador j : jugadores) {
+            if (j.getNombre().equalsIgnoreCase(nombre)) {
+                return j;
+            }
+        }
+        return null;
+    }
+
 
 }
