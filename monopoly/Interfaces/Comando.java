@@ -35,4 +35,8 @@ public interface Comando {
     void edificarPropiedad(String tipo) throws excepcionMonopoly;
     void venderPropiedad(String tipo, String nombreCasilla, int cantidad) throws excepcionMonopoly;
     void declararBancarrota(); // Extraído de 'declarar bancarrota'
+
+    // TRATOS
+    void proponerTrato(String nombreReceptor, String contenido) throws excepcionMonopoly; // Proponer trato
+    void listarTratos(); //Metodo para listar los tratos
 }

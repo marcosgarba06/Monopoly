@@ -93,6 +93,7 @@ public class Juego implements Comando { // la clase menu
         juegoIniciado = true; //El juego ha iniciado correctamente
         consola.imprimir("Comandos disponibles:");
         menuComandos(); //imprime el menu de comados
+        consola.imprimir(tablero.toString());
 
         while (true) {
             Jugador actual = jugadores.get(turno); //obtiene el jugador que tiene el turno actual
@@ -404,6 +405,9 @@ public class Juego implements Comando { // la clase menu
                 mostrarEstadisticasJuego();
                 return true;
 
+            case "tratos": case "listar tratos":
+                listarTratos();
+                return true;
             default:
                 return false;
         }
@@ -529,6 +533,7 @@ public class Juego implements Comando { // la clase menu
         }
         return false;
     }
+
     // Metodo helper para ejecutar comandos desde un archivo
     private void ejecutarComandosDesdeArchivo(String rutaArchivo) {
         // Crear un objeto Path a partir de la ruta recibida
@@ -1125,6 +1130,8 @@ public class Juego implements Comando { // la clase menu
         if (actual.isEnCarcel() || actual.getAvatar().estaEnCarcel()) {
             consola.imprimir("CUIDADO " + actual.getNombre() + " esta en la Carcel.");
         }
+
+        consola.imprimir(tablero.toString());
     }
 
 
@@ -1704,7 +1711,9 @@ public class Juego implements Comando { // la clase menu
             consola.imprimir("No puedes declararte en bancarrota voluntariamente.");
         }
     }
-    private void proponerTrato(String nombreReceptor, String contenido) throws excepcionMonopoly {
+
+    @Override
+    public void proponerTrato(String nombreReceptor, String contenido) throws excepcionMonopoly {
         Jugador proponente = jugadores.get(turno); // Jugador que propone el trato
         Jugador receptor = buscarJugador(nombreReceptor); // Jugador que recibe el trato, al que se le propone
 
@@ -1817,7 +1826,8 @@ public class Juego implements Comando { // la clase menu
         return prop;
     }
 
-    private void crearTrato(Jugador proponente, Jugador receptor, TratoParseado ofrecido, TratoParseado recibido)
+
+    public void crearTrato(Jugador proponente, Jugador receptor, TratoParseado ofrecido, TratoParseado recibido)
             throws excepcionMonopoly {
 
         // Validaciones básicas
@@ -1862,5 +1872,68 @@ public class Juego implements Comando { // la clase menu
         return null;
     }
 
+    // Metodo para imprimir los tratos que se le han propuesto a un jugador
+    @Override
+    public void listarTratos() {
+        // Jugador que tiene el turno
+        Jugador actual = jugadores.get(turno);
 
+        // Obtener tratos que le han propuesto solo a este jugador
+        ArrayList<Trato> recibidos = actual.getTratosRecibidos();
+
+        // Si no hay tratos salimos
+        if (recibidos.isEmpty()) {
+            consola.imprimir("No tienes tratos pendientes de responder.");
+            return;
+        }
+
+        // Si hay tratos se imprimen
+        consola.imprimir("$> tratos");
+
+        // Flag para decidir si poner comas
+        int contador = 0;
+
+        // Recorrer los tratos
+        for (Trato t : recibidos) {
+
+            // Crear la cadena de la parte que ofrece el trato
+            StringBuilder ofrece = new StringBuilder();
+            if (t.getPropiedadOfrece() != null) {
+                ofrece.append(t.getPropiedadOfrece().getNombre()); //se añade las propiedades que ofrece
+            }
+
+            // Si incluye dinero se añade tambien
+            if (t.getDineroOfrece() > 0) {
+                if (ofrece.length() > 0) // solo si hay algo en la cadena se imprime la "y"
+                    ofrece.append(" y ");
+                ofrece.append((long) t.getDineroOfrece());
+            }
+
+            // Construcción de la cadena de la parte que recibe
+            StringBuilder recibe = new StringBuilder();
+            if (t.getPropiedadRecibe() != null) {
+                recibe.append(t.getPropiedadRecibe().getNombre());
+            }
+            if (t.getDineroRecibe() > 0) {
+                if (recibe.length() > 0) // solo si hay algo en la cadena se imprime la "y"
+                    recibe.append(" y ");
+                recibe.append((long) t.getDineroRecibe());
+            }
+
+            // Impresión de datos
+            consola.imprimir("{");
+            consola.imprimir("id: " + t.getId());
+            consola.imprimir("jugadorPropone: " + t.getProponente().getNombre() + ",");
+            consola.imprimir("trato: cambiar (" + ofrece + ", " + recibe + ")");
+
+            // 3. Lógica para la coma final: si NO es el último, imprimimos "},"
+            if (contador < recibidos.size() - 1) {
+                consola.imprimir("},");
+            } else {
+                consola.imprimir("}");
+            }
+
+            contador++; // Incrementamos manualmente
+        }
+    }
 }
