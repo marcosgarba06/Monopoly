@@ -1872,6 +1872,127 @@ public class Juego implements Comando { // la clase menu
         return null;
     }
 
+    public void aceptarTrato (String IDtrato) throws excepcionMonopoly {
+        Jugador receptor = jugadores.get(turno);
+        Trato trato = null;
+
+        // buscamos a ver si el jugador actual ha recibido algún trato
+        for (Trato t : receptor.getTratosRecibidos()) {
+            if (t.getId().equals(IDtrato)) {
+                trato = t;
+                break;
+            }
+        }
+
+        // comprobamos que existe el trato
+        if (trato == null) throw new excepNoExisteObjeto("trato", IDtrato);
+
+        // comprobamos que el trato ha sido propuesto al jugador actual
+        if (!trato.getReceptor().equals(receptor)) throw new excepTransaccion(" no puedes aceptar un trato que no te han propuesto");
+
+        // comprobamos que el trato es válido
+        if (!trato.esTratoValido()) {
+            // Identificar el motivo específico del fallo
+            Jugador proponente = trato.getProponente();
+
+            // Verificar dinero del receptor
+            if (trato.getDineroRecibe() > 0 && receptor.getFortuna() < trato.getDineroRecibe()) {
+                consola.imprimir("El trato no puede ser aceptado: " + receptor.getNombre() +
+                        " no dispone de " + (long)trato.getDineroRecibe() + "€.");
+                return;
+            }
+
+            // Verificar dinero del proponente
+            if (trato.getDineroOfrece() > 0 && proponente.getFortuna() < trato.getDineroOfrece()) {
+                consola.imprimir("El trato no puede ser aceptado: " + proponente.getNombre() +
+                        " no dispone de " + (long)trato.getDineroOfrece() + "€.");
+                return;
+            }
+
+            // Verificar propiedad del proponente
+            if (trato.getPropiedadOfrece() != null &&
+                    !trato.getPropiedadOfrece().perteneceAJugador(proponente)) {
+                consola.imprimir("El trato no puede ser aceptado: " +
+                        trato.getPropiedadOfrece().getNombre() +
+                        " no pertenece a " + proponente.getNombre() + ".");
+                return;
+            }
+
+            // Verificar propiedad del receptor
+            if (trato.getPropiedadRecibe() != null &&
+                    !trato.getPropiedadRecibe().perteneceAJugador(receptor)) {
+                consola.imprimir("El trato no puede ser aceptado: " +
+                        trato.getPropiedadRecibe().getNombre() +
+                        " no pertenece a " + receptor.getNombre() + ".");
+                return;
+            }
+        }
+
+        trato.ejecutarTrato();
+
+        // tenemos que eliminar el trato de la lista
+        Jugador proponente = trato.getProponente();
+        proponente.eliminarTratoPropuesto(trato);
+        receptor.eliminarTratoRecibido(trato);
+
+        // construimos el mensaje
+        StringBuilder mensaje = new StringBuilder();
+        mensaje.append("Se ha aceptado el siguiente trato con ").append(proponente.getNombre()).append(": ");
+
+        // lo que da el receptor (lo que recibe el proponente)
+        mensaje.append("le doy ");
+        boolean primero = true;
+        if (trato.getPropiedadRecibe() != null) {
+            mensaje.append(trato.getPropiedadRecibe().getNombre());
+            primero = false;
+        }
+        if (trato.getDineroRecibe() > 0) {
+            if (!primero) mensaje.append(" y ");
+            mensaje.append((long)trato.getDineroRecibe()).append("€");
+        }
+
+        // lo que recibe el receptor (lo que ofrece el proponente)
+        mensaje.append(" y ").append(proponente.getNombre()).append(" me da ");
+        primero = true;
+        if (trato.getPropiedadOfrece() != null) {
+            mensaje.append(trato.getPropiedadOfrece().getNombre());
+            primero = false;
+        }
+        if (trato.getDineroOfrece() > 0) {
+            if (!primero) mensaje.append(" y ");
+            mensaje.append((long)trato.getDineroOfrece()).append("€");
+        }
+        
+        consola.imprimir(mensaje.toString());
+    }
+
+    public void eliminarTrato (String IDtrato) throws excepcionMonopoly {
+        Jugador jugadorActual = jugadores.get(turno);
+        Trato trato = null;
+        boolean esProponente = false;
+
+        // comprobamos si el trato que queremos eliminar fue propuesto por el jugador actual
+        for (Trato t : jugadorActual.getTratosPropuestos()) {
+            if (t.getId().equals(IDtrato)) {
+                trato = t;
+                esProponente = true;
+                break;
+            }
+        }
+
+        // si no lo encontramos en ninguna lista es porque no existe
+        if (trato == null) throw new excepNoExisteObjeto("trato", IDtrato);
+
+        Jugador proponente = trato.getProponente();
+        Jugador receptor = trato.getReceptor();
+
+        proponente.eliminarTratoPropuesto(trato);
+        receptor.eliminarTratoRecibido(trato);
+
+        consola.imprimir("Se ha eliminado el " + IDtrato );
+    }
+
+
     // Metodo para imprimir los tratos que se le han propuesto a un jugador
     @Override
     public void listarTratos() {
@@ -1936,4 +2057,6 @@ public class Juego implements Comando { // la clase menu
             contador++; // Incrementamos manualmente
         }
     }
+
+
 }

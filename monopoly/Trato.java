@@ -33,6 +33,52 @@ public class Trato {
     public float getDineroOfrece() { return dineroOfrece; }
     public float getDineroRecibe() { return dineroRecibe; }
 
+
+    public void ejecutarTrato() {
+        // persona que ofrece el trato da una propiedad al receptor del trato
+        if (propiedadOfrece != null) {
+            proponente.eliminarPropiedad(propiedadOfrece);
+            receptor.anhadirPropiedad(propiedadOfrece);
+            propiedadOfrece.setDuenho(receptor);
+        }
+
+        //  persona que recibe el trato da ina propiedad al que propuso el trato
+        if (propiedadRecibe != null) {
+            receptor.eliminarPropiedad(propiedadRecibe);
+            proponente.anhadirPropiedad(propiedadRecibe);
+            propiedadRecibe.setDuenho(proponente);
+        }
+
+        // damos una cantidad de dinero de la persona que ofreció el trato a la persona que recibió el trato
+        if (dineroOfrece > 0) {
+            proponente.restarFortuna(dineroOfrece);
+            receptor.sumarFortuna(dineroRecibe);
+        }
+
+        // damos una cantidad de dinero de la persona que recibió el trato a la persona que ofreció el trato
+        if (dineroRecibe > 0) {
+            receptor.restarFortuna(dineroRecibe);
+            proponente.sumarFortuna(dineroRecibe);
+        }
+    }
+
+    // comprobamos que los jugadores tienen las propiedades y/o dinero del trato propuesto
+    public boolean esTratoValido() {
+        if (propiedadOfrece != null && propiedadRecibe.perteneceAJugador(proponente)) return false;
+
+        if (dineroOfrece > 0 && proponente.getFortuna() < dineroRecibe) return false;
+
+        if (propiedadRecibe != null && !propiedadRecibe.perteneceAJugador(receptor)) return false;
+
+        if (dineroRecibe > 0 && receptor.getFortuna() < dineroRecibe) return false;
+
+        if (propiedadOfrece != null && propiedadOfrece.estaHipotecada()) return false;
+
+        if (propiedadRecibe != null && !propiedadRecibe.estaHipotecada()) return false;
+
+        return true;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
