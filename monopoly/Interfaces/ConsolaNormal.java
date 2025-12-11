@@ -1,6 +1,4 @@
 package monopoly.Interfaces;
-
-import monopoly.Interfaces.Consola;
 import java.util.Scanner;
 
 public class ConsolaNormal implements Consola {
@@ -8,7 +6,7 @@ public class ConsolaNormal implements Consola {
     private Scanner sc;
 
     public ConsolaNormal() {
-        this.sc = new Scanner(System.in);
+        this.sc = new Scanner(System.in); //
     }
 
     @Override

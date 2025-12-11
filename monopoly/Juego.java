@@ -7,10 +7,7 @@ import partida.*;
 import monopoly.Casillas.*;
 import monopoly.excepciones.*;
 import monopoly.Interfaces.Comando;
-import monopoly.Trato;
-import monopoly.Interfaces.Consola;
 import monopoly.Interfaces.ConsolaNormal;
-
 import monopoly.Edificios.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -24,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Juego implements Comando { // la clase menu
+
     // Es buena práctica declarar la variable con el tipo de la interfaz (Consola)
     // e instanciarla con la implementación (ConsolaNormal).
     public static ConsolaNormal consola = new ConsolaNormal();
@@ -43,7 +41,7 @@ public class Juego implements Comando { // la clase menu
 
     private Dado dado1; //dado uno
     private Dado dado2; // dado dos
-    private int turno = 0; //indice del jugador actual
+    private int turno = 0; //índice del jugador actual
     private boolean tirado = false; //uindica si un jugador a tirado o no en esa partida
     private int contadorDobles = 0; //hay o no dobles
     private boolean repetirTurno = false; // si repite o no tirada
@@ -1755,9 +1753,9 @@ public class Juego implements Comando { // la clase menu
         }
 
         // Parsear el contenido del trato, analizar y descomponer
-        parsearYCrearTrato(proponente, receptor, contenido);
+        AuxTrato(proponente, receptor, contenido);
     }
-    private void parsearYCrearTrato(Jugador proponente, Jugador receptor, String contenido)
+    private void AuxTrato(Jugador proponente, Jugador receptor, String contenido)
             throws excepcionMonopoly {
 
         // Dividir por coma
@@ -1772,8 +1770,8 @@ public class Juego implements Comando { // la clase menu
         String recibe = partes[1].trim(); // Lo que recibe el proponente (ofrece el receptor)
 
         // Parsear lo que ofrece y lo que recibe
-        TratoParseado ofrecido = parsearElemento(ofrece, proponente);
-        TratoParseado recibido = parsearElemento(recibe, receptor);
+        TratoParseado ofrecido = AuxElemento(ofrece, proponente);
+        TratoParseado recibido = AuxElemento(recibe, receptor);
 
         // Crear el trato
         crearTrato(proponente, receptor, ofrecido, recibido);
@@ -1785,7 +1783,7 @@ public class Juego implements Comando { // la clase menu
         float dinero;
     }
 
-    private TratoParseado parsearElemento(String elemento, Jugador duenho) throws excepcionMonopoly {
+    private TratoParseado AuxElemento(String elemento, Jugador duenho) throws excepcionMonopoly {
         TratoParseado resultado = new TratoParseado();
 
         // Si contiene "y", tiene propiedad Y dinero o otra propiedad
