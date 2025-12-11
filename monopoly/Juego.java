@@ -245,7 +245,7 @@ public class Juego implements Comando { // la clase menu
 
         } catch (excepNoExisteObjeto e) {
             consola.imprimir(e.getMessage());
-            consola.imprimir("💡 Sugerencia: Usa 'ver tablero' o 'listar enventa' para ver las opciones");
+            consola.imprimir("No valido");
 
         } catch (excepComandoInvalido e) {
             consola.imprimir(e.getMessage());
@@ -297,7 +297,7 @@ public class Juego implements Comando { // la clase menu
             validarPartida();
             return;
         }
-        consola.imprimir("EstÃ¡s en modo configuraciÃ³n. Comandos:");
+        consola.imprimir("Estas en modo configuración. Comandos:");
         menuSetUp();
     }
 
@@ -415,6 +415,33 @@ public class Juego implements Comando { // la clase menu
 
     private boolean procesarComandoConParametros(String comandoMinusculas, String comandoOriginal) throws excepcionMonopoly {
         String[] palabras = comandoMinusculas.split("\\s+");
+
+
+        // "aceptar trato <id>" o "aceptar <id>"
+        if (palabras.length >= 2 && palabras[0].equals("aceptar")) {
+            String idTrato;
+            if (palabras.length == 2) {
+                idTrato = palabras[1];
+            } else {
+                return false;
+            }
+            aceptarTrato(idTrato);
+            return true;
+        }
+
+
+        if (palabras.length >= 2 && palabras[0].equals("eliminar")) {
+            String idTrato;
+            if (palabras.length == 2) {
+                // Formato: "eliminar trato1" o "eliminar trato-1"
+                idTrato = palabras[1];
+            } else {
+                return false;
+            }
+            eliminarTrato(idTrato);
+            return true;
+        }
+
 
         // "comprar <propiedad>"
         if (palabras.length == 2 && palabras[0].equals("comprar")) {
@@ -585,7 +612,7 @@ public class Juego implements Comando { // la clase menu
                 consola.imprimir("nombre: " + j.getNombre() + ",");
                 consola.imprimir("avatar: " + j.getAvatar().getId() + ",");
                 consola.imprimir("fortuna: " + (long) j.getFortuna() + ",");
-                consola.imprimir("Cartas para salir de la cÃ¡rcel: " + j.getCartasSalirCarcel());
+
 
                 if (j.getPropiedades().isEmpty()) {
                     consola.imprimir("propiedades: -,");
@@ -751,7 +778,7 @@ public class Juego implements Comando { // la clase menu
 
         int total = d1 + d2;
         tablero.setUltimaTirada(total);
-        consola.imprimir("Has forzado " + d1 + " y " + d2 + " â†’ total: " + total);
+        consola.imprimir("Has forzado " + d1 + " y " + d2 + " el total: " + total);
 
         // GestiÃ³n de dobles
         if (d1 == d2) {
@@ -1178,11 +1205,13 @@ public class Juego implements Comando { // la clase menu
         consola.imprimir("  - 'estadisticas <jugador>'");
         consola.imprimir("  - 'estadisticas juego'");
         consola.imprimir("  - 'salir carcel'");
-        consola.imprimir("  - 'estadistas juego'");
         consola.imprimir("  - 'listar edificios'");
-        consola.imprimir("  - 'trato <jugador>: cambiar (<prop1>, <prop2>)'");
         consola.imprimir("  - 'listar edificios <grupo>'");
         consola.imprimir("  - 'edificar <tipo>'");
+        consola.imprimir("  - 'trato <jugador>: cambiar (<prop1>, <prop2>)'");
+        consola.imprimir("  - 'tratos' / 'listar tratos'");
+        consola.imprimir("  - 'aceptar trato <id>'");         // NUEVO
+        consola.imprimir("  - 'eliminar trato <id>'");        // NUEVO
         consola.imprimir("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
         consola.imprimir("  - 'salir' (cerrar el juego)");
     }
@@ -1848,7 +1877,7 @@ public class Juego implements Comando { // la clase menu
         }
 
         // Crear el trato
-        String id = "trato-" + (++contadorTratos);
+        String id = "trato" + (++contadorTratos);
         Trato trato = new Trato(id, proponente, receptor,
                 ofrecido.propiedad, recibido.propiedad,
                 ofrecido.dinero, recibido.dinero);
@@ -1860,7 +1889,7 @@ public class Juego implements Comando { // la clase menu
         // Mostrar mensaje
         consola.imprimir(trato.toString());
         consola.imprimir("Trato propuesto con ID: " + id);
-        consola.imprimir(receptor.getNombre() + " puede aceptarlo con: aceptar trato " + id);
+        consola.imprimir(receptor.getNombre() + " puede aceptarlo con: aceptar " + id);
     }
 
     private Jugador buscarJugador(String nombre) {
@@ -1966,12 +1995,12 @@ public class Juego implements Comando { // la clase menu
         consola.imprimir(mensaje.toString());
     }
 
-    public void eliminarTrato (String IDtrato) throws excepcionMonopoly {
+    public void eliminarTrato(String IDtrato) throws excepcionMonopoly {
         Jugador jugadorActual = jugadores.get(turno);
         Trato trato = null;
         boolean esProponente = false;
 
-        // comprobamos si el trato que queremos eliminar fue propuesto por el jugador actual
+        // Verificar si el jugador actual es el PROPONENTE del trato
         for (Trato t : jugadorActual.getTratosPropuestos()) {
             if (t.getId().equals(IDtrato)) {
                 trato = t;
@@ -1980,16 +2009,36 @@ public class Juego implements Comando { // la clase menu
             }
         }
 
-        // si no lo encontramos en ninguna lista es porque no existe
-        if (trato == null) throw new excepNoExisteObjeto("trato", IDtrato);
+        // Si no lo encontró como proponente, verificar si lo recibió
+        if (trato == null) {
+            for (Trato t : jugadorActual.getTratosRecibidos()) {
+                if (t.getId().equals(IDtrato)) {
+                    trato = t;
+                    esProponente = false;
+                    break;
+                }
+            }
+        }
 
+        // Si no existe el trato
+        if (trato == null) {
+            throw new excepNoExisteObjeto("trato", IDtrato);
+        }
+
+        // Solo el PROPONENTE puede eliminar el trato
+        if (!esProponente) {
+            throw new excepTransaccion("solo el proponente (" + trato.getProponente().getNombre() +
+                    ") puede eliminar este trato");
+        }
+
+        // Eliminar el trato de ambas listas
         Jugador proponente = trato.getProponente();
         Jugador receptor = trato.getReceptor();
 
         proponente.eliminarTratoPropuesto(trato);
         receptor.eliminarTratoRecibido(trato);
 
-        consola.imprimir("Se ha eliminado el " + IDtrato );
+        consola.imprimir("Se ha eliminado el " + IDtrato);
     }
 
 
