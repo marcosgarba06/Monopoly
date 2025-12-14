@@ -29,16 +29,16 @@ public class CartaSuerte extends Carta {
 
         switch (id) {
             case 1: // Avanza a Solar19
-                casillaDestino = tablero.encontrarCasilla("Sol19"); //buscamos la casilla Sol19 en el tablero
+                casillaDestino = tablero.encontrarCasilla("Solar19"); //buscamos la casilla Sol19 en el tablero
                 if (casillaDestino != null) { //si la casilla existe
-                    Juego.consola.imprimir("Avanzas a la casilla Sol19.");
+                    Juego.consola.imprimir("Avanzas a la casilla Solar19.");
                     casillaActual.eliminarAvatar(jugador.getAvatar()); //eliminamos el avatar de la casilla actual
                     jugador.getAvatar().setCasilla(casillaDestino); //asignamos la nueva casilla al avatar
                     jugador.getAvatar().setPosicion(casillaDestino.getPosicion()); //actualizamos la posicion del avatar
                     casillaDestino.anhadirAvatar(jugador.getAvatar()); //añadimos el avatar a la casilla destino
                     casillaDestino.evaluarCasilla(jugador, tablero); //evaluamos la casilla destino (compra o pago alquiler)
                 } else {
-                    Juego.consola.imprimir("Error: No se encontró la casilla Sol19.");
+                    Juego.consola.imprimir("Error: No se encontró la casilla Solar19.");
                 }
                 break;
 

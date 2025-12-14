@@ -7,7 +7,10 @@ import partida.*;
 import monopoly.Casillas.*;
 import monopoly.excepciones.*;
 import monopoly.Interfaces.Comando;
+import monopoly.Trato;
+import monopoly.Interfaces.Consola;
 import monopoly.Interfaces.ConsolaNormal;
+
 import monopoly.Edificios.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -21,7 +24,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Juego implements Comando { // la clase menu
-
     // Es buena práctica declarar la variable con el tipo de la interfaz (Consola)
     // e instanciarla con la implementación (ConsolaNormal).
     public static ConsolaNormal consola = new ConsolaNormal();
@@ -41,8 +43,8 @@ public class Juego implements Comando { // la clase menu
 
     private Dado dado1; //dado uno
     private Dado dado2; // dado dos
-    private int turno = 0; //índice del jugador actual
-    private boolean tirado = false; //uindica si un jugador a tirado o no en esa partida
+    private int turno = 0; //indice del jugador actual
+    private boolean tirado = false; //indica si un jugador a tirado o no en esa partida
     private int contadorDobles = 0; //hay o no dobles
     private boolean repetirTurno = false; // si repite o no tirada
     private boolean intentoSalirCarcel = false; // si intento salir de la carcel en ese turno
@@ -243,7 +245,7 @@ public class Juego implements Comando { // la clase menu
 
         } catch (excepNoExisteObjeto e) {
             consola.imprimir(e.getMessage());
-            consola.imprimir("No valido");
+            consola.imprimir("Sugerencia: Usa 'ver tablero' o un comando que te sirva para ver la situación actual");
 
         } catch (excepComandoInvalido e) {
             consola.imprimir(e.getMessage());
@@ -295,7 +297,7 @@ public class Juego implements Comando { // la clase menu
             validarPartida();
             return;
         }
-        consola.imprimir("Estas en modo configuración. Comandos:");
+        consola.imprimir("Estás en modo configuración. Comandos:");
         menuSetUp();
     }
 
@@ -306,15 +308,15 @@ public class Juego implements Comando { // la clase menu
         );
 
 //        ^(tirar|lanzar)         // El comando debe empezar por "tirar" o "lanzar"
-//        \\s+                    // Uno o mÃ¡s espacios
+//        \\s+                    // Uno o más espacios
 //        dados                   // Literal "dados"
 //        (?:                     // Inicio de grupo opcional (no captura)
-//        \\s+                 // Uno o mÃ¡s espacios
-//        (\\d)                // Primer nÃºmero (dado1), un solo dÃ­gito
+//        \\s+                 // Uno o más espacios
+//        (\\d)                // Primer número (dado1), un solo dígito
 //        \\s*\\+\\s* // El signo + con espacios opcionales
-//        (\\d)                // Segundo nÃºmero (dado2), un solo dÃ­gito
+//        (\\d)                // Segundo número (dado2), un solo dígito
 //        )?                      // Fin del grupo opcional
-//        $                       // Fin de la lÃ­nea
+//        $                       // Fin de la línea
 //
 
         Matcher coincidencia = patronDados.matcher(comandoOriginal);
@@ -414,33 +416,6 @@ public class Juego implements Comando { // la clase menu
     private boolean procesarComandoConParametros(String comandoMinusculas, String comandoOriginal) throws excepcionMonopoly {
         String[] palabras = comandoMinusculas.split("\\s+");
 
-
-        // "aceptar trato <id>" o "aceptar <id>"
-        if (palabras.length >= 2 && palabras[0].equals("aceptar")) {
-            String idTrato;
-            if (palabras.length == 2) {
-                idTrato = palabras[1];
-            } else {
-                return false;
-            }
-            aceptarTrato(idTrato);
-            return true;
-        }
-
-
-        if (palabras.length >= 2 && palabras[0].equals("eliminar")) {
-            String idTrato;
-            if (palabras.length == 2) {
-                // Formato: "eliminar trato1" o "eliminar trato-1"
-                idTrato = palabras[1];
-            } else {
-                return false;
-            }
-            eliminarTrato(idTrato);
-            return true;
-        }
-
-
         // "comprar <propiedad>"
         if (palabras.length == 2 && palabras[0].equals("comprar")) {
             comprarCasilla(palabras[1]);
@@ -538,6 +513,18 @@ public class Juego implements Comando { // la clase menu
             hipotecarPropiedad(nombreCasilla);
             return true;
         }
+
+        if(palabras.length == 2 && palabras[0].equals("aceptar")){
+            String nombreTrato = palabras[1];
+            aceptarTrato(nombreTrato);
+            return true;
+        }
+
+        if(palabras.length == 2 && palabras[0].equals("eliminar")){
+            String nombreTrato = palabras[1];
+            eliminarTrato(nombreTrato);
+            return true;
+        }
         return false;
     }
 
@@ -575,11 +562,11 @@ public class Juego implements Comando { // la clase menu
             String linea;
             int numLinea = 0;
 
-            // Leer lÃ­nea a lÃ­nea hasta que no haya mÃ¡s
+            // Leer línea a línea hasta que no haya más
             while ((linea = br.readLine()) != null) {
                 numLinea++;
                 String comando = linea.strip(); //Elimina los espacios al final
-                if (comando.isEmpty()) continue; // Ignora lÃ­neas vacÃ­as
+                if (comando.isEmpty()) continue; // Ignora líneas vacías
 
                 if (juegoIniciado && !jugadores.isEmpty()) {
                     Jugador actual = jugadores.get(turno);
@@ -610,7 +597,7 @@ public class Juego implements Comando { // la clase menu
                 consola.imprimir("nombre: " + j.getNombre() + ",");
                 consola.imprimir("avatar: " + j.getAvatar().getId() + ",");
                 consola.imprimir("fortuna: " + (long) j.getFortuna() + ",");
-
+                consola.imprimir("Cartas para salir de la cÃ¡rcel: " + j.getCartasSalirCarcel());
 
                 if (j.getPropiedades().isEmpty()) {
                     consola.imprimir("propiedades: -,");
@@ -696,12 +683,12 @@ public class Juego implements Comando { // la clase menu
         Jugador actual = jugadores.get(turno);
         Avatar av = actual.getAvatar();
 
-        // *** CAMBIO CLAVE: Si estÃ¡ en carcel, NO mostrar menu aqui ***
+        // *** CAMBIO CLAVE: Si está en carcel, NO mostrar menu aqui ***
         if (actual.isEnCarcel() || av.estaEnCarcel()) {
             throw new excepEstJugEnCarcel("tirar dados", actual.getNombre());
         }
 
-        // Tirada normal (fuera de cÃ¡rcel)
+        // Tirada normal (fuera de cárcel)
         int d1 = dado1.hacerTirada();
         int d2 = dado2.hacerTirada();
         int total = d1 + d2;
@@ -764,7 +751,7 @@ public class Juego implements Comando { // la clase menu
         Jugador actual = jugadores.get(turno);
         Avatar av = actual.getAvatar();
 
-        // *** CAMBIO: No mostrar menÃº automÃ¡ticamente ***
+        // *** CAMBIO: No mostrar menú automáticamente ***
         if (actual.isEnCarcel() || av.estaEnCarcel()) {
             consola.imprimir("Estas en la Carcel. Usa el comando 'salir carcel'.");
             return; // return 0 -> return
@@ -776,9 +763,9 @@ public class Juego implements Comando { // la clase menu
 
         int total = d1 + d2;
         tablero.setUltimaTirada(total);
-        consola.imprimir("Has forzado " + d1 + " y " + d2 + " el total: " + total);
+        consola.imprimir("Has forzado " + d1 + " y " + d2 + " â†’ total: " + total);
 
-        // GestiÃ³n de dobles
+        // Gestión de dobles
         if (d1 == d2) {
             contadorDobles++;
             consola.imprimir("¡Dados dobles! (" + contadorDobles + " seguidos)");
@@ -855,7 +842,7 @@ public class Juego implements Comando { // la clase menu
             av.setEnCarcel(false);
             jugador.setEnCarcel(false);
             av.setTurnosEnCarcel(0);
-            consola.imprimir("Has pagado 500.000â‚¬ y sales de la Carcel.");
+            consola.imprimir("Has pagado 500.000‚¬ y sales de la Carcel.");
 
             // Tirar dados y moverse
             int d1 = dado1.hacerTirada();
@@ -896,12 +883,12 @@ public class Juego implements Comando { // la clase menu
                 consola.imprimir("Has pagado 500.000‚ y sales de la carcel.");
                 consola.imprimir("Tira los dados.");
 
-                tirado = false; // asÃ­ puede tirar los dados
+                tirado = false; // así puede tirar los dados
                 intentoSalirCarcel = true;
                 break;
             }
 
-            // OPCIONN 2: CARTA
+            // OPCIÓN 2: CARTA
             else if (opcion.equals("2")) {
                 if (!jugador.usarCartaSalirCarcel()) {
                     consola.imprimir("No tienes ninguna carta. Elige otra opcion.");
@@ -919,7 +906,7 @@ public class Juego implements Comando { // la clase menu
                 break;
             }
 
-            // OPCIÃ“N 3: INTENTAR DOBLES
+            // OPCIÓN 3: INTENTAR DOBLES
             else if (opcion.equals("3")) {
                 int d1 = dado1.hacerTirada();
                 int d2 = dado2.hacerTirada();
@@ -945,7 +932,7 @@ public class Juego implements Comando { // la clase menu
                 intentoSalirCarcel = true;
                 break;
             } else {
-                consola.imprimir("Opcion no valida. Elige 1, 2 o 3.");
+                consola.imprimir("Opción no válida. Elige 1, 2 o 3.");
             }
         }
     }
@@ -967,7 +954,7 @@ public class Juego implements Comando { // la clase menu
         consola.imprimir("avatar: " + actual.getAvatar().getId());
         consola.imprimir("}");
 
-        // *** SOLO INFORMAR si estÃ¡ en cÃ¡rcel ***
+        // *** SOLO INFORMAR si está en cárcel ***
         if (actual.isEnCarcel() || actual.getAvatar().estaEnCarcel()) {
             consola.imprimir("\n  Estas en la Carcel. Usa 'salir carcel' para intentar salir.");
         }
@@ -1008,8 +995,8 @@ public class Juego implements Comando { // la clase menu
 
 
 
-    // MÃ©todo que realiza las acciones asociadas al comando 'listar jugadores'.
-    // MÃ©todo que realiza las acciones asociadas al comando 'listar jugadores'.
+    // Método que realiza las acciones asociadas al comando 'listar jugadores'.
+    // Método que realiza las acciones asociadas al comando 'listar jugadores'.
     @Override
     public void listarJugadores() {
         if (jugadores == null || jugadores.isEmpty()) {
@@ -1160,7 +1147,7 @@ public class Juego implements Comando { // la clase menu
     }
 
 
-    // Determina si hay un Ãºnico jugador activo (no en bancarrota) y lo retorna como ganador.
+    // Determina si hay un único jugador activo (no en bancarrota) y lo retorna como ganador.
     private Jugador verificarGanador() {
         ArrayList<Jugador> activos = new ArrayList<>();
         for (Jugador j : jugadores) {
@@ -1175,11 +1162,11 @@ public class Juego implements Comando { // la clase menu
     public void verificarGanadorTrasBancarrota() {
         Jugador ganador = verificarGanador(); //en la funcion verificar ganador, si solo queda uno devuleve el nombre de ese jugador, si no null
         if (ganador != null) {
-            consola.imprimir("Â¡" + ganador.getNombre() + " ha ganado la partida!");
-            consola.imprimir("Fortuna final: " + (long) ganador.getFortuna() + "â‚¬");
+            consola.imprimir("¡" + ganador.getNombre() + " ha ganado la partida!");
+            consola.imprimir("Fortuna final: " + (long) ganador.getFortuna() );
             consola.imprimir("Propiedades: " + ganador.getPropiedades().size());
-            consola.imprimir("Gastos totales: " + (long) ganador.getGastos() + "â‚¬");
-            // AquÃ­ puedes terminar el juego o bloquear mÃ¡s comandos
+            consola.imprimir("Gastos totales: " + (long) ganador.getGastos() );
+            // Aquí puedes terminar el juego o bloquear más comandos
         }
     }
 
@@ -1203,13 +1190,14 @@ public class Juego implements Comando { // la clase menu
         consola.imprimir("  - 'estadisticas <jugador>'");
         consola.imprimir("  - 'estadisticas juego'");
         consola.imprimir("  - 'salir carcel'");
+        consola.imprimir("  - 'estadistas juego'");
         consola.imprimir("  - 'listar edificios'");
+        consola.imprimir("  - 'trato <jugador>: cambiar (<prop1>, <prop2>)'");
+        consola.imprimir("  - 'listar tratos' / 'tratos'");
+        consola.imprimir("  - 'aceptar <idTrato>'");
+        consola.imprimir("  - 'eliminar <idTratos>' -> El que lo propuso es el que lo elimina");
         consola.imprimir("  - 'listar edificios <grupo>'");
         consola.imprimir("  - 'edificar <tipo>'");
-        consola.imprimir("  - 'trato <jugador>: cambiar (<prop1>, <prop2>)'");
-        consola.imprimir("  - 'tratos' / 'listar tratos'");
-        consola.imprimir("  - 'aceptar trato <id>'");         // NUEVO
-        consola.imprimir("  - 'eliminar trato <id>'");        // NUEVO
         consola.imprimir("  - 'comandos <ruta/al/archivo.txt>' (ejecutar comandos desde archivo)");
         consola.imprimir("  - 'salir' (cerrar el juego)");
     }
@@ -1360,7 +1348,7 @@ public class Juego implements Comando { // la clase menu
 
 
     private String generarId(String tipo) {
-        //para generar el id lo que vamos a hacer es ponerle el numero que tiene de casas y hoteles el tablero, asi nos aseguramos que nunca se va a sepetir id
+        //para generar el id lo que vamos a hacer es ponerle el numero que tiene de casas y hoteles el tablero, asi nos aseguramos que nunca se va a repetir id
         switch (tipo.toLowerCase()) {
             case "casa":
                 return "casa-" + (++contadorCasas);
@@ -1626,7 +1614,7 @@ public class Juego implements Comando { // la clase menu
                 return;
             }
         }
-        consola.imprimir("No se encontrÃ³ ningÃºn jugador con el nombre '" + nombreJugador + "'.");
+        consola.imprimir("No se encontró ningún jugador con el nombre '" + nombreJugador + "'.");
     }
 
     @Override
@@ -1753,9 +1741,9 @@ public class Juego implements Comando { // la clase menu
         }
 
         // Parsear el contenido del trato, analizar y descomponer
-        AuxTrato(proponente, receptor, contenido);
+        parsearYCrearTrato(proponente, receptor, contenido);
     }
-    private void AuxTrato(Jugador proponente, Jugador receptor, String contenido)
+    private void parsearYCrearTrato(Jugador proponente, Jugador receptor, String contenido)
             throws excepcionMonopoly {
 
         // Dividir por coma
@@ -1770,8 +1758,8 @@ public class Juego implements Comando { // la clase menu
         String recibe = partes[1].trim(); // Lo que recibe el proponente (ofrece el receptor)
 
         // Parsear lo que ofrece y lo que recibe
-        TratoParseado ofrecido = AuxElemento(ofrece, proponente);
-        TratoParseado recibido = AuxElemento(recibe, receptor);
+        TratoParseado ofrecido = parsearElemento(ofrece, proponente);
+        TratoParseado recibido = parsearElemento(recibe, receptor);
 
         // Crear el trato
         crearTrato(proponente, receptor, ofrecido, recibido);
@@ -1783,7 +1771,7 @@ public class Juego implements Comando { // la clase menu
         float dinero;
     }
 
-    private TratoParseado AuxElemento(String elemento, Jugador duenho) throws excepcionMonopoly {
+    private TratoParseado parsearElemento(String elemento, Jugador duenho) throws excepcionMonopoly {
         TratoParseado resultado = new TratoParseado();
 
         // Si contiene "y", tiene propiedad Y dinero o otra propiedad
@@ -1993,12 +1981,12 @@ public class Juego implements Comando { // la clase menu
         consola.imprimir(mensaje.toString());
     }
 
-    public void eliminarTrato(String IDtrato) throws excepcionMonopoly {
+    public void eliminarTrato (String IDtrato) throws excepcionMonopoly {
         Jugador jugadorActual = jugadores.get(turno);
         Trato trato = null;
         boolean esProponente = false;
 
-        // Verificar si el jugador actual es el PROPONENTE del trato
+        // comprobamos si el trato que queremos eliminar fue propuesto por el jugador actual
         for (Trato t : jugadorActual.getTratosPropuestos()) {
             if (t.getId().equals(IDtrato)) {
                 trato = t;
@@ -2007,36 +1995,16 @@ public class Juego implements Comando { // la clase menu
             }
         }
 
-        // Si no lo encontró como proponente, verificar si lo recibió
-        if (trato == null) {
-            for (Trato t : jugadorActual.getTratosRecibidos()) {
-                if (t.getId().equals(IDtrato)) {
-                    trato = t;
-                    esProponente = false;
-                    break;
-                }
-            }
-        }
+        // si no lo encontramos en ninguna lista es porque no existe
+        if (trato == null) throw new excepNoExisteObjeto("trato", IDtrato);
 
-        // Si no existe el trato
-        if (trato == null) {
-            throw new excepNoExisteObjeto("trato", IDtrato);
-        }
-
-        // Solo el PROPONENTE puede eliminar el trato
-        if (!esProponente) {
-            throw new excepTransaccion("solo el proponente (" + trato.getProponente().getNombre() +
-                    ") puede eliminar este trato");
-        }
-
-        // Eliminar el trato de ambas listas
         Jugador proponente = trato.getProponente();
         Jugador receptor = trato.getReceptor();
 
         proponente.eliminarTratoPropuesto(trato);
         receptor.eliminarTratoRecibido(trato);
 
-        consola.imprimir("Se ha eliminado el " + IDtrato);
+        consola.imprimir("Se ha eliminado el " + IDtrato );
     }
 
 

@@ -1,0 +1,43 @@
+crear jugador Pedro pelota
+crear jugador Maria coche
+empezar
+lanzar dados 6+6
+lanzar dados 6+6
+lanzar dados 5+6
+acabar turno
+lanzar dados 4+2
+comprar Solar2
+comprar Solar3
+acabar turno
+lanzar dados 1+1
+comprar Solar21
+edificar casa
+lanzar dados 1+1
+comprar Solar22
+edificar hotel
+edificar casa
+edificar casa
+acabar turno
+describir jugador Pedro
+describir jugador Maria
+lanzar dados 6+5
+acabar turno
+describir jugador Maria
+lanzar dados 2+4
+trato Maria: cambiar (16000000, Solar3)
+trato Maria: cambiar (Solar1, 1000)
+trato Maria: cambiar (100000, Solar3)
+acabar turno
+lanzar dados 1+3
+comprar Solar12
+aceptar trato1
+trato Pedro:  cambiar (Solar12, Solar3)
+eliminar trato2
+trato Pedro:  cambiar (Solar12, Solar3 y 100000)
+listar tratos
+acabar turno
+eliminar trato3
+aceptar trato1
+aceptar trato3
+describir jugador Pedro
+describir jugador Maria

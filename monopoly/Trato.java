@@ -52,7 +52,7 @@ public class Trato {
         // damos una cantidad de dinero de la persona que ofreció el trato a la persona que recibió el trato
         if (dineroOfrece > 0) {
             proponente.restarFortuna(dineroOfrece);
-            receptor.sumarFortuna(dineroRecibe);
+            receptor.sumarFortuna(dineroOfrece);
         }
 
         // damos una cantidad de dinero de la persona que recibió el trato a la persona que ofreció el trato
@@ -64,9 +64,9 @@ public class Trato {
 
     // comprobamos que los jugadores tienen las propiedades y/o dinero del trato propuesto
     public boolean esTratoValido() {
-        if (propiedadOfrece != null && propiedadRecibe.perteneceAJugador(proponente)) return false;
+        if (propiedadOfrece != null && !propiedadOfrece.perteneceAJugador(proponente)) return false;
 
-        if (dineroOfrece > 0 && proponente.getFortuna() < dineroRecibe) return false;
+        if (dineroOfrece > 0 && proponente.getFortuna() < dineroOfrece) return false;
 
         if (propiedadRecibe != null && !propiedadRecibe.perteneceAJugador(receptor)) return false;
 

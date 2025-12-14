@@ -39,4 +39,6 @@ public interface Comando {
     // TRATOS
     void proponerTrato(String nombreReceptor, String contenido) throws excepcionMonopoly; // Proponer trato
     void listarTratos(); //Metodo para listar los tratos
+    void aceptarTrato(String IDTrato) throws excepcionMonopoly; // método para aceptar los tratos
+    void eliminarTrato(String IDTrato) throws excepcionMonopoly;
 }

@@ -38,7 +38,7 @@ public class Hotel extends Edificacion {
         return true;
     }
 
-    // ✅ Construcción sin necesidad de pasar edificacionesGlobal
+    // Construcción sin necesidad de pasar edificacionesGlobal
     // La eliminación de casas la maneja Juego.java
     public void construir(Jugador jugador, Solar solar) {
         solar.construirHotel(jugador);

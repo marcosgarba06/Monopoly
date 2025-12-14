@@ -63,7 +63,7 @@ public class CartaCajaComunidad extends Carta {
                 break;
 
             case 5: // Retroceder a Solar1
-                casillaDestino = tablero.encontrarCasilla("Sol1");
+                casillaDestino = tablero.encontrarCasilla("Solar1");
                 if (casillaDestino != null) {
                     Juego.consola.imprimir("Retrocedes hasta Solar1 para comprar antigüedades exóticas.");
                     casillaActual.eliminarAvatar(jugador.getAvatar());
@@ -75,7 +75,7 @@ public class CartaCajaComunidad extends Carta {
                 break;
 
             case 6: // Ir a Solar20 (cobrando salida si corresponde)
-                casillaDestino = tablero.encontrarCasilla("Sol20");
+                casillaDestino = tablero.encontrarCasilla("Solar20");
                 if (casillaDestino != null) {
                     Juego.consola.imprimir("Vas a Solar20 para disfrutar del San Fermín.");
 
