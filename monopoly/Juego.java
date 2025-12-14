@@ -763,7 +763,7 @@ public class Juego implements Comando { // la clase menu
 
         int total = d1 + d2;
         tablero.setUltimaTirada(total);
-        consola.imprimir("Has forzado " + d1 + " y " + d2 + " â†’ total: " + total);
+        consola.imprimir("Has forzado " + d1 + " y " + d2 + " en total: " + total);
 
         // Gestión de dobles
         if (d1 == d2) {
@@ -821,7 +821,7 @@ public class Juego implements Comando { // la clase menu
         consola.imprimir("\n=== ESTAS EN LA CARCEL ===");
         consola.imprimir("Turno en Carcel: " + (turnosEnCarcel + 1) + "/3");
 
-        // *** CASO 1: Tercer turno â†’ PAGO OBLIGATORIO ***
+        // *** CASO 1: Tercer turno -> PAGO OBLIGATORIO ***
         if (turnosEnCarcel >= 2) {
             consola.imprimir("\n¡Has estado 3 turnos en la carcel!");
             consola.imprimir("Debes pagar 500.000‚ obligatoriamente y avanzar con tu tirada.");
@@ -913,7 +913,7 @@ public class Juego implements Comando { // la clase menu
                 consola.imprimir("Has sacado: " + d1 + " y " + d2);
 
                 if (d1 == d2) {
-                    // Â¡DOBLES! â†’ SALE Y SE MUEVE
+                    // ¡DOBLES! SALE Y SE MUEVE
                     av.setEnCarcel(false);
                     jugador.setEnCarcel(false);
                     av.setTurnosEnCarcel(0);
@@ -922,7 +922,7 @@ public class Juego implements Comando { // la clase menu
                     av.moverAvatar(total, tablero);
                     consola.imprimir(tablero.toString());
                 } else {
-                    // NO DOBLES â†’ Incrementa turno en cÃ¡rcel
+                    // NO DOBLES  Incrementa turno en cárcel
                     av.incrementarTurnosEnCarcel();
                     consola.imprimir("No son dobles. Pierdes el turno.");
                     consola.imprimir("Llevas " + av.getTurnosEnCarcel() + " turno(s) en la Carcel.");
